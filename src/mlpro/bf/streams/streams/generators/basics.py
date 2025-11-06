@@ -149,7 +149,10 @@ class StreamGenerator (Stream, EventManager):
 
 ## -------------------------------------------------------------------------------------------------
     def set_random_seed(self, p_seed=None):
-        self._rgen = np.random.default_rng( seed = p_seed )
+        if self._seed is None:
+            self._seed = p_seed
+
+        self._rgen = np.random.default_rng( seed = self._seed )
         
 
 ## -------------------------------------------------------------------------------------------------
