@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [![CI](https://github.com/blueaic/mlpro/actions/workflows/ci.yml/badge.svg)](https://github.com/blueaic/mlpro/actions/workflows/ci.yml)
 [![Documentation Status](https://readthedocs.org/projects/mlpro/badge/?version=latest)](https://mlpro.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/mlpro.svg)](https://badge.fury.io/py/mlpro)
@@ -47,3 +48,21 @@ The original repository, containing the project history up to MLPro 2.1.0, is pr
 
 [fhswf/MLPro](https://github.com/fhswf/MLPro)
 
+=======
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6653484.svg)](https://doi.org/10.5281/zenodo.6653484)
+
+---
+
+### 🧩 Project Status Notice
+
+This repository represents the original **MLPro** framework, developed at **FH Südwestfalen** as an open research initiative for modular and transparent machine learning.  
+Active development in this repository has ended and is now being **professionally continued by [blueAIC](https://github.com/blueAIC)**.
+
+Under blueAIC, MLPro evolves into a sustainable and professionally maintained platform that continues to support open research while offering **commercial extensions and related services** for advanced machine learning applications.  
+The framework remains **free and open source under the Apache 2.0 license**, ensuring unrestricted use in both academic and industrial contexts.
+
+Researchers and developers interested in the latest developments, integrations, and publications are kindly invited to follow:  
+👉 **[blueAIC/MLPro](https://github.com/blueAIC/MLPro)**
+
+---
+>>>>>>> 933ef905b (Revise README for project status and new maintainer)
