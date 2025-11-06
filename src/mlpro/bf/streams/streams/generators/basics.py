@@ -6,10 +6,11 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-21  1.0.0     DA       Creation 
+## -- 2025-11-06  1.0.1     DA       Bugfix in StreamGenerator.__next__()
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-09-21)
+Ver. 1.0.1 (2025-11-06)
 
 This module provides template classes for single and multi-stream data generation in a d-dimensional 
 feature space.
@@ -183,7 +184,7 @@ class StreamGenerator (Stream, EventManager):
 
         raise_outlier = False
 
-        if self._outlier_appearance and np.random.rand() < self._outlier_rate:
+        if self._outlier_appearance and self._rgen.random() < self._outlier_rate:
             # 1 Generate outlier instance
             outlier_data        = Element( p_set = self.get_feature_space() )
             outlier_values      = self._gen_rnd_array( self.C_BOUNDARIES[0], self.C_BOUNDARIES[1], self._num_dim )
