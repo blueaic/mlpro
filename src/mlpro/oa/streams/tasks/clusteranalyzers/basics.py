@@ -184,8 +184,6 @@ class ClusterInfrastructure (ClusterActions):    # EventManager, Plottable,
         are handed over to each new cluster.
     """
 
-    C_TYPE                          = 'Cluster Compound'
-
     # List of cluster properties supported/maintained by the algorithm
     C_CLUSTER_PROPERTIES : PropertyDefinitions = []
 
@@ -196,9 +194,7 @@ class ClusterInfrastructure (ClusterActions):    # EventManager, Plottable,
     def __init__( self, 
                   p_cls_cluster : type = Cluster,
                   p_cluster_limit : int = 0,
-                  p_thrs_cluster_influence : float = None,
-                  p_visualize: bool = False, 
-                  p_logging = Log.C_LOG_WE ):
+                  p_thrs_cluster_influence : float = None ):
 
         ClusterActions.__init__( self )
 
@@ -546,11 +542,11 @@ class ClusterAnalyzer (OAStreamTask, ClusterInfrastructure):
                                **p_kwargs )
 
         ClusterInfrastructure.__init__( self, 
-                                  p_cls_cluster = p_cls_cluster,
-                                  p_cluster_limit = p_cluster_limit,
-                                  p_thrs_cluster_influence = p_thrs_cluster_influence,
-                                  p_visualize = p_visualize,
-                                  p_logging = p_logging )
+                                        p_cls_cluster = p_cls_cluster,
+                                        p_cluster_limit = p_cluster_limit,
+                                        p_thrs_cluster_influence = p_thrs_cluster_influence,
+                                        p_visualize = p_visualize,
+                                        p_logging = p_logging )
 
 
 ## -------------------------------------------------------------------------------------------------
