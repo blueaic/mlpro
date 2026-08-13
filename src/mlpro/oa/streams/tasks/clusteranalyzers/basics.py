@@ -44,7 +44,7 @@
 ## --                                - renamed the _get_next_cell_id() method to _get_next_cluster_id()
 ## -- 2025-04-24  1.5.0     DA       Added method _get_clusters() since needed for wrappers(!!)
 ## -- 2025-04-27  1.5.1     DA       Class ClusterAnalyzer: changed internal access to clusters to 
-## --                                self._clusters 
+## --                                self.clusters 
 ## -- 2025-06-06  1.6.0     DA       Refactoring: p_inst -> p_instances
 ## -- 2025-08-20  1.7.0     DA       Method ClusterAnalyzer._get_cluster_relations: 
 ## --                                new parameter p_relative_values
@@ -105,7 +105,7 @@ class ClusterActions (ABC):
 
 ## -------------------------------------------------------------------------------------------------
     def __init__( self ):
-        self._clusters = {}
+        self.clusters = {}
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -144,21 +144,12 @@ class ClusterActions (ABC):
                                 p_scope : int = C_RESULT_SCOPE_MAX ) -> List[ResultItem]: ...
 
 
-## -------------------------------------------------------------------------------------------------
-    def _get_clusters(self):
-        return self._clusters
-
-
-## -------------------------------------------------------------------------------------------------
-    clusters = property( fget = _get_clusters )
-
-
 
 
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class ClusterInfrastructure (EventManager, Plottable, ClusterActions):
+class ClusterInfrastructure (ClusterActions):    # EventManager, Plottable, 
     """
     Base class for online cluster analysis. It raises an event when a cluster was added or removed.
 
@@ -195,12 +186,6 @@ class ClusterInfrastructure (EventManager, Plottable, ClusterActions):
 
     C_TYPE                          = 'Cluster Compound'
 
-    C_EVENT_CLUSTER_ADDED           = 'CLUSTER_ADDED'
-    C_EVENT_CLUSTER_REMOVED         = 'CLUSTER_REMOVED'
-
-    C_PLOT_ACTIVE                   = True
-    C_PLOT_STANDALONE               = False
-
     # List of cluster properties supported/maintained by the algorithm
     C_CLUSTER_PROPERTIES : PropertyDefinitions = []
 
@@ -215,8 +200,6 @@ class ClusterInfrastructure (EventManager, Plottable, ClusterActions):
                   p_visualize: bool = False, 
                   p_logging = Log.C_LOG_WE ):
 
-        EventManager.__init__( self, p_logging = p_logging )
-        Plottable.__init__( self, p_visualize = p_visualize )
         ClusterActions.__init__( self )
 
         self._next_cluster_id : ClusterId = -1
@@ -272,7 +255,7 @@ class ClusterInfrastructure (EventManager, Plottable, ClusterActions):
            True, if adding a new cluster allowed. False otherwise.
         """
 
-        return ( self._cluster_limit == 0 ) or ( len(self._clusters.keys()) < self._cluster_limit )
+        return ( self._cluster_limit == 0 ) or ( len(self.clusters.keys()) < self._cluster_limit )
     
 
 ## -------------------------------------------------------------------------------------------------
@@ -298,14 +281,14 @@ class ClusterInfrastructure (EventManager, Plottable, ClusterActions):
             Cluster object to be added.
         """
 
-        self._clusters[p_cluster.id] = p_cluster
+        self.clusters[p_cluster.id] = p_cluster
 
         if self.get_visualization(): 
             p_cluster.init_plot( p_figure=self._figure, p_plot_settings=self.get_plot_settings() )
 
-        self._raise_event( p_event_id = self.C_EVENT_CLUSTER_ADDED, 
-                           p_event_object = MLProEvent( p_raising_object = self,
-                                                        p_cluster = p_cluster ) )
+        # self._raise_event( p_event_id = self.C_EVENT_CLUSTER_ADDED, 
+        #                    p_event_object = MLProEvent( p_raising_object = self,
+        #                                                 p_cluster = p_cluster ) )
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -320,11 +303,11 @@ class ClusterInfrastructure (EventManager, Plottable, ClusterActions):
         """
 
         p_cluster.remove_plot(p_refresh=True)
-        del self._clusters[p_cluster.id]
+        del self.clusters[p_cluster.id]
 
-        self._raise_event( p_event_id = self.C_EVENT_CLUSTER_REMOVED, 
-                           p_event_object = MLProEvent( p_raising_object = self,
-                                                        p_cluster = p_cluster ) )
+        # self._raise_event( p_event_id = self.C_EVENT_CLUSTER_REMOVED, 
+        #                    p_event_object = MLProEvent( p_raising_object = self,
+        #                                                 p_cluster = p_cluster ) )
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -364,7 +347,7 @@ class ClusterInfrastructure (EventManager, Plottable, ClusterActions):
         list_results_rel    = []
         cluster_max_results = None
 
-        for cluster in self._clusters.values():
+        for cluster in self.clusters.values():
 
             if p_relation_type == 0:
                 result_abs  = cluster.get_membership( p_instance = p_instance )
@@ -423,7 +406,7 @@ class ClusterInfrastructure (EventManager, Plottable, ClusterActions):
 ## -------------------------------------------------------------------------------------------------
     def get_cluster_memberships( self, 
                                  p_instance : Instance,
-                                 p_scope : int = C_RESULT_SCOPE_MAX ) -> List[ResultItem]:
+                                 p_scope : int = ClusterActions.C_RESULT_SCOPE_MAX ) -> List[ResultItem]:
         """
         Method to determine the relative membership of the given instance to each cluster as a value 
         in [0,1]. 
@@ -454,7 +437,7 @@ class ClusterInfrastructure (EventManager, Plottable, ClusterActions):
 ## -------------------------------------------------------------------------------------------------
     def get_cluster_influences( self, 
                                 p_instance : Instance,
-                                p_scope : int = C_RESULT_SCOPE_MAX ) -> List[ResultItem]:
+                                p_scope : int = ClusterActions.C_RESULT_SCOPE_MAX ) -> List[ResultItem]:
         """
         Method to determine the relative influence of the given instance to each cluster as a value 
         in [0,1]. 
@@ -482,61 +465,6 @@ class ClusterInfrastructure (EventManager, Plottable, ClusterActions):
                                             p_scope = p_scope )
 
         
-## -------------------------------------------------------------------------------------------------
-    def init_plot(self, p_figure: Figure = None, p_plot_settings: PlotSettings = None):
-
-        if not self.get_visualization(): return
-
-        super().init_plot( p_figure=p_figure, p_plot_settings=p_plot_settings)
-
-        for cluster in self._clusters.values():
-            cluster.init_plot(p_figure=p_figure, p_plot_settings = p_plot_settings)
-
-
-## -------------------------------------------------------------------------------------------------
-    def update_plot( self, 
-                     p_instances : InstDict = None, 
-                     **p_kwargs ):
-
-        if not self.get_visualization(): return
-
-        for cluster in self._clusters.values():
-            cluster.update_plot( p_instances = p_instances, **p_kwargs)
-
-
-## -------------------------------------------------------------------------------------------------
-    def remove_plot(self, p_refresh:bool = True):
-        """"
-        Removes the plot and optionally refreshes the display.
-
-        Parameters
-        ----------
-        p_refresh : bool = True
-            On True the display is refreshed after removal
-        """
-
-        if not self.get_visualization(): return
-
-        for cluster in self._clusters.values():
-            cluster.remove_plot( p_refresh = False)
-
-        
-## -------------------------------------------------------------------------------------------------
-    def _renormalize(self, p_normalizer: Normalizer):
-        """
-        Internal renormalization of all clusters. See method OATask.renormalize_on_event() for further
-        information.
-
-        Parameters
-        ----------
-        p_normalizer : Normalizer
-            Normalizer object to be applied on task-specific 
-        """
-
-        for cluster in self._clusters.values():
-            cluster.renormalize( p_normalizer=p_normalizer )
- 
-
 
 
 
@@ -589,6 +517,12 @@ class ClusterAnalyzer (OAStreamTask, ClusterInfrastructure):
 
     C_TYPE                          = 'Cluster Analyzer'
 
+    C_EVENT_CLUSTER_ADDED           = 'CLUSTER_ADDED'
+    C_EVENT_CLUSTER_REMOVED         = 'CLUSTER_REMOVED'
+
+    C_PLOT_ACTIVE                   = True
+    C_PLOT_STANDALONE               = False
+
 ## -------------------------------------------------------------------------------------------------
     def __init__( self, 
                   p_name: str = None, 
@@ -622,3 +556,59 @@ class ClusterAnalyzer (OAStreamTask, ClusterInfrastructure):
 ## -------------------------------------------------------------------------------------------------
     def _run(self, p_instances : InstDict):
         self.adapt( p_instances = p_instances )
+
+
+## -------------------------------------------------------------------------------------------------
+    def init_plot(self, p_figure: Figure = None, p_plot_settings: PlotSettings = None):
+
+        if not self.get_visualization(): return
+
+        super().init_plot( p_figure=p_figure, p_plot_settings=p_plot_settings)
+
+        for cluster in self.clusters.values():
+            cluster.init_plot(p_figure=p_figure, p_plot_settings = p_plot_settings)
+
+
+## -------------------------------------------------------------------------------------------------
+    def update_plot( self, 
+                     p_instances : InstDict = None, 
+                     **p_kwargs ):
+
+        if not self.get_visualization(): return
+
+        for cluster in self.clusters.values():
+            cluster.update_plot( p_instances = p_instances, **p_kwargs)
+
+
+## -------------------------------------------------------------------------------------------------
+    def remove_plot(self, p_refresh:bool = True):
+        """"
+        Removes the plot and optionally refreshes the display.
+
+        Parameters
+        ----------
+        p_refresh : bool = True
+            On True the display is refreshed after removal
+        """
+
+        if not self.get_visualization(): return
+
+        for cluster in self.clusters.values():
+            cluster.remove_plot( p_refresh = False)
+
+        
+## -------------------------------------------------------------------------------------------------
+    def _renormalize(self, p_normalizer: Normalizer):
+        """
+        Internal renormalization of all clusters. See method OATask.renormalize_on_event() for further
+        information.
+
+        Parameters
+        ----------
+        p_normalizer : Normalizer
+            Normalizer object to be applied on task-specific 
+        """
+
+        for cluster in self.clusters.values():
+            cluster.renormalize( p_normalizer=p_normalizer )
+
