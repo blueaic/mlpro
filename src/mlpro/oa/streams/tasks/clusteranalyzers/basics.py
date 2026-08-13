@@ -537,16 +537,14 @@ class ClusterAnalyzer (OAStreamTask, ClusterInfrastructure):
                                p_range_max = p_range_max, 
                                p_ada = p_ada, 
                                p_duplicate_data = p_duplicate_data, 
-                               p_visualize = False, 
-                               p_logging = Log.C_LOG_NOTHING, 
+                               p_visualize = p_visualize, 
+                               p_logging = p_logging, 
                                **p_kwargs )
 
         ClusterInfrastructure.__init__( self, 
                                         p_cls_cluster = p_cls_cluster,
                                         p_cluster_limit = p_cluster_limit,
-                                        p_thrs_cluster_influence = p_thrs_cluster_influence,
-                                        p_visualize = p_visualize,
-                                        p_logging = p_logging )
+                                        p_thrs_cluster_influence = p_thrs_cluster_influence )
 
 
 ## -------------------------------------------------------------------------------------------------
