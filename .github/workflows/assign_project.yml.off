@@ -14,17 +14,13 @@ on:
     types:
       - opened
 
-
 jobs:
   add-to-project:
     name: Assign project MLPro to new issue
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/add-to-project@v0.5.0
+      - uses: actions/add-to-project@v2
         with:
-          # You can target a project in a different organization
-          # to the issue
-          project-url: https://github.com/orgs/fhswf/projects/11
+          project-url: https://github.com/orgs/blueaic/projects/XX
           github-token: ${{ secrets.ISSUE_UPDATES }}
-          # labeled: bug, needs-triage
-          # label-operator: OR

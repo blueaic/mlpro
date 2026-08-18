@@ -4,13 +4,14 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
-## -- 2023-10     1.0.0     DA       Creation 
+## -- 2023-10     1.0.0     DA       Creation
 ## -- 2024-10-09  2.0.0     DA       Restructuring and introduction of PR-based processing
 ## -- 2024-10-16  2.1.0     DA       Step 3: creation of virtual environment due to new security
 ## --                                restrictions in Python 3.12
 ## -- 2024-12-05  2.2.0     DA       Changed name of tmp. branch to 'extension_hub_tmp'
 ## -- 2024-12-10  2.3.0     DA       Update actions/checkout to v4
 ## -- 2025-05-07  2.4.0     DA       Stabilized step 2
+## -- 2026-08-18  2.5.0     DA       Migration to blueAIC, updated GitHub Actions and reduced PAT usage
 ## -------------------------------------------------------------------------------------------------
 
 name: Update Extension Hub
@@ -21,6 +22,11 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
 jobs:
   update-extension-hub:
     name: Update the MLPro extension hub
@@ -29,9 +35,9 @@ jobs:
     steps:
       - name: Step 1 - Checkout code
         id: step1
-        uses: actions/checkout@v4
-        
-      - name: Step 2 - Preparation 
+        uses: actions/checkout@v7
+
+      - name: Step 2 - Preparation
         id: step2
         run: |
           git config user.name "github-actions[bot]"
@@ -48,8 +54,11 @@ jobs:
         run: |
           python3 -m venv venv
           source venv/bin/activate
-          pip3 install PyGithub
-          python3 ${GITHUB_WORKSPACE}/extensions/update_extension_hub.py ${{ secrets.EXTENSION_HUB_UPDATES }} ../doc/rtd/content/04_extensions/sub/
+          python -m pip install --upgrade pip
+          python -m pip install PyGithub
+          python ${GITHUB_WORKSPACE}/extensions/update_extension_hub.py \
+            ${{ github.token }} \
+            ../doc/rtd/content/04_extensions/sub/
 
       - name: Step 4 - Commit changes
         id: step4
@@ -67,20 +76,24 @@ jobs:
         id: step6
         if: ${{ steps.step5.outcome == 'success' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.EXTENSION_HUB_UPDATES }}
-        run: gh pr create --title "Update Extension Hub" --body "This PR was created automatically." --head extension_hub_tmp --base main
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --title "Update Extension Hub" \
+            --body "This PR was created automatically." \
+            --head extension_hub_tmp \
+            --base main
 
       - name: Step 7 - Auto-Review Pull Request
         id: step7
         if: ${{ steps.step6.outcome == 'success' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.EXTENSION_HUB_REVIEW_DA }}
+          GH_TOKEN: ${{ secrets.EXTENSION_HUB_REVIEW_DA }}
         run: gh pr review --approve extension_hub_tmp
-          
+
       - name: Step 8 - Merge Pull Request
         id: step8
         if: ${{ steps.step7.outcome == 'success' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.EXTENSION_HUB_UPDATES }}
+          GH_TOKEN: ${{ github.token }}
         run: gh pr merge --auto --delete-branch --merge
-        

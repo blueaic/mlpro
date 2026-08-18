@@ -23,10 +23,11 @@
 ## -- 2024-10-08  1.2.0     DA       Removed dependency from MLPro to avoid installations from PyPI
 ## -- 2024-12-05  1.3.0     DA       Method ExtensionHub._create_issue(): optimization and linking
 ## --                                to GitHub team 'mlpro-admin'
+## -- 2026-08-18  2.0.0     DA       Migration to bluaic
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.3.0 (2024-12-05)
+Ver. 2.0.0 (2026-08-18)
 
 This standalone module collects meta data of all public GitHub repositories that are labelled as
 MLPro extensions (repo topic "mlpro-extension). It updates the RTD subsection "Extension Hub"
@@ -335,7 +336,7 @@ class ExtensionHub (Log):
         if self._extension_issues is None:
             self.log(Log.C_LOG_TYPE_I, 'Creating new issue...')
 
-            self._mlpro = self.gh.get_repo('fhswf/MLPro')
+            self._mlpro = self.gh.get_repo('blueaic/mlpro')
 
             # 1.1 Searching for open issues for pending extensions
             issues = self._mlpro.get_issues( state='open', labels=['pending-extension'] )
@@ -349,13 +350,13 @@ class ExtensionHub (Log):
             mlpro_admins  = []
 
             for team in self._mlpro.get_teams():
-                if ( team.slug == 'mlpro_admin' ) and ( team.organization.login == 'fhswf' ):
+                if ( team.slug == 'mlpro_admin' ) and ( team.organization.login == 'blueaic' ):
                     for mlpro_admin in team.get_members():
                         mlpro_admins.append(mlpro_admin.login)
                         self.log(Log.C_LOG_TYPE_I, 'MLPro admin found:', mlpro_admin.login)
 
             if len( mlpro_admins ) == 0:
-                self.log(Log.C_LOG_TYPE_E, 'No administrator found in repository fhswf/MLPro')
+                self.log(Log.C_LOG_TYPE_E, 'No administrator found in repository blueaic/mlpro')
                 return
             
         else:
