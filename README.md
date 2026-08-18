@@ -59,7 +59,7 @@ The original repository, containing the project history up to MLPro 2.1.0, is pr
 >>>>>>> b78d51f38 (Recovering README.md)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6653484.svg)](https://doi.org/10.5281/zenodo.6653484)
 
-<img src="https://github.com/fhswf/MLPro/blob/main/doc/logo/original/logo.png?raw=True" align="right" width="40%"/>
+<img src="https://github.com/blueaic/mlpro/blob/main/doc/logo/original/logo.png?raw=True" align="right" width="40%"/>
 
 # MLPro - The integrative middleware framework for standardized machine learning in Python
 MLPro is a modular, open-source middleware framework for standardized machine learning tasks in Python. It seamlessly integrates reinforcement learning, game theory, and online learning into flexible, recombinable workflows. With its rigorous design, scientific validity, and ready-to-use process models, MLPro accelerates research, development, and education. Whether for hybrid ML applications or real-time adaptive systems, MLPro is the right choice due to its transparency, reusability, and professional quality.
