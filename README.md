@@ -1,4 +1,4 @@
-[![CI](https://github.com/fhswf/MLPro/actions/workflows/ci.yml/badge.svg)](https://github.com/fhswf/MLPro/actions/workflows/ci.yml)
+[![CI](https://github.com/blueaic/mlpro/actions/workflows/ci.yml/badge.svg)](https://github.com/blueaic/mlpro/actions/workflows/ci.yml)
 [![Documentation Status](https://readthedocs.org/projects/mlpro/badge/?version=latest)](https://mlpro.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/mlpro.svg)](https://badge.fury.io/py/mlpro)
 [![PyPI Total Downloads](https://static.pepy.tech/personalized-badge/mlpro?period=total&units=international_system&left_color=blue&right_color=orange&left_text=PyPI%20Total%20Downloads)](https://pepy.tech/project/mlpro)
