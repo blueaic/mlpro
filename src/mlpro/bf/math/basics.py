@@ -44,10 +44,11 @@
 ## --                                - New class Scaler
 ## -- 2025-07-11  3.0.1     DA       Bugfix in method Scaler.rescale()
 ## -- 2025-10-02  3.1.0     DA       Refactoring: removed try/except from Function.map()
+## -- 2026-08-18  3.2.0     DA       Class Element: alignment with higher numpy versions
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 3.1.0 (2025-10-02)
+Ver. 3.2.0 (2026-08-18)
 
 This module provides basic mathematical classes.
 """
@@ -481,7 +482,12 @@ class Element:
 
 ## -------------------------------------------------------------------------------------------------
     def get_value(self, p_dim_id):
-        return self._values[self._set.get_dim_ids().index(p_dim_id)]
+        value = self._values[self._set.get_dim_ids().index(p_dim_id)]
+
+        if isinstance(value, np.ndarray):
+            return value.item()
+
+        return value
 
 
 ## -------------------------------------------------------------------------------------------------

@@ -45,15 +45,18 @@
 ## -- 2023-02-13  1.7.3     MRD       Simplify State Space and Action Space generation
 ## -- 2023-05-30  1.7.4     LSB      Redefining the inheritence order in EnvBase to resolve MRO in OAEnv
 ## -- 2025-07-17  1.8.0     DA       Refactoring
+## -- 2026-08-18  1.8.1     DA       Class Reward: Alignment with higher numpy versions
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.8.0 (2025-07-17) 
+Ver. 1.8.1 (2026-08-18) 
 
 This module provides model classes for environments.
 """
 
 from datetime import timedelta
+
+import numpy as np
 
 from mlpro.bf import Log, Mode, ParamError
 from mlpro.bf.various import TStamp
@@ -133,10 +136,10 @@ class Reward (TStamp):
 
 ## -------------------------------------------------------------------------------------------------
     def get_overall_reward(self):
-        try:
-            return self.overall_reward[0]
-        except:
+        if np.isscalar(self.overall_reward):
             return self.overall_reward
+
+        return self.overall_reward[0]
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -151,14 +154,19 @@ class Reward (TStamp):
 ## -------------------------------------------------------------------------------------------------
     def get_agent_reward(self, p_agent_id):
         if self.type == self.C_TYPE_OVERALL:
-            return self.overall_reward
+            return self.get_overall_reward()
 
         try:
             i = self.agent_ids.index(p_agent_id)
         except ValueError:
             return None
 
-        return self.rewards[i]
+        reward = self.rewards[i]
+
+        if isinstance(reward, np.ndarray):
+            return reward.item()
+        
+        return reward
 
 
 ## -------------------------------------------------------------------------------------------------

@@ -8,10 +8,11 @@
 ## -- 2025-04-09  0.0.0     SY       Creation
 ## -- 2025-04-09  1.0.0     SY       Release of first version
 ## -- 2025-07-18  1.1.0     DA       Refactoring
+## -- 2026-08-18  1.1.1     DA       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.1.0 (2025-07-18) 
+Ver. 1.1.1 (2026-08-18) 
 
 This module implements a dynamic game policy class for State-Based Potential Games (SbPG),
 including three learning algorithms:
@@ -407,7 +408,7 @@ class SbPG(Policy):
         self.exploration    *= self.get_hyperparam().get_value(self._hp_ids[1])
         self._counter       += 1
 
-        rwd                 = p_kwargs["p_sars_elem"].get_data()["reward"].get_agent_reward(self._id)[0]
+        rwd                 = p_kwargs["p_sars_elem"].get_data()["reward"].get_agent_reward(self._id)
         if rwd > (self.performance_map[1, x_disc, y_disc]).item():
             self.performance_map[1,x_disc,y_disc] = rwd
             self.performance_map[0,x_disc,y_disc] = p_kwargs["p_sars_elem"].get_data()["action"].get_sorted_values().item()
@@ -441,7 +442,7 @@ class SbPG(Policy):
         prev_util       = self.performance_map[1, x_disc, y_disc]
         
         act             = p_kwargs["p_sars_elem"].get_data()["action"].get_sorted_values().item()
-        util            = p_kwargs["p_sars_elem"].get_data()["reward"].get_agent_reward(self._id)[0]
+        util            = p_kwargs["p_sars_elem"].get_data()["reward"].get_agent_reward(self._id)
         
         if (act-prev_action) == 0:
             gradient    = (util-prev_util)
@@ -458,6 +459,7 @@ class SbPG(Policy):
         self._counter += 1
         
         return True
+
 
 ## -------------------------------------------------------------------------------------------------
     def _adapt_gb_mom(self, p_kwargs) -> bool:
@@ -484,7 +486,7 @@ class SbPG(Policy):
         prev_util       = self.performance_map[1, x_disc, y_disc]
         
         act             = p_kwargs["p_sars_elem"].get_data()["action"].get_sorted_values().item()
-        util            = p_kwargs["p_sars_elem"].get_data()["reward"].get_agent_reward(self._id)[0]
+        util            = p_kwargs["p_sars_elem"].get_data()["reward"].get_agent_reward(self._id)
                
         if (act-prev_action) == 0:
             gradient    = (util-prev_util)

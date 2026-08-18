@@ -9,10 +9,11 @@
 ## -- 2024-01-18  1.0.0     SY       Release of first version
 ## -- 2024-01-28  1.0.1     SY       Refactoring
 ## -- 2025-07-18  1.1.0     DA       Refactoring
+## -- 2028-08-18  1.2.0     DA       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.1.0 (2025-07-18) 
+Ver. 1.2.0 (2026-08-18) 
 
 This module provides a 3-player game of routing problems, where each player has to move simultaneously
 from the starting node to the target node. We also set up this game as a congestion game, which means
@@ -88,6 +89,10 @@ class TransferFunction_Routing3P(TransferFunction):
 
 ## -------------------------------------------------------------------------------------------------
     def _custom_function(self, p_input, p_range=None):
+
+        # 2026-08-18/DA: alignment to higher numpy versions
+        p_input = [x.item() if isinstance(x, np.ndarray) else x for x in p_input]
+
 
         path = {
             1 : ['S','1','2','3','T'],

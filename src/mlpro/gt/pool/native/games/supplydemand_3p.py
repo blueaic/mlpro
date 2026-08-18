@@ -9,10 +9,11 @@
 ## -- 2023-12-12  1.0.0     SY       Release of first version
 ## -- 2024-01-12  1.0.1     SY       Refactoring: Module Name
 ## -- 2025-07-18  1.1.0     DA       Refactoring
+## -- 2028-08-18  1.2.0     DA       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.1.0 (2025-07-18) 
+Ver. 1.2.0 (2026-08-18) 
 
 This module provides a 3-player game of supply and demand games, where each player represents a seller.
 Each seller has the capability to produce the same product with a quantity between 1-5 items everyday.
@@ -85,21 +86,24 @@ class TransferFunction_SD3P(TransferFunction):
 ## -------------------------------------------------------------------------------------------------
     def _custom_function(self, p_input, p_range=None):
 
+        # 2026-08-18/DA: alignment to higher numpy versions
+        _input = [x.item() if isinstance(x, np.ndarray) else x for x in p_input]
+
         total_production = sum(p_input)
 
         if total_production <= self.demand:
 
-            profit_seller_1 = p_input[0]*self.price_seller_1[int(p_input[0]-1)]-self.prod_cost
-            profit_seller_2 = p_input[1]*self.price_seller_2[int(p_input[1]-1)]-self.prod_cost
-            profit_seller_3 = p_input[2]*self.price_seller_3[int(p_input[2]-1)]-self.prod_cost
+            profit_seller_1 = _input[0]*self.price_seller_1[int(_input[0]-1)]-self.prod_cost
+            profit_seller_2 = _input[1]*self.price_seller_2[int(_input[1]-1)]-self.prod_cost
+            profit_seller_3 = _input[2]*self.price_seller_3[int(_input[2]-1)]-self.prod_cost
 
             return [profit_seller_1, profit_seller_2, profit_seller_3]
         
         else:
 
-            price_seller_1  = self.price_seller_1[int(p_input[0]-1)]
-            price_seller_2  = self.price_seller_2[int(p_input[1]-1)]
-            price_seller_3  = self.price_seller_3[int(p_input[2]-1)]
+            price_seller_1  = self.price_seller_1[int(_input[0]-1)]
+            price_seller_2  = self.price_seller_2[int(_input[1]-1)]
+            price_seller_3  = self.price_seller_3[int(_input[2]-1)]
             list_of_prices  = [price_seller_1, price_seller_2, price_seller_3]
             
             sold_quantity   = 0
@@ -111,9 +115,9 @@ class TransferFunction_SD3P(TransferFunction):
                     min_price = min(list_of_prices)
                     idx = list_of_prices.index(min_price)
 
-                    if (sold_quantity+p_input[idx]) <= self.demand:
-                        sold_quantity += p_input[idx]
-                        profit_seller[idx] += (p_input[idx]*list_of_prices[idx])
+                    if (sold_quantity+_input[idx]) <= self.demand:
+                        sold_quantity += _input[idx]
+                        profit_seller[idx] += (_input[idx]*list_of_prices[idx])
                         list_of_prices[idx] = 100
                     else:
                         quantity = self.demand-sold_quantity
