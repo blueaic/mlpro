@@ -8,9 +8,10 @@
 
 **MLPro is an open-source Python framework for machine learning research, development, and education.**
 
-It provides a common infrastructure for different machine learning paradigms and supports the composition of reusable processing and learning workflows.
-
 <img src="https://github.com/blueaic/mlpro/blob/main/doc/logo/original/logo.png?raw=True" align="right" width="35%"/>
+
+
+It provides a common infrastructure for different machine learning paradigms and supports the composition of reusable processing and learning workflows.
 
 
 ## Sub-frameworks
