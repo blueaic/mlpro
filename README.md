@@ -5,12 +5,9 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6653484.svg)](https://doi.org/10.5281/zenodo.6653484)
 
 
-
-
+# MLPro
 <img src="https://github.com/blueaic/mlpro/blob/main/doc/logo/original/logo.png?raw=True" align="right" width="35%"/>
 
-
-# MLPro
 
 **MLPro is an open-source Python framework for machine learning research, development, and education.**
 
