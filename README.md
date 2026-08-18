@@ -5,7 +5,7 @@
 [![PyPI Last Month Downloads](https://static.pepy.tech/personalized-badge/mlpro?period=month&units=international_system&left_color=blue&right_color=orange&left_text=PyPI%20Last%20Month%20Downloads)](https://pepy.tech/project/mlpro)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6653484.svg)](https://doi.org/10.5281/zenodo.6653484)
 
-<img src="https://github.com/fhswf/MLPro/blob/main/doc/logo/original/logo.png?raw=True" align="right" width="40%"/>
+<img src="https://github.com/blueaic/mlpro/blob/main/doc/logo/original/logo.png?raw=True" align="right" width="40%"/>
 
 # MLPro - The integrative middleware framework for standardized machine learning in Python
 MLPro is a modular, open-source middleware framework for standardized machine learning tasks in Python. It seamlessly integrates reinforcement learning, game theory, and online learning into flexible, recombinable workflows. With its rigorous design, scientific validity, and ready-to-use process models, MLPro accelerates research, development, and education. Whether for hybrid ML applications or real-time adaptive systems, MLPro is the right choice due to its transparency, reusability, and professional quality.
