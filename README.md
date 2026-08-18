@@ -4,12 +4,15 @@
 [![PyPI Total Downloads](https://static.pepy.tech/personalized-badge/mlpro?period=total\&units=international_system\&left_color=blue\&right_color=orange\&left_text=PyPI%20Total%20Downloads)](https://pepy.tech/project/mlpro)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6653484.svg)](https://doi.org/10.5281/zenodo.6653484)
 
-# MLPro
 
-**MLPro is an open-source Python framework for machine learning research, development, and education.**
+
 
 <img src="https://github.com/blueaic/mlpro/blob/main/doc/logo/original/logo.png?raw=True" align="right" width="35%"/>
 
+
+# MLPro
+
+**MLPro is an open-source Python framework for machine learning research, development, and education.**
 
 It provides a common infrastructure for different machine learning paradigms and supports the composition of reusable processing and learning workflows.
 
