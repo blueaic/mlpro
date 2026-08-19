@@ -1,6 +1,6 @@
 dill>=0.4.1
 multiprocess>=0.70.19
-numpy>=2.5.2
+numpy>=2.4.6
 torch>=2.13.0
 PySide6>=6.11.2
 matplotlib>=3.11.1
