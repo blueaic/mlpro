@@ -20,7 +20,7 @@ MLPro - Elevate your machine learning journey
       discovering the world of machine learning, MLPro gives you the structure and flexibility to elevate your ML projects to the 
       next level.<br><br>
 
-      🔓 MLPro is fully open source and licensed under <a href="https://github.com/fhswf/MLPro?tab=Apache-2.0-1-ov-file#readme" target="_blank">Apache 2.0</a>, giving you the freedom to innovate, customize, and contribute.<br><br>
+      🔓 MLPro is fully open source and licensed under <a href="https://github.com/blueaic/mlpro?tab=License-1-ov-file" target="_blank">Apache 2.0</a>, giving you the freedom to innovate, customize, and contribute.<br><br>
 
       ✨ Start exploring MLPro and take your machine learning journey further! <br><br>
     </div>
@@ -78,7 +78,7 @@ MLPro - Elevate your machine learning journey
 
 |welcome| |mlpro_bf| |mlpro_sl| |mlpro_oa| |mlpro_rl| |mlpro_gt| 
 
-|examples| |mlpro_api| |extensions| |podcast| |chatgpt| |project|
+|examples| |mlpro_api| |extensions| |project|
 
 
 .. |mlpro_pypi| image:: content/00_start_page/images/pypi.svg
@@ -86,45 +86,27 @@ MLPro - Elevate your machine learning journey
    :scale: 30 %
 
 .. |mlpro_github| image:: content/00_start_page/images/github.png
-   :target: https://github.com/fhswf/MLPro
+   :target: https://github.com/blueaic/mlpro
    :scale: 1 %
 
 .. |mlpro_zenodo| image:: content/00_start_page/images/zenodo.png
-   :target: https://github.com/fhswf/MLPro
+   :target: https://github.com/blueaic/mlpro
+   :scale: 4 %
+
+.. |mlpro_newsletter| image:: content/00_start_page/images/newsletter.png
+   :target: https://github.com/blueaic/mlpro
    :scale: 4 %
 
 
 .. list-table::
-   :widths: 50 50 50
+   :widths: 50 50 50 50
 
    * - |mlpro_pypi|     `PyPI <https://pypi.org/project/mlpro>`_
-     - |mlpro_github|   `GitHub <https://github.com/fhswf/MLPro>`_
+     - |mlpro_github|   `GitHub <https://github.com/blueaic/mlpro>`_
      - |mlpro_zenodo|   `Zenodo <https://zenodo.org/communities/mlpro>`_
+     - |mlpro_newsletter| `Newsletter <https://www.blueaic.com/en/newsletter-mlpro>`_
 
-----------------------------------------------------------------------
-
-News ticker
-===========
-
-.. postlist:: 3
-   :author: MLPro team
-   :category: Manual
-   :location: Soest, Germany
-   :language: en
-   :tags: tips
-   :date: %A, %B %d, %Y
-   :format: {title} on {date}
-   :list-style: square
-   :excerpts:
-   :expand: Read more ...
-
-
-.. list-table::
-   :widths: 20 20
-
-   * - :ref:`🗂️ All news <target_new_feed>`
-     - :ref:`🔔 Subscribe (RSS feed) <target_new_feed_subscribe>`
-
+.. ----------------------------------------------------------------------
 
 
 .. toctree::
@@ -143,7 +125,6 @@ News ticker
    :numbered:
 
    content/01_welcome/sub/*
-   news/index
 
 
 .. toctree::
