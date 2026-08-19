@@ -19,11 +19,11 @@ sys.path.insert(0, os.path.abspath("../../src"))
 # -- Project information -----------------------------------------------------
 
 project = "MLPro Documentations"
-copyright = "2025 South Westphalia University of Applied Sciences, Germany"
+copyright = "2026 blueAIC UG (haftungsbeschränkt), Germany"
 author = "Detlef Arend, Steve Yuwono, Mochammad Rizky Diprasetya, Laxmikant Shrikant Baheti et al"
 
 # The full version, including alpha/beta/rc tags
-release = "2.1.0"
+release = "2.2.0"
 
 
 # -- General configuration ---------------------------------------------------
@@ -92,18 +92,7 @@ html_static_path = ["_static"]
 
 html_context = {
     "display_github": True,
-    "github_user": "fhswf",
-    "github_repo": "MLPro",
+    "github_user": "blueaic",
+    "github_repo": "mlpro",
     "github_version": "main/doc/docs/",
 }
-
-
-#
-# RSS feed
-#
-blog_title = 'MLPro News'
-blog_baseurl = 'https://mlpro.readthedocs.io/en/latest'  
-blog_path = 'news'
-fontawesome_included = True
-blog_feed_archives = True
-blog_feed_fulltext = True
