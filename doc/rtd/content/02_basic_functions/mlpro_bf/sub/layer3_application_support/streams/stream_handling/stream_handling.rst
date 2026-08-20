@@ -70,6 +70,7 @@ Approved integrations such as OpenML, scikit-learn, and River use this wrapper p
 
 **Cross references**
     + :ref:`Howto BF-STREAMS-101: Basics of Streams <Howto BF STREAMS 101>`
-    + :ref:`Howto BF-STREAMS-005: Stream Samplers <Howto_BF_STREAMS_005>`
+    + :ref:`Howto BF-STREAMS-020: Stream Samplers <Howto_BF_STREAMS_020>`
+    + :ref:`Howto BF-STREAMS-030: Multi-streams <Howto_BF_STREAMS_030>`
     + :ref:`3rd party support <target_bf_streams_3rd_party_support>`
     + :ref:`API Reference: Streams <target_ap_bf_streams>`
