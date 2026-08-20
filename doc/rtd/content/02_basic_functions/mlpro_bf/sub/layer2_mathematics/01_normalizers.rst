@@ -77,5 +77,5 @@ This allows stored states, geometric properties, or other normalized data struct
 
 
 **Cross reference**
-    + :ref:`Howto BF-MATH-010: Normalizers <Howto BF MATH 010>`
+    + :ref:`Howto BF-MATH-011: Normalizers <Howto BF MATH 011>`
     + :ref:`API reference <target_ap_bf_math_norm>`
