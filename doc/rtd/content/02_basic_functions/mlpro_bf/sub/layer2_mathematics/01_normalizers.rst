@@ -6,8 +6,7 @@ Normalization
 Why normalization?
 ------------------
 
-Many algorithms become easier to combine and numerically more stable when their input features live on comparable scales.
-A temperature in degrees, a position in meters, and a probability may all describe the same sample, but their numerical ranges can differ by orders of magnitude.
+Many algorithms become easier to combine and numerically more stable when their input features live on comparable scales. A temperature in degrees, a position in meters, and a probability may all describe the same sample, but their numerical ranges can differ by orders of magnitude.
 
 MLPro treats normalization as a reversible mapping rather than as a one-way preprocessing step. The common abstraction is **Normalizer**, which builds on :class:`Scaler` and therefore supports normalization, denormalization, and renormalization with a consistent parameter model.
 
@@ -15,11 +14,7 @@ The basic lifecycle is:
 
 ``raw data -> determine parameters -> normalize -> parameters change -> renormalize``
 
-Common interface
-----------------
-
-All normalizers use linear parameters per dimension. Internally, each dimension has a scale factor and an offset.
-This common representation enables the same operations for different normalization strategies:
+All normalizers use linear parameters per dimension. Internally, each dimension has a scale factor and an offset. This common representation enables the same operations for different normalization strategies:
 
 * ``normalize()`` maps original data into normalized coordinates,
 * ``denormalize()`` reconstructs data in the original coordinates,
@@ -28,10 +23,10 @@ This common representation enables the same operations for different normalizati
 
 The operations work with MLPro data representations such as Elements and numpy arrays and can also be applied dimension-wise.
 
-MinMax normalization
---------------------
+Normalization strategies
+------------------------
 
-**NormalizerMinMax** maps known source boundaries to configurable destination boundaries. The default destination interval is ``[-1, 1]``.
+**MinMax normalization.** **NormalizerMinMax** maps known source boundaries to configurable destination boundaries. The default destination interval is ``[-1, 1]``.
 
 .. code-block:: python
 
@@ -51,10 +46,7 @@ MinMax normalization
 
 The boundaries may also be obtained directly from an MLPro Set. If source boundaries change, a new parameter set is computed while the former one is retained for later renormalization.
 
-Z transformation
-----------------
-
-**NormalizerZTrans** standardizes data using mean and standard deviation. Parameters can be initialized from a complete dataset or maintained incrementally when samples are added or removed.
+**Z transformation.** **NormalizerZTrans** standardizes data using mean and standard deviation. Parameters can be initialized from a complete dataset or maintained incrementally when samples are added or removed.
 
 .. code-block:: python
 
@@ -75,14 +67,9 @@ Z transformation
 
 The incremental parameter update is especially useful for online scenarios where the statistical description of the data changes over time.
 
-Why renormalization matters
----------------------------
+**Why renormalization matters.** In adaptive or online applications, normalization parameters may change after data has already been normalized. Simply applying the new parameters to old normalized values would move them into the wrong coordinate system.
 
-In adaptive or online applications, normalization parameters may change after data has already been normalized.
-Simply applying the new parameters to old normalized values would move them into the wrong coordinate system.
-
-MLPro therefore stores previous and current parameter sets. ``renormalize()`` first reconstructs the original value with the old parameters and then applies the new parameters.
-Conceptually:
+MLPro therefore stores previous and current parameter sets. ``renormalize()`` first reconstructs the original value with the old parameters and then applies the new parameters:
 
 ``normalized(old) -> denormalize(old) -> normalize(new) -> normalized(new)``
 
