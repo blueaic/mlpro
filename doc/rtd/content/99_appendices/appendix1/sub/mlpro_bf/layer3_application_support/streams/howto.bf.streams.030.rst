@@ -4,7 +4,7 @@ Howto BF-STREAMS-030: Multi-streams
 
 **Executable code**
 
-.. literalinclude:: ../../../../../../../../../test/howtos/bf/streams/howto_bf_streams_030_multi_streams.py
+.. literalinclude:: ../../../../../../../../../test/howtos/bf/streams/stream_generation/howto_bf_streams_030_multi_streams.py
 	:language: python
 
 
