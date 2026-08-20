@@ -90,6 +90,13 @@ This makes Hypercuboid useful as a lightweight representation of bounding boxes,
 
 
 **Cross reference**
+    + :ref:`Howto BF-MATH-031: Geometry - Point in 2D <Howto BF MATH 031>`
+    + :ref:`Howto BF-MATH-032: Geometry - Point in 3D <Howto BF MATH 032>`
+    + :ref:`Howto BF-MATH-033: Geometry - Hypercuboid in 2D <Howto BF MATH 033>`
+    + :ref:`Howto BF-MATH-034: Geometry - Hypercuboid in 3D <Howto BF MATH 034>`
+    + :ref:`Howto BF-MATH-035: Geometry - Crosshair in 1D <Howto BF MATH 035>`
+    + :ref:`Howto BF-MATH-036: Geometry - Crosshair in 2D <Howto BF MATH 036>`
+    + :ref:`Howto BF-MATH-037: Geometry - Crosshair in 3D <Howto BF MATH 037>`
     + :ref:`Managed Properties <target_bf_math_properties>`
     + :ref:`Normalization <target_bf_math_normalizer>`
     + :ref:`API reference <target_ap_bf_math_geo>`
