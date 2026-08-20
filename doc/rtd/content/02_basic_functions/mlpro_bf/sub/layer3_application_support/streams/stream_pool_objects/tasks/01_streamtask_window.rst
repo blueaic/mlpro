@@ -1,37 +1,43 @@
 .. _target_bf_streams_tasks_window:
-Window
-======
 
-In streaming scenarios, data is available sequentially, and the amount of data received is directly proportional to
-the time for which the stream is active. In practice, this data accumulates in tremendous amounts as the application
-becomes complex. Processing data with minimum use of storage is important. A window task stores a small amount of
-data from the incoming stream, that can be used to process subsequent tasks based on a smaller amount of data that
-represents the stream behaviour.
+Window and Ring Buffer
+======================
 
+A stream may be endless, but many processing algorithms only need a finite representation of the most recent data. MLPro separates the general **Window** abstraction from its concrete sliding-window implementation **RingBuffer**.
+
+The RingBuffer keeps at most ``p_buffer_size`` active instances. As soon as the buffer is full and a new instance arrives, the oldest one is removed and forwarded as ``InstTypeDel`` while the new one is forwarded as ``InstTypeNew``:
+
+``new sample -> buffer full? -> oldest '-' + newest '+'``
+
+This is an important DSP pattern because downstream tasks receive both changes explicitly and can update their own state consistently.
 
 .. image::
     images/window.png
     :width: 800 px
 
+A typical task is configured like this:
 
-The window task in MLPro, stores the most recent instances received from the stream in the buffer. The buffer size
-of the window is fixed and defined by the user. As soon as the buffer is full, the oldest instance is deleted form
-the buffer to add the latest instance to the buffer. The subsequent tasks in the workflow with dependency on window,
-have access to the data in the buffer.
+.. code-block:: python
 
-.. note::
-    The availability of the buffered instances to the subsequent tasks can be delayed by setting the :code:`p_delay` parameter to :code:`True`. In this case, the buffered instances are only available once the buffer is completely full.
+    from mlpro.bf.streams.tasks.windows import RingBuffer
 
+    window = RingBuffer(
+        p_buffer_size=50,
+        p_delay=True,
+        p_enable_statistics=True,
+        p_name='Recent samples'
+    )
 
-The window task of MLPro, also provides functionality to get statistical information about the buffered instances,
-such as Boundaries, Mean, Variance and Standard Deviation of the features of the instances in the buffer.
-Additionally, MLPro also provides visualization functionality for window, as shown below.
+**Delayed forwarding.** With ``p_delay=False`` new instances are forwarded immediately while the buffer is still filling. With ``p_delay=True`` no instances are forwarded until the first complete window is available; the initial buffer content is then emitted together.
 
+**Statistics.** Window provides mean, variance, and standard deviation over buffered data. RingBuffer can additionally maintain numeric feature boundaries through the common ``BoundaryProvider`` interface from MLPro-BF-MATH. Statistics are enabled through ``p_enable_statistics`` and are also activated when visualization requires them.
+
+**Visualization.** RingBuffer specializes the standard StreamTask plotting behavior and can visualize the active window in 2D, 3D, and nD views. This makes the same object useful as both processing state and an inspectable view of the currently active data.
 
 
 **Cross Reference**
-
-- :ref:`Howto BF-STREAMS-110: Window <Howto BF STREAMS 110>`
-- :ref:`API Reference: Streams <target_ap_bf_streams>`
-
-
+    + :ref:`Howto BF-STREAMS-111: Ring Buffer / Window (2D) <Howto BF STREAMS 111>`
+    + :ref:`Howto BF-STREAMS-112: Ring Buffer / Window (3D) <Howto BF STREAMS 112>`
+    + :ref:`Howto BF-STREAMS-113: Ring Buffer / Window (nD) <Howto BF STREAMS 113>`
+    + :ref:`Statistics and Boundaries <target_bf_math_statistics>`
+    + :ref:`API Reference: Streams <target_ap_bf_streams>`
