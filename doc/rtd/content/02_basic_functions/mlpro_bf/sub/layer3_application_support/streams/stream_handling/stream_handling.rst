@@ -55,7 +55,7 @@ MLPro's built-in provider can be used as follows:
     for stream in provider.get_stream_list():
         print(stream.get_name())
 
-    stream = provider.get_stream(p_name='Rnd10D')
+    stream = provider.get_stream(p_id='Rnd10Dx1000')
 
 .. image::
     images/stream_providers.drawio.png
