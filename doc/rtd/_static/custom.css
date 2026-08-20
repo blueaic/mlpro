@@ -6,15 +6,22 @@
 .version{
     color: var(--link-color) !important;
 }
+
 .wy-side-nav-search{
   background-color: var(--main-bg-color);
 }
 
-.codeblock,pre.literal-block,.rst-content .literal-block,.rst-content pre.literal-block,div[class^='highlight'] {
-        background: #f7f5f5;;
+.codeblock,
+pre.literal-block,
+.rst-content .literal-block,
+.rst-content pre.literal-block,
+div[class^='highlight'] {
+    background: #f7f5f5;
 }
 
-.field-list .xref.py.docutils, .field-list code.docutils, .field-list .docutils.literal.notranslate
+.field-list .xref.py.docutils,
+.field-list code.docutils,
+.field-list .docutils.literal.notranslate
 {
   border: None;
   padding-left: 0;
@@ -28,12 +35,20 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-body, h1, h2, h3, h4, h5, h6 {
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: "Roboto", sans-serif;
 }
 
 
-
+/* -------------------------------------------------------------------------
+   Blog / post list
+   ------------------------------------------------------------------------- */
 
 /* Container of the postlist */
 ul.postlist {
@@ -85,4 +100,91 @@ ul.postlist > li span.readmore a {
 
 ul.postlist > li span.readmore a:hover {
     text-decoration: underline;
+}
+
+
+/* -------------------------------------------------------------------------
+   Start page navigation buttons
+   ------------------------------------------------------------------------- */
+
+.mlpro-button {
+    display: inline-block;
+    width: 120px;
+    height: auto;
+    margin: 0 10px 14px 0;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.mlpro-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.22);
+}
+
+
+/* -------------------------------------------------------------------------
+   Start page external links
+   ------------------------------------------------------------------------- */
+
+.mlpro-linkbar {
+    width: auto !important;
+    border: none !important;
+    margin: 0 !important;
+    margin-left: 0 !important;
+}
+
+.mlpro-linkbar tbody,
+.mlpro-linkbar tr {
+    display: flex !important;
+    gap: 14px !important;
+}
+
+.mlpro-linkbar td {
+    display: block !important;
+
+    flex: 0 0 120px !important;
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+.mlpro-linkbar td > p {
+    box-sizing: border-box !important;
+
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+    min-height: 37px;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+
+    margin: 0 !important;
+    padding: 8px 12px;
+
+    border: none;
+    background-color: #fffbea;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        background-color 0.15s ease;
+}
+
+.mlpro-linkbar td > p:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+    background-color: #fff1a8;
+}
+
+.mlpro-linkbar td a {
+    text-decoration: none;
 }
