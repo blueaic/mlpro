@@ -3,42 +3,60 @@
 Layer 2 - Mathematics
 =====================
 
-Mathematics is an integral part of many areas, particularly in the fields of data analysis, machine learning, and system simulation.
-MLPro-BF-MATH provides the basic functions of mathematics, which become the foundation for various computational tasks.
-The basic functions of mathematics simplify the users of defining, conserving, and processing numeric data at a low level.
+Mathematical Foundations
+------------------------
 
-First, four main components are introduced in MLPro-BF-MATH to define a bunch of numeric data, such as:
+Machine learning code quickly becomes difficult to combine if every component brings its own idea of dimensions, data spaces, elements, mappings, or scaling.
+MLPro-BF-MATH provides a common mathematical vocabulary for these recurring concepts so that higher-level components can exchange and process data in a standardized way.
 
-   a) **Dimension**
+The central idea is simple:
 
-      An object specifies properties of a dimension, including the name, the unit, the data type, the boundaries, and many more.
-      Dimension in MLPro is not limited to real, natural, and integer numbers, but can also handle a big data object (e.g. images, point cloud, etc.).
+``Dimension -> Set/Space -> Element -> Function -> Scaler``
 
-   b) **Set**
+**Dimensions, sets and elements.** A **Dimension** stores the structural information of one coordinate, including names, unit, base set, boundaries, description, symmetry, and additional user-defined parameters. Besides numeric base sets such as real, natural, and integer numbers, dimensions can also represent data objects such as images or point clouds.
 
-      Set is a collection of dimensions that can also be described as a multivariate set in a mathematical sense.
-      There are interesting functionalities, for instance, adding a new dimension to the set, getting information on the actual dimension in the set, and spawning a new object with a subset of dimensions.
+A **Set** combines several dimensions into a multivariate structure. Sets can be extended, queried by dimension id or name, copied, appended, or spawned into subsets. An **Element** represents one concrete point or data item in such a set and stores one value for every related dimension.
 
-   c) **Element**
+.. code-block:: python
 
-      Element of a multivariate set. Each element represents a set, where the values of each component (Dimension object) can now be set.
+    from mlpro.bf.math import Dimension, ESpace, Element
 
-   d) **ElementList**
+    space = ESpace()
+    space.add_dim(Dimension('x'))
+    space.add_dim(Dimension('y'))
 
-      ElementList consists of a list of Element objects.
+    point = Element(space)
+    point.set_values([2.0, 3.0])
+
+    print(point.get_values())
+
+For groups of elements, **ElementList** provides a lightweight id-based container. **DataObject** can wrap large or non-standard data objects together with optional metadata, while the type alias **Data** summarizes the common representations handled by mathematical mappings: scalar values, lists, numpy arrays, and Element objects.
 
 .. image:: images/MLPro-BF-MATH_Basics.drawio.png
     :width: 800
 
-Second, MLPro also provides two objects to measure the distance between two elements, such as **MSpace** and **ESpace**.
-**MSpace** represents a metric space. The distance calculation is based on the metric of the space.
-**ESpace** represents a Euclidean space. The distance calculation is based on the Euclidean norm.
+**Metric and Euclidean spaces.** The class **MSpace** is the generic template for metric spaces and defines the common distance interface. **ESpace** implements the Euclidean metric directly.
 
-Third, MLPro has a **Function** class with mapping functionality.
-This class is intended for an elementary bi-multivariate mathematical function that maps elements of a multivariate input space to elements of a multivariate output space.
-With this class, it is possible to map a multivariate abscissa/input element to a multivariate ordinate/output element.
+.. code-block:: python
 
-Lastly, there are more advanced functions of mathematics, as follows:
+    p1 = Element(space)
+    p1.set_values([0.0, 0.0])
+
+    p2 = Element(space)
+    p2.set_values([3.0, 4.0])
+
+    print(space.distance(p1, p2))  # 5.0
+
+**Functions and scaling.** The class **Function** standardizes mappings between mathematical representations. Implementations may map scalar values, lists, numpy arrays, and Element objects, may provide an inverse mapping, and can optionally restrict a mapping to one dimension. For Element-based mappings, output elements can be created automatically if an output set and output element class are configured.
+
+The class **Scaler** extends Function with standardized parameter handling for scaling, unscaling, and rescaling data. It maintains previous and current parameter sets so that already scaled data can be transformed consistently after parameters change. This mechanism is the foundation for MLPro's normalizers and is particularly useful in online or adaptive scenarios.
+
+Higher-Level Mathematical Components
+------------------------------------
+
+The foundations above are intentionally generic. On top of them, MLPro-BF-MATH provides dedicated components for **normalization**, **managed properties**, **geometry**, and **statistical boundary handling**. These components reuse the same data structures and mapping concepts rather than introducing separate representations of their own.
+
+The following pages describe these higher-level components in detail:
 
 .. toctree::
    :maxdepth: 1
