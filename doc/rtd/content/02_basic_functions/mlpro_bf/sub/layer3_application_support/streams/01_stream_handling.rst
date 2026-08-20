@@ -1,51 +1,48 @@
 .. _target_bf_streams_handling:
 
-Streams
-=======
+Stream Handling
+===============
 
-A data stream is a live data source that delivers instances sequentially. Unlike offline datasets, data
-instances cannot be scanned on demand in case of streams. Data instances are only available at the order they
-arrive. For example, think of a live RADIO signal that delivers new data with time, where complete access to entire
-data is not possible.
+A stream is MLPro's standardized interface to sequentially available data. Instead of assuming that the complete dataset can be scanned at any time, a Stream behaves like an iterator and delivers the next Instance when requested.
+
+The basic data model is:
+
+``Feature / Label -> Instance -> Stream -> StreamProvider``
+
+An **Instance** contains feature data and optional label data, together with an id, a time stamp, and optional metadata. A **Stream** defines the feature and label spaces and controls sequential access. A **StreamProvider** groups or discovers related streams and provides a uniform lookup interface.
+
+Streams can optionally use a **Sampler** to omit selected instances during iteration. **MultiStream** combines several streams into one sequence and can switch between them in configurable batches.
+
+A compact example using MLPro's native stream provider looks like this:
+
+.. code-block:: python
+
+    from mlpro.bf.streams.streams import StreamProviderMLPro
+
+    provider = StreamProviderMLPro()
+    streams = provider.get_stream_list()
+
+    stream = streams[0]
+    instance = next(iter(stream))
+
+    print(instance.id)
+    print(instance.feature_values)
+
+The detailed page explains stream providers, streams, instances, samplers, and multi-streams as extension points for own data sources.
 
 .. image::
     images/stream_processor.png
     :width: 700 px
 
 
-As shown in the figure above, at every timestep, new information is available. However, the number of instances
-delivered at each instance and availability of historical instances depends on the type of stream and the processing
-task respectively.
-
-In industrial scenarios, with more and more complex systems, the amount of live data delivered by the systems increases
-rapidly. This high amount of live data can be leveraged to take optimal decisions for processes. This real-time data
-is a data stream because of its live nature and processing such real-time data is a relevant field of data-mining
-and machine learning known as Stream Processing and Online Machine Learning respectively.
-
-
-
-After loading the stream provider (MLPro's native stream provider for example), the list of available streams can be
-loaded as following:
-
-.. code-block:: python
-
-    # Import the stream provider class
-    from mlpro.bf.streams.native import NativeStreamProvider
-    # Create an object of the stream provider
-    mlpro = NativeStreamProvider()
-    # Get a list of streams
-    mlpro.get_stream_list()
-
-
-
 **Learn more**
 
 .. toctree::
+   :maxdepth: 1
 
-    stream_handling/stream_handling.rst
+   stream_handling/stream_handling.rst
 
 
 **Cross reference**
-
-    + :ref:`Howto BF-STREAMS-101: Basics of streams <Howto BF STREAMS 101>`
+    + :ref:`Howto BF-STREAMS-101: Basics of Streams <Howto BF STREAMS 101>`
     + :ref:`API reference: Streams <target_ap_bf_streams>`
