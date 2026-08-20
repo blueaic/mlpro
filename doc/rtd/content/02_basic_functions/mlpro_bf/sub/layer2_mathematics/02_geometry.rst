@@ -8,10 +8,9 @@ Why geometric properties?
 
 Many MLPro applications need to describe more than abstract feature vectors. They work with positions, regions, centers, sizes, trajectories, or other geometric state that changes over time.
 
-MLPro-BF-MATH models these concepts as managed properties. This means that geometric objects can carry their current value together with optional derivatives, visualization state, and renormalization behavior.
-The geometry package therefore builds directly on :ref:`Managed Properties <target_bf_math_properties>`.
+MLPro-BF-MATH models these concepts as managed properties. Geometric objects can therefore carry their current value together with optional derivatives, visualization state, and renormalization behavior. The geometry package builds directly on :ref:`Managed Properties <target_bf_math_properties>`.
 
-The main concepts are:
+The main relationships are:
 
 ``Point -> Crosshair``
 
@@ -19,10 +18,10 @@ and
 
 ``MultiProperty -> Hypercuboid -> center + size``
 
-Point
------
+Geometric building blocks
+-------------------------
 
-A **Point** represents coordinates in a hyper-space. Because Point inherits from Property, it can optionally derive velocity and acceleration automatically from time-stamped position updates.
+**Point.** A **Point** represents coordinates in a hyper-space. Because Point inherits from Property, it can optionally derive velocity and acceleration automatically from time-stamped position updates.
 
 .. code-block:: python
 
@@ -39,17 +38,9 @@ A **Point** represents coordinates in a hyper-space. Because Point inherits from
     print(point.value)          # [2. 3.]
     print(point.derivatives[1]) # velocity
 
-This makes a Point more than a coordinate container. It can act as a compact state variable for moving objects or evolving geometric centers.
+This makes a Point more than a coordinate container. It can act as a compact state variable for moving objects or evolving geometric centers. Point supports 2D, 3D, and nD visualization; in 2D and 3D views, a first derivative can additionally be visualized as a velocity vector.
 
-Point supports 2D, 3D, and nD visualization. In 2D and 3D views, a first derivative can additionally be visualized as a velocity vector.
-
-Crosshair
----------
-
-A **Crosshair** specializes Point by adding axis-aligned guide lines through the current position.
-It retains the same managed-property behavior, including optional velocity and acceleration, plotting, and renormalization.
-
-Typical use cases include highlighting a current operating point, a selected sample, or a geometric reference position in 2D, 3D, and nD plots.
+**Crosshair.** A **Crosshair** specializes Point by adding axis-aligned guide lines through the current position. It retains the same managed-property behavior, including optional velocity and acceleration, plotting, and renormalization.
 
 .. code-block:: python
 
@@ -62,14 +53,9 @@ Typical use cases include highlighting a current operating point, a selected sam
 
     cursor.set(p_value=[1.5, -0.5], p_tstamp=0)
 
-Because Crosshair is a Point, client code can treat both classes through the same basic interface whenever only position and derivative information matter.
+Typical use cases include highlighting a current operating point, a selected sample, or a geometric reference position. Because Crosshair is a Point, client code can treat both classes through the same basic interface whenever only position and derivative information matter.
 
-Hypercuboid
------------
-
-A **Hypercuboid** represents an axis-aligned region in an arbitrary number of dimensions. Its value is stored as one lower and one upper boundary for every dimension.
-
-For a two-dimensional rectangle, for example:
+**Hypercuboid.** A **Hypercuboid** represents an axis-aligned region in an arbitrary number of dimensions. Its value is stored as one lower and one upper boundary for every dimension.
 
 .. code-block:: python
 
@@ -84,14 +70,9 @@ For a two-dimensional rectangle, for example:
     print(region.center_geo.value) # geometric center
     print(region.size_geo.value)   # geometric size
 
-Hypercuboid is implemented as a MultiProperty. Whenever its boundaries change, the dependent properties ``center_geo`` and ``size_geo`` are updated automatically.
-This is a good example of how MLPro's property system can turn one geometric definition into several synchronized characteristics.
+Hypercuboid is implemented as a MultiProperty. Whenever its boundaries change, the dependent properties ``center_geo`` and ``size_geo`` are updated automatically. This is a direct example of how the managed-property system keeps several geometric characteristics synchronized.
 
-Collision checks
-----------------
-
-Hypercuboid also provides a direct collision test for two axis-aligned regions.
-Two hypercuboids collide as long as their intervals overlap in every dimension.
+**Collision checks.** Hypercuboid also provides a collision test for axis-aligned regions. Two hypercuboids collide as long as their intervals overlap in every dimension.
 
 .. code-block:: python
 
@@ -105,12 +86,7 @@ Two hypercuboids collide as long as their intervals overlap in every dimension.
 
 This makes Hypercuboid useful as a lightweight representation of bounding boxes, operating regions, search spaces, or occupancy regions.
 
-Renormalization and visualization
----------------------------------
-
-Geometric objects often live in data spaces whose normalization changes over time. Point and Hypercuboid therefore support renormalization through MLPro normalizers so that their internally stored values can follow a changed coordinate system.
-
-The geometry classes also integrate with MLPro's plotting infrastructure. Depending on dimensionality, Points, Crosshairs, and Hypercuboids can be visualized in 2D, 3D, or nD views.
+**Renormalization and visualization.** Geometric objects often live in data spaces whose normalization changes over time. Point and Hypercuboid therefore support renormalization through MLPro normalizers so that their internally stored values can follow a changed coordinate system. The geometry classes also integrate with MLPro's plotting infrastructure for 2D, 3D, and nD views.
 
 
 **Cross reference**
