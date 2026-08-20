@@ -61,4 +61,8 @@ The property system is a foundation for several other MLPro-BF-MATH components, 
 
 
 **Cross reference**
+    + :ref:`Howto BF-MATH-021: External Properties with Implicit Time Index <Howto BF MATH 021>`
+    + :ref:`Howto BF-MATH-022: External Properties with Explicit Integer Time Index <Howto BF MATH 022>`
+    + :ref:`Howto BF-MATH-023: External Properties with Explicit Datetime Index <Howto BF MATH 023>`
+    + :ref:`Howto BF-MATH-024: Internal Properties with Implicit Time Index <Howto BF MATH 024>`
     + :ref:`API Reference - Managed Properties <target_ap_bf_math_properties>`
