@@ -37,6 +37,8 @@ Whether all data already exists in memory is irrelevant to the consumer. This is
 
 **Sampler.** A Sampler is attached to a Stream and decides for every incoming instance whether it should be omitted. Custom samplers implement ``_omit_instance(p_instance)``. This keeps sampling separate from the stream source and makes sampling strategies reusable across different streams.
 
+MLPro already provides ready-to-use sampler implementations for random, weighted-random, reservoir, and min-wise sampling. They share the same Sampler interface and can therefore be exchanged without changing the Stream consumer.
+
 **MultiStream.** MultiStream combines several Stream objects into a single sequence. Streams can be consumed in configurable batches before switching to the next source, which is useful for mixed training/evaluation streams or scenarios that combine several sequential sources.
 
 Connecting data sources
@@ -68,5 +70,6 @@ Approved integrations such as OpenML, scikit-learn, and River use this wrapper p
 
 **Cross references**
     + :ref:`Howto BF-STREAMS-101: Basics of Streams <Howto BF STREAMS 101>`
+    + :ref:`Howto BF-STREAMS-005: Stream Samplers <Howto_BF_STREAMS_005>`
     + :ref:`3rd party support <target_bf_streams_3rd_party_support>`
     + :ref:`API Reference: Streams <target_ap_bf_streams>`
