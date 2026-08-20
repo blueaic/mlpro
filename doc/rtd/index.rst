@@ -22,63 +22,66 @@ MLPro - Elevate your machine learning journey
 
       🔓 MLPro is fully open source and licensed under <a href="https://github.com/blueaic/mlpro?tab=License-1-ov-file" target="_blank">Apache 2.0</a>, giving you the freedom to innovate, customize, and contribute.<br><br>
 
-      ✨ Start exploring MLPro and take your machine learning journey further! <br><br>
+      ✨ Start exploring MLPro and take your machine learning journey further! <br><br><br>
     </div>
 
 
+
 .. |welcome| image:: content/00_start_page/images/welcome.png
-   :scale: 34 %
+   :scale: 40 %
    :target: content/01_welcome/main.html
+   :class: mlpro-button
 
 .. |mlpro_bf| image:: content/00_start_page/images/mlpro_bf.png
-   :scale: 34 %
+   :scale: 40 %
    :target: content/02_basic_functions/mlpro_bf/main.html
-   
+   :class: mlpro-button
+
 .. |mlpro_sl| image:: content/00_start_page/images/mlpro_sl.png
-   :scale: 34 %
+   :scale: 40 %
    :target: content/03_machine_learning/mlpro_sl/main.html
-
-.. |mlpro_rl| image:: content/00_start_page/images/mlpro_rl.png
-   :scale: 34 %
-   :target: content/03_machine_learning/mlpro_rl/main.html
-
-.. |mlpro_gt| image:: content/00_start_page/images/mlpro_gt.png
-   :scale: 34 %
-   :target: content/03_machine_learning/mlpro_gt/main.html
+   :class: mlpro-button
 
 .. |mlpro_oa| image:: content/00_start_page/images/mlpro_oa.png
-   :scale: 34 %
+   :scale: 40 %
    :target: content/03_machine_learning/mlpro_oa/main.html
+   :class: mlpro-button
+
+.. |mlpro_rl| image:: content/00_start_page/images/mlpro_rl.png
+   :scale: 40 %
+   :target: content/03_machine_learning/mlpro_rl/main.html
+   :class: mlpro-button
+
+.. |mlpro_gt| image:: content/00_start_page/images/mlpro_gt.png
+   :scale: 40 %
+   :target: content/03_machine_learning/mlpro_gt/main.html
+   :class: mlpro-button
 
 .. |examples| image:: content/00_start_page/images/example_pool.png
-   :scale: 34 %
+   :scale: 40 %
    :target: content/99_appendices/appendix1/main.html
-
-.. |podcast| image:: content/00_start_page/images/podcast.png
-   :scale: 34 %
-   :target: https://www.gitpodcast.com/fhswf/mlpro
-
-.. |chatgpt| image:: content/00_start_page/images/chatgpt.png
-   :scale: 34 %
-   :target: https://chatgpt.com/g/g-67a1b30e91d481918ee1d6fe2af91bb5-mlpro
+   :class: mlpro-button
 
 .. |mlpro_api| image:: content/00_start_page/images/api_reference.png
-   :scale: 34 %
+   :scale: 40 %
    :target: content/99_appendices/appendix2/main.html
+   :class: mlpro-button
 
 .. |extensions| image:: content/00_start_page/images/extension_hub.png
-   :scale: 34 %
+   :scale: 40 %
    :target: content/04_extensions/main.html
+   :class: mlpro-button
 
 .. |project| image:: content/00_start_page/images/project_mlpro.png
-   :scale: 34 %
+   :scale: 40 %
    :target: content/99_appendices/appendix3/main.html
+   :class: mlpro-button
 
 
-
-|welcome| |mlpro_bf| |mlpro_sl| |mlpro_oa| |mlpro_rl| |mlpro_gt| 
+|welcome| |mlpro_bf| |mlpro_sl| |mlpro_oa| |mlpro_rl| |mlpro_gt|
 
 |examples| |mlpro_api| |extensions| |project|
+
 
 
 .. |mlpro_pypi| image:: content/00_start_page/images/pypi.svg
@@ -100,6 +103,7 @@ MLPro - Elevate your machine learning journey
 
 .. list-table::
    :widths: 50 50 50 50
+   :class: mlpro-linkbar   
 
    * - |mlpro_pypi|     `PyPI <https://pypi.org/project/mlpro>`_
      - |mlpro_github|   `GitHub <https://github.com/blueaic/mlpro>`_
