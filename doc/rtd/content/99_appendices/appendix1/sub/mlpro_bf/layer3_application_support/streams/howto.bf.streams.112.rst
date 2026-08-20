@@ -1,5 +1,6 @@
-.. _Howto BF STREAMS 110:
-Howto BF-STREAMS-112: Window (3D)
+.. _Howto BF STREAMS 112:
+
+Howto BF-STREAMS-112: Ring Buffer / Window (3D)
 ===============================================
 
 **Prerequisites**
@@ -10,12 +11,10 @@ Please install the following packages to run this example properly:
     - `Matplotlib <https://pypi.org/project/matplotlib/>`_
 
 
-
 **Executable code**
 
 .. literalinclude:: ../../../../../../../../../test/howtos/bf/streams/howto_bf_streams_112_stream_task_window_3d.py
-	:language: python
-
+   :language: python
 
 
 **Results**
@@ -24,7 +23,6 @@ Please install the following packages to run this example properly:
     images/streams_window_3d.gif
 
 
-
 **Cross Reference**
-
+    - :ref:`Window and Ring Buffer <target_bf_streams_tasks_window>`
     - :ref:`API Reference: Streams <target_ap_bf_streams>`
