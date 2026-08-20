@@ -12,10 +12,7 @@ A plain Python attribute stores the current value only. MLPro's **Property** cla
 
 For example, instead of handling position, previous position, time stamps, and velocity in separate attributes, one Property can manage these aspects together.
 
-Core concept
-------------
-
-A **Property** stores a value of almost any type. Depending on its configuration, it can additionally provide:
+**Core concept.** A **Property** stores a value of almost any type. Depending on its configuration, it can additionally provide:
 
 * ``value_prev`` - the previously stored value,
 * ``tstamp`` - the time stamp of the latest update,
@@ -23,8 +20,7 @@ A **Property** stores a value of almost any type. Depending on its configuration
 * plotting support,
 * renormalization support.
 
-Numeric scalar and vector values can be supplied together with time stamps. MLPro then updates the internal history and derives higher-order information automatically.
-A typical lifecycle therefore looks like this:
+Numeric scalar and vector values can be supplied together with time stamps. MLPro then updates the internal history and derives higher-order information automatically. A typical lifecycle therefore looks like this:
 
 ``new value -> update history -> update time stamp -> calculate derivatives -> update visualization``
 
@@ -50,38 +46,18 @@ A minimal example illustrates the idea:
 
 Here, the first derivative represents the rate of change between the latest samples. Higher derivative orders can be enabled in the same way.
 
-Managing groups of properties
------------------------------
+Managing several properties
+---------------------------
 
-The class **Properties** is intended as a parent class for objects that require several managed state variables.
-Properties can be defined statically through the class attribute ``C_PROPERTIES`` or added dynamically at runtime.
-Each property is exposed as an attribute of the owning object and can be queried, replaced, linked, plotted, or renormalized together with the surrounding property structure.
+The class **Properties** is intended as a parent class for objects that require several managed state variables. Properties can be defined statically through the class attribute ``C_PROPERTIES`` or added dynamically at runtime. Each property is exposed as an attribute of the owning object and can be queried, replaced, linked, plotted, or renormalized together with the surrounding property structure.
 
 This makes Properties useful whenever an object consists of several related characteristics. A geometric object, for example, may expose a center, a size, or other quantities as individual managed properties while still presenting them through one common object.
 
-Reusable property definitions
------------------------------
+**Reusable definitions.** A property definition is represented by a tuple containing the property name, maximum derivative order, a switch for storing the previous value, and the Property class to be instantiated. The type aliases ``PropertyDefinition`` and ``PropertyDefinitions`` provide a standardized format for such reusable configurations.
 
-A property definition is represented by a tuple containing
+**Hierarchical properties.** The class **MultiProperty** extends the concept to properties that themselves contain further managed properties. This is useful for structured mathematical or geometric objects whose top-level characteristics are composed of several dependent sub-properties.
 
-* the property name,
-* the maximum derivative order,
-* a switch for storing the previous value, and
-* the Property class to be instantiated.
-
-The type aliases ``PropertyDefinition`` and ``PropertyDefinitions`` provide a standardized format for such reusable configurations. This mechanism is used throughout MLPro to define recurring property types consistently.
-
-Hierarchical properties
------------------------
-
-The class **MultiProperty** extends the concept to hierarchical properties that themselves contain further managed properties.
-This is useful for structured mathematical or geometric objects whose top-level characteristics are composed of several dependent sub-properties.
-
-Where it is used
-----------------
-
-The property system is a foundation for several other MLPro-BF-MATH components, especially the geometry package.
-Classes such as **Point**, **Crosshair**, and **Hypercuboid** combine managed values, optional derivatives, visualization, and renormalization through this common abstraction.
+The property system is a foundation for several other MLPro-BF-MATH components, especially the geometry package. Classes such as **Point**, **Crosshair**, and **Hypercuboid** combine managed values, optional derivatives, visualization, and renormalization through this common abstraction.
 
 
 **Cross reference**
