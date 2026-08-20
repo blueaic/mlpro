@@ -129,16 +129,23 @@ ul.postlist > li span.readmore a:hover {
    ------------------------------------------------------------------------- */
 
 .mlpro-linkbar {
-    width: auto !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
     border: none !important;
     margin: 0 !important;
-    margin-left: 0 !important;
 }
 
-.mlpro-linkbar tbody,
+.mlpro-linkbar tbody {
+    display: block !important;
+    width: 100% !important;
+}
+
 .mlpro-linkbar tr {
     display: flex !important;
+    flex-wrap: wrap !important;
     gap: 14px !important;
+    width: 100% !important;
 }
 
 .mlpro-linkbar td {
