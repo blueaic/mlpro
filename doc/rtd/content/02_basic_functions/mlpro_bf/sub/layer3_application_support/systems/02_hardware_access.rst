@@ -3,31 +3,43 @@
 Hardware access
 ===============
 
-MLPro also provides possibility to use the standardized Systems API with real world systems. It manages the
-interaction between real world hardware including sensors, actuators and controllers with the standard processes in
-MLPro framework.
+MLPro-BF-Systems uses the same ``System`` abstraction for simulated and real systems. In real operation, sensor values and
+actuator commands are connected to the system through a **sensor/actuator gateway** (``SAGateway``).
 
 .. image::
-    images/hardware_access.drawio.png
-    :width: 400 px
+    images/hardware_access.svg
+    :width: 650 px
 
-As shown in the above figure, the controller class in MLPro registers a number of sensors and actuators for a system.
+The hardware-facing objects are intentionally small and composable:
 
-1. **Sensor**:
+**Sensor**
+    A ``Sensor`` is a specialization of :class:`Dimension`. It describes one observable quantity exposed by a gateway. Sensor
+    dimensions can be mapped to dimensions of the system's state space.
 
-    A sensor observes a system to deliver characteristic information about the system at a given time. The Sensor class in MLPro inherits from the Dimension class.
+**Actuator**
+    An ``Actuator`` is likewise a specialization of :class:`Dimension`. It describes one externally writable quantity and can
+    be mapped to a dimension of the system's action space.
 
-2. **Actuator**:
+**SAGateway**
+    ``SAGateway`` is the communication boundary between MLPro and concrete hardware. A custom gateway implements
+    ``_get_sensor_value()``, ``_set_actuator_value()``, and ``_reset()``. The base class manages registered sensors and actuators
+    and raises ``COMM_ERROR`` events if reading, writing, or resetting fails.
 
-    An actuator is responsible to generate an Action, which is executed in the real world system. Similar to Sensor class, the Actuator class is also inherited from the Dimension class of MLPro.
+A system can register one or more gateways and define mappings between state/action dimensions and sensor/actuator dimensions.
+This keeps the system model independent from the communication technology used underneath: field bus, device API, network
+service, laboratory hardware, or another adapter can all be hidden behind the same gateway interface.
 
-3. **Controller**:
+A typical integration follows this flow::
 
-    The controller is responsible to gather sensor data, compute the error signal and generate a corresponding action in order to maintain/reach the desired state of the system. The Controller class in MLPro manages the mapping details to map actions and states, to and from Actuators and Sensors, respectively.
+    sensor -> SAGateway -> State -> System
+    actuator <- SAGateway <- Action <- System
 
+The executable :ref:`Howto BF-SYSTEMS-010 <Howto BF SYSTEMS 010>` demonstrates a custom two-sensor/two-actuator gateway,
+registers it on a custom system, switches the system to real mode, and processes an action through the mapping.
 
 
 **Cross reference**
 
-- :ref:`Howto BF-SYSTEMS-001: System, Controller, Actuator, Sensor <Howto BF SYSTEMS 001>`
+- :ref:`State-based systems <target_bf_systems>`
+- :ref:`Howto BF-SYSTEMS-010: System, SAGateway, Actuator, Sensor <Howto BF SYSTEMS 010>`
 - :ref:`API reference BF-Systems <target_ap_bf_systems>`

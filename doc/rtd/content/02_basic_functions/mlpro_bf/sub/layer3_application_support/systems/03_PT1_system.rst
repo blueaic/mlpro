@@ -1,106 +1,69 @@
 .. _target_bf_systems_03:
+
 PT1 System
 ==========
 
-A **PT1 system** (Proportional-Time-Lag system of first order) is a simple dynamic system used to model processes that exhibit a time delay in their response. It is commonly encountered in electrical, thermal, mechanical, and other physical systems where the output changes gradually in response to an input.
+Overview
+--------
 
-Transfer Function of a PT1 System
----------------------------------
+``PT1`` is the ready-to-use first-order demo system in the BF-Systems pool. It models a proportional first-order lag and is
+particularly useful for control examples, controller tuning experiments, and tests that need a simple dynamic plant.
 
-The transfer function of a PT1 system in the Laplace domain is:
+The continuous reference model is commonly written as
 
 .. math::
 
-   G(s) = \frac{K}{T \cdot s + 1}
+   G(s) = \frac{K}{T s + 1}
 
-Where:
-- **\(K\):** Gain factor (amplifies the output signal relative to the input signal).  
-- **\(T\):** Time constant (characterizes how quickly the system responds to input changes).  
-- **\(s\):** Complex frequency variable from the Laplace transformation.
+with gain ``K`` and time constant ``T``. The MLPro implementation evaluates the dynamics numerically. For every control cycle it
+splits the configured system latency into ``C_SAMPLE_FREQ`` internal steps and recursively updates the system output.
 
-Time Behavior of a PT1 System
------------------------------
-
-The time behavior of a PT1 system can be analyzed using its **step response**, which describes how the output changes over time when the input is a step function.
-
-1. **Step Response:**
-   The output rises gradually and asymptotically approaches its final value. The response is characterized by the time constant (T):
-   - At (t = T), the output reaches approximately 63% of its final value.
-   - At (t = 3T), the output is about 95% of the final value.
-
-   The step response is described mathematically as:
-
-   .. math::
-
-      y(t) = K \cdot \left(1 - e^{-\frac{t}{T}}\right)
-
-2. **Time Constant (T):**
-   - A smaller \(T\) means the system responds faster.
-   - A larger \(T\) means the system responds more slowly.
+The state and action spaces are both one-dimensional Euclidean spaces. Their dimension is named from ``p_sys_num`` and uses the
+configured output boundaries. The resulting state is clipped to these boundaries after every simulated reaction.
 
 
+Configuration
+-------------
+
+The main constructor parameters are:
+
+- ``p_K``: gain factor;
+- ``p_T``: time constant;
+- ``p_sys_num``: numeric identifier used for the state/action dimension name;
+- ``p_y_start``: initial output value;
+- ``p_boundaries``: lower and upper output limits;
+- ``p_latency``: duration of one externally visible system cycle.
+
+``reset()`` restores the configured start value and marks the resulting state as initial.
 
 .. image::
     images/time_behavior_pt1_system.png
     :width: 750 px
 
-Frequency Response of a PT1 System
-----------------------------------
 
-- At **low frequencies**, the output amplitude is close to the input amplitude (\(K\)).
-- At **high frequencies**, the output amplitude decreases significantly, and the system acts as a low-pass filter.
-
-Applications of PT1 Systems
----------------------------
-
-PT1 systems are widely used to model simple processes, such as:
-
-- **Electrical circuits**: RC circuits where the resistor-capacitor combination creates a first-order response.
-- **Thermal systems**: Temperature control systems where heat transfer is slow.
-- **Hydraulic systems**: Systems with a simple delay in flow or pressure changes.
-- **Mechanical systems**: Systems with inertia or damping where the response follows a first-order dynamic.
-
-Advantages and Limitations
----------------------------
-
-**Advantages:**
-- Simple to analyze and model.
-- Suitable for many practical systems with first-order dynamics.
-
-**Limitations:**
-- Cannot model oscillatory or higher-order behavior.
-- Limited to systems where the response is exponential and without overshoot.
-
-
-
-
-
-
-**PT1 system can be imported and used as following:**
+Usage
+-----
 
 .. code-block:: python
 
-    #import PT1  model
+    from datetime import timedelta
     from mlpro.bf.systems.pool import PT1
 
-    #create a PT1 object
-    my_ctrl_sys = PT1( p_K = pt1_K,
-                    p_T = pt1_T,
-                    p_sys_num = 0,
-                    p_y_start = 0,
-                    p_latency = timedelta( seconds = cycle_time),
-                    p_visualize = visualize,
-                    p_logging = logging )
+    system = PT1(
+        p_K=1.0,
+        p_T=2.0,
+        p_sys_num=0,
+        p_y_start=0.0,
+        p_boundaries=[-250, 250],
+        p_latency=timedelta(seconds=0.1),
+    )
 
-
+The model is used directly by the BF-Control PID How-Tos.
 
 
 **Cross Reference**
 
-- :ref:`Howto BF-CONTROL-101: PID-Controller with PT1 system <Howto_BF_CONTROL_101>`
-
-- :ref:`API References <target_api_bf_systems_pool_pt1_system>`
-
-- `Further information <https://www.circuitbread.com/tutorials/first-order-systems-2-2>`_
-
-
+- :ref:`State-based systems <target_bf_systems>`
+- :ref:`Howto BF-CONTROL-101: PID Controller with PT1 system <Howto_BF_CONTROL_101>`
+- :ref:`PID Controller <target_bf_control_pid>`
+- :ref:`API Reference <target_api_bf_systems_pool_pt1_system>`

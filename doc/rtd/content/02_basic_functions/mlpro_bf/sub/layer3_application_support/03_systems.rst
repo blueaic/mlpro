@@ -3,102 +3,85 @@
 State-based systems
 ===================
 
-MLPro aims to standardize machine learning processes to accommodate complex applications in simplified reusable APIs.
-MLPro's Systems module standardizes state-based systems and their operation in a modular design. The keyword
-**state-based** implies the possibility to characteristically represent a system's unique state as a vector
-corresponding to a given timestep.
+Overview
+--------
 
-A state-based system has a definite condition at any given point in time, defined by a fixed number of variables that
-completely defines the condition. A system transits from a state to next state at each timestep based on the inherent
-state transition dynamics. However, this state transition is triggered by an external source of action, for example
-an Actuator.
+MLPro-BF-Systems provides a common model for state-based systems in simulation and real operation. A system is described by a
+**state space**, an **action space**, its current :class:`State`, and a transition from the current state to the next state after an
+:class:`Action` has been applied.
 
-In real application of state-based systems, such as controlled systems, it is highly interesting to maintain a desired
-system state, reach a system state or maximize system output, through optimum state transitions. Additionally, it is
-also an important concern to verify if the system is performing within the objective of the application or if the
-system has failed.
+The central objects are:
 
+- **State**: the current condition of a system. Besides its values and timestamp, a state can be marked as initial, terminal,
+  successful, broken, or timed out.
+- **Action / ActionElement**: the input applied to a system. An action can contain several action elements, for example for
+  multi-agent or multi-source setups.
+- **System**: the common execution model for simulated and real systems. It combines state transitions, terminal-state
+  assessment, timing, persistence, visualization, task execution, and real/simulated operation modes.
+- **FctSTrans, FctSuccess, FctBroken**: interchangeable function templates for state transition, success assessment, and
+  broken-state assessment. The same behavior can alternatively be implemented directly in a custom System subclass.
+- **Sensor, Actuator, SAGateway**: the hardware-facing abstraction for reading state-related values from sensors and writing
+  action-related values to actuators.
+- **MultiSystem / SystemShared**: infrastructure for composing several systems and exchanging mapped state/action values between
+  them.
+- **DemoScenario**: a lightweight scenario for exercising and validating a system with generated or predefined actions.
+
+A compact mental model is therefore::
+
+    Action -> System -> State
+                |        |
+                |        +-> success / broken / terminal
+                +-> simulated transition or real hardware access
+
+
+System execution model
+----------------------
+
+A custom system normally starts by defining its state and action spaces in ``setup_spaces()``. During operation,
+``process_action()`` applies an action and updates the current state. In simulated mode this is based on the state-transition
+logic of the system or an externally supplied ``FctSTrans`` object. In real mode, MLPro can obtain state values from sensors and
+forward action values to actuators through one or more ``SAGateway`` objects.
+
+The execution cycle also evaluates the resulting state for success and breakdown. These checks can be implemented directly in
+the system through ``_compute_success()`` and ``_compute_broken()`` or delegated to ``FctSuccess`` and ``FctBroken`` objects.
+This separates the physical or logical system dynamics from application-specific terminal-state criteria when desired.
+
+``System`` also participates in MLPro's task architecture and supports latency/timestep handling, reset, persistence, and
+visualization. This makes the same system implementation reusable from standalone demonstrations, control applications, and
+higher-level ML scenarios.
+
+
+Simulation, hardware, and composed systems
+------------------------------------------
+
+**Simulation.** Native Python implementations can provide ``_simulate_reaction()`` directly. MLPro also supports optional
+MuJoCo-backed systems through the separate MLPro-Int-MuJoCo integration. See :ref:`MuJoCo integration <target_bf_systems_mujoco>`.
+
+**Real systems.** ``Sensor`` and ``Actuator`` objects are dimensions exposed by an ``SAGateway``. A system maps state dimensions
+to sensors and action dimensions to actuators and can then use the same System API in real mode. See
+:ref:`Hardware access <target_bf_systems_hardware>` and :ref:`Howto BF-SYSTEMS-010 <Howto BF SYSTEMS 010>`.
+
+**Composed systems.** ``MultiSystem`` and ``SystemShared`` provide the basis for connecting several systems and mapping values
+between their state and action dimensions. They build on MLPro's task/workflow infrastructure so that coupled systems can also
+participate in asynchronous execution.
+
+
+Ready-to-use systems
+--------------------
+
+The systems pool contains reusable examples and benchmark components, including first- and second-order systems (``PT1`` and
+``PT2``), double-pendulum systems, and the Fox system. PT1 and PT2 are especially useful together with BF-Control for building
+and testing closed-loop control configurations.
 
 .. image::
     images/Systems.drawio.png
     :width: 550 px
 
-As shown in the figure above, MLPro's Systems module encapsulates the aforementioned functionalities into a standard
-template. The System object of MLPro can be reused to define any custom system with default methods to handle surrounding standard operations.
-
-The system's module provides following objects and templates:
-
-1. **System**:
-
-The System class standardizes and provides the base template for any State-based System along with standard MLPro
-functionalities such as Logging, Timer, Cycle Management, Persistence, Real/Simulated mode and Reset. The System
-class additionally provides room for custom functionalities such as Reaction Simulation, Terminal State Monitoring
-such as Success and Broken. These custom functionalities can be incorporated by implementing the
-:code:`_simulate_reaction()`, :code:`_compute_success()`, :code:`_compute_broken()` methods on Systems class or
-corresponding function classes (described below), which are then passed as a parameter to the system.
-
-.. note:: The System class also supports operation in modes: **Real** and **Simulated**, based on which, it enables working with a real hardware or a simulated system respectively.
-
-2. **FctStrans**:
-
-The FctStrans (State Transition Function) standardizes the process of simulating the primary State Transition
-process of a System. The :code:`simulate_reaction(p_state, p_action)` method of this class takes the current state of
-the environment and the action from the corresponding actuator as a parameter, and maps it to the next state of the
-system, based on the inherent dynamics.
-
-.. note:: Please implement the :code:`_simulate_reaction()` method of FctStrans, in order to re-use in a custom implementation.
-
-3. **FctSuccess**:
-
-A System state can be monitored through FctSuccess (Success Function) to determine if the system has reached the
-expected objective state/output. It maps the current state of the system to a boolean value indicating the success of
-a system.
-
-.. note:: Please implement :code:`_compute_success()` method of FctSuccess, in order to re-use it in a custom implementation.
-
-
-4. **FctBroken**:
-
-Similar to FctSuccess class, the FctBroken class standardizes the process of monitoring whether the system has
-reached a broken terminal state, by mapping the current state to a boolean value indicating the broken state.
-
-.. note:: Please implement :code:`_compute_broken()` method of FctBroken, in order to re-use it in custom implementation.
-
-5. **State**:
-
-The state object represents the current state of the system with respect to time. A state object inherits from
-the Element class of MLPro, which represents an element in a Multi-dimensional Set object, a State-Space in this case.
-The state consists information about the System for corresponding dimension of the related State-Space.
-
-6. **Action**:
-
-The Action object standardizes external input to the system. For example, input from a controller, input from an
-actuator or an agent in case of Reinforcement Learning. The standard Action object consists of an ActionElement or a
-list of ActionElements, in case of more than one action sources. The action element is similar to a state object,
-consisting corresponding values for all the dimension in the related action-space.
-
-MLPro also provides the possibility to integrate real world hardware, such as controllers and hardware to the System
-object. Furthermore, Systems module integrates optional visualization and simulation functionalities from MuJoCo into
-MLPro for re-usability.
-
-7. **DemoScenario**:
-
-Our module provides a demo scenario class to help users validate their system's behavior. The Demo scenario takes a system 
-as a parameter and runs a particular scenario to validate its behavior. Currently, this scenario does not consider an external 
-object to compute and deliver the actions. Rather, it computes the action internally and processes the action in the system. 
-The demo scenario supports two action styles:
-
-- Constant Action: 
-    A constant value of action is given for the entire run.
-
-- Action List: 
-    A list of actions provided by the user is used to process the system for a given number of cycles. With this 
-    demo scenario class, users can easily test their system and ensure that it behaves as expected.
 
 **Learn more**
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :glob:
 
    systems/*
@@ -107,7 +90,8 @@ The demo scenario supports two action styles:
 **Cross reference**
 
 - :ref:`Howto BF-SYSTEMS-001: Demonstrating native systems <Howto BF SYSTEMS 001>`
-- :ref:`Howto BF-SYSTEMS-010: System, Controller, Actuator, Sensor <Howto BF SYSTEMS 010>`
-- :ref:`MLPro-Int-MuJoCo <https://mlpro-int-mujoco.readthedocs.io>`_
+- :ref:`Howto BF-SYSTEMS-010: System, SAGateway, Actuator, Sensor <Howto BF SYSTEMS 010>`
+- :ref:`BF-Control <target_bf_control>`
+- `MLPro-Int-MuJoCo <https://mlpro-int-mujoco.readthedocs.io>`_
 - :ref:`API reference BF-Systems <target_ap_bf_systems>`
-- :ref:`API reference BF-Systems Sample pool <target_pool_bf_systems>`
+- :ref:`API reference BF-Systems sample pool <target_pool_bf_systems>`
