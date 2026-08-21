@@ -66,9 +66,13 @@ Functional scope
     timestamps, on/off status, buffering, visualization, and event-handler integration. Both instance-based and cluster-based
     change models are supported by the current source tree.
 
-**Statistics and observation**
-    Online statistics such as moving averages can participate in the same workflow, while OA/change/cluster observers provide
-    higher-level visualization and monitoring of adaptive processing chains.
+**Online statistics**
+    Tasks such as ``MovingAverage`` incrementally summarize the active stream context, can remove obsolete-instance influence,
+    and can renormalize their internal state when an upstream normalizer adapts.
+
+**Observation**
+    OA/change/cluster observers provide higher-level visualization and monitoring of adaptive processing chains without becoming
+    part of the processing logic itself.
 
 **Experimental change prediction**
     The source tree contains work on change and anomaly prediction, but these parts are currently disabled. They are therefore
@@ -79,8 +83,8 @@ How to read this section
 ------------------------
 
 Start with :ref:`OA-Streams Overview <target_oa_stream_overview>` for the core objects and processing lifecycle. The following
-sections then cover adaptive preprocessing, cluster analysis, change detection, and observation. Executable examples are linked
-from the relevant functional pages and collected in the OA-Streams How-To section.
+sections then cover adaptive preprocessing, cluster analysis, change detection, online statistics, and observation. Executable
+examples are linked from the relevant functional pages and collected in the OA-Streams How-To section.
 
 
 .. toctree::
@@ -90,6 +94,7 @@ from the relevant functional pages and collected in the OA-Streams How-To sectio
    streams/10_preprocessing
    streams/20_cluster_analysis
    streams/30_change_detection
+   streams/40_statistics
    streams/99_helpers
 
 
