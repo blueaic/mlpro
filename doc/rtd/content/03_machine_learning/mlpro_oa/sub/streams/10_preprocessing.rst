@@ -79,29 +79,24 @@ OA preprocessing is deliberately interoperable with :ref:`BF-Streams <target_bf_
 ``Rearranger``, ``Window``/``RingBuffer``, or ``Deriver`` can be combined with adaptive boundary detection and normalization in
 one ``OAStreamWorkflow``. This makes it possible to adapt only those stages that actually need adaptation.
 
-The How-To collection demonstrates both compact normalizer pipelines and larger hybrid workflows in 2D, 3D, and nD.
-
-
-How-Tos
--------
-
-- :ref:`OA-PP-001: Boundary detection and MinMax normalization in 2D <Howto_OA_PP_001>`
-- :ref:`OA-PP-002: Boundary detection and MinMax normalization in 3D <Howto_OA_PP_002>`
-- :ref:`OA-PP-003: Boundary detection and MinMax normalization in nD <Howto_OA_PP_003>`
-- :ref:`OA-PP-006: Z-transformation in 2D <Howto_OA_PP_006>`
-- :ref:`OA-PP-007: Z-transformation in 3D <Howto_OA_PP_007>`
-- :ref:`OA-PP-008: Z-transformation in nD <Howto_OA_PP_008>`
-- :ref:`OA-PP-101: Hybrid preprocessing in 2D <Howto_OA_PP_101>`
-- :ref:`OA-PP-102: Hybrid preprocessing in 3D <Howto_OA_PP_102>`
-- :ref:`OA-PP-103: Hybrid preprocessing in nD <Howto_OA_PP_103>`
-- :ref:`OA-PP-104: Hybrid preprocessing in 2D, 3D and nD <Howto_OA_PP_104>`
-- :ref:`OA-PP-121: Complex preprocessing with parallel tasks <Howto_OA_PP_121>`
+The available howtos demonstrate both compact normalizer pipelines and larger hybrid workflows in 2D, 3D, and nD.
 
 
 **Cross reference**
 
+- :ref:`Howtos OA-Streams <target_appendix1_OA_streams>`
+- :ref:`Howto OA-PP-001: Boundary detection and MinMax normalization in 2D <Howto_OA_PP_001>`
+- :ref:`Howto OA-PP-002: Boundary detection and MinMax normalization in 3D <Howto_OA_PP_002>`
+- :ref:`Howto OA-PP-003: Boundary detection and MinMax normalization in nD <Howto_OA_PP_003>`
+- :ref:`Howto OA-PP-006: Z-transformation in 2D <Howto_OA_PP_006>`
+- :ref:`Howto OA-PP-007: Z-transformation in 3D <Howto_OA_PP_007>`
+- :ref:`Howto OA-PP-008: Z-transformation in nD <Howto_OA_PP_008>`
+- :ref:`Howto OA-PP-101: Hybrid preprocessing in 2D <Howto_OA_PP_101>`
+- :ref:`Howto OA-PP-102: Hybrid preprocessing in 3D <Howto_OA_PP_102>`
+- :ref:`Howto OA-PP-103: Hybrid preprocessing in nD <Howto_OA_PP_103>`
+- :ref:`Howto OA-PP-104: Hybrid preprocessing in 2D, 3D and nD <Howto_OA_PP_104>`
+- :ref:`Howto OA-PP-121: Complex preprocessing with parallel tasks <Howto_OA_PP_121>`
 - :ref:`OA-Streams Overview <target_oa_stream_overview>`
 - :ref:`BF-Streams: Stream tasks and workflows <target_bf_streams>`
 - :ref:`BF-Math: Mathematics and normalizers <target_bf_mathematics>`
-- :ref:`OA-Streams How-Tos <target_appendix1_OA_streams>`
 - :ref:`API reference: MLPro-OA-Streams <target_api_oa_streams>`
