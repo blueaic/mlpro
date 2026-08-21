@@ -94,6 +94,6 @@ How-Tos
 
 - :ref:`OA-Streams Overview <target_oa_stream_overview>`
 - :ref:`BF-Streams: Stream tasks and workflows <target_bf_streams>`
-- :ref:`BF-Math: Normalizers <target_bf_math_normalizers>`
+- :ref:`BF-Math: Mathematics and normalizers <target_bf_mathematics>`
 - :ref:`OA-Streams How-Tos <target_appendix1_OA_streams>`
 - :ref:`API reference: MLPro-OA-Streams <target_api_oa_streams>`
