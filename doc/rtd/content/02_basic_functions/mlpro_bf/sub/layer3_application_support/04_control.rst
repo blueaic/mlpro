@@ -79,7 +79,7 @@ than hidden in a deeper documentation hierarchy.
 
     .. image::
         control/control_scenarios/images/03_cascade_control_system.drawio.png
-        :width: 900 px
+        :width: 1050 px
 
     See :ref:`Howto BF-CONTROL-003 <Howto BF CONTROL 003>`.
 
