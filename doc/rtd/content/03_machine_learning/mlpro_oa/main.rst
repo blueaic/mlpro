@@ -4,7 +4,7 @@ MLPro-OA - Online Adaptivity
 ============================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    sub/00_overview
    sub/01_oa_stream_processing
