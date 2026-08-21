@@ -13,7 +13,7 @@ stream algorithms. Ready-to-use native algorithms are available only for selecte
 reusable templates for custom implementations.
 
 .. image:: images/oa_streams_architecture.svg
-   :width: 62%
+   :width: 680 px
    :align: center
    :alt: Simplified architecture of MLPro-OA-Streams combining BF-Streams and BF-ML
 
@@ -53,7 +53,7 @@ parameters can change, and downstream models may keep internal state that depend
 these situations explicit through a stream-specific adaptation lifecycle.
 
 .. image:: images/oa_streams_adaptation_lifecycle.svg
-   :width: 72%
+   :width: 720 px
    :align: center
    :alt: Simplified lifecycle of forward, reverse, and renormalization adaptation in an OAStreamTask
 
@@ -73,7 +73,7 @@ other deterministic processing can remain in BF-Streams while only selected stag
 The active functional scope is summarized below.
 
 .. image:: images/oa_streams_functional_landscape.svg
-   :width: 72%
+   :width: 760 px
    :align: center
    :alt: Simplified functional landscape of adaptive preprocessing, cluster analysis, change detection, and auxiliary functionality in OA-Streams
 
