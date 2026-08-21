@@ -16,6 +16,10 @@ provides dedicated methods for buffering, removing, and raising ``Drift`` object
 A drift event can describe both the beginning and the end of a drift, which is useful for long-running streams where a changed
 regime may persist over many instances.
 
+.. image:: ../../../../../99_appendices/appendix2/sub/mlpro_oa/streams/30_change_detection/20_drift_detection/images/MLPro-OA-Drift-Detectors_class_diagram.drawio.png
+   :width: 90%
+   :alt: Class architecture of drift detection in MLPro-OA
+
 
 Drift versus anomaly
 --------------------
