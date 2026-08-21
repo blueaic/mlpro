@@ -83,8 +83,9 @@ How to read this section
 ------------------------
 
 Start with :ref:`OA-Streams Overview <target_oa_stream_overview>` for the core objects and processing lifecycle. The following
-sections then cover adaptive preprocessing, cluster analysis, change detection, online statistics, and observation. Executable
-examples are linked from the relevant functional pages and collected in the OA-Streams How-To section.
+sections then cover adaptive preprocessing, cluster analysis, change detection, anomaly and drift detection, online statistics,
+and observation. Executable examples are linked from the relevant functional pages and collected in the OA-Streams How-To
+section.
 
 
 .. toctree::
@@ -94,6 +95,8 @@ examples are linked from the relevant functional pages and collected in the OA-S
    streams/10_preprocessing
    streams/20_cluster_analysis
    streams/30_change_detection
+   streams/30_change_detection/10_anomaly_detection
+   streams/30_change_detection/20_drift_detection
    streams/40_statistics
    streams/99_helpers
 
