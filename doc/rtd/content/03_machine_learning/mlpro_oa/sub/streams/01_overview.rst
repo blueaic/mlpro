@@ -67,7 +67,7 @@ other deterministic processing can remain in BF-Streams while only selected stag
 
 The active functional scope is summarized below.
 
-.. image:: ../images/oa_streams_functional_landscape.svg
+.. image:: images/oa_streams_functional_landscape.svg
    :width: 72%
    :align: center
    :alt: Simplified functional landscape of adaptive preprocessing, cluster analysis, change detection, statistics, and observation in OA-Streams
