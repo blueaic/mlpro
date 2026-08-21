@@ -1,12 +1,14 @@
 .. _Howto BF CONTROL 003:
+
 Howto BF-CONTROL-003: Cascade control system
 ============================================
+
+This How-To demonstrates nested BF-Control workflows in a cascaded closed-loop configuration.
 
 **Executable code**
 
 .. literalinclude:: ../../../../../../../../../test/howtos/bf/control/howto_bf_control_003_cascade_control_system.py
-	:language: python
-
+   :language: python
 
 
 **Results**
@@ -18,4 +20,6 @@ Howto BF-CONTROL-003: Cascade control system
 
 **Cross Reference**
 
-    - :ref:`API Reference: Closed-loop control <target_api_bf_control>`
+- :ref:`Cascade control system <target_bf_control_scenario_cascade>`
+- :ref:`BF-Control overview <target_bf_control>`
+- :ref:`API Reference: Closed-loop control <target_api_bf_control>`
