@@ -26,13 +26,9 @@ OA-Streams is not limited to one learning algorithm or one application domain. I
 processing tasks for adaptive preprocessing, online cluster analysis, change detection, statistics, and observation. Concrete
 algorithms can therefore be composed into larger adaptive pipelines without creating a new runtime model for every method.
 
-
-Adaptation in a data stream
----------------------------
-
-A stream is not only a sequence of new samples. In dynamic processing chains, instances can also become obsolete, preprocessing
-parameters can change, and downstream models may keep internal state that depends on earlier transformations. OA-Streams makes
-these situations explicit through a stream-specific adaptation lifecycle.
+**Adaptation in a data stream.** A stream is not only a sequence of new samples. In dynamic processing chains, instances can also
+become obsolete, preprocessing parameters can change, and downstream models may keep internal state that depends on earlier
+transformations. OA-Streams makes these situations explicit through a stream-specific adaptation lifecycle.
 
 ``OAStreamTask`` supports:
 
@@ -49,9 +45,8 @@ may change the observed data range, an adaptive normalizer can react to the new 
 renormalize buffered state. Adaptation therefore becomes a property of the complete processing chain rather than an isolated
 method call inside one algorithm.
 
-
-Functional scope
-----------------
+**Functional scope.** The following overview shows the active functional areas of OA-Streams and how they relate to the incoming
+data stream and to each other.
 
 .. image:: streams/images/oa_streams_functional_landscape.svg
    :width: 72%
@@ -79,12 +74,8 @@ Functional scope
     OA/change/cluster observers provide higher-level visualization and monitoring of adaptive processing chains without becoming
     part of the processing logic itself.
 
-
-How to read this section
-------------------------
-
 Start with :ref:`OA-Streams Overview <target_oa_stream_overview>` for the core objects and processing lifecycle. The following
-sections then cover adaptive preprocessing, cluster analysis, change detection and its anomaly/drift specializations, online
+sections cover adaptive preprocessing, cluster analysis, change detection and its anomaly/drift specializations, online
 statistics, and observation. Executable howtos are linked from the corresponding pages through their cross-reference sections.
 
 
