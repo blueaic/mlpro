@@ -6,9 +6,9 @@ Anomaly Detection
 Overview
 --------
 
-Anomaly detection identifies unusual behavior in an evolving stream and represents it as explicit ``Anomaly`` objects and
-events. In MLPro-OA, anomaly detection is a specialization of the generic :ref:`Change Detection <target_oa_change_detection>`
-architecture rather than a separate runtime subsystem.
+Anomaly detection is a specialization of :ref:`Change Detection <target_oa_change_detection>`. It identifies unusual behavior
+in an evolving stream and represents it as explicit ``Anomaly`` objects and events while reusing the common
+``Change``/``ChangeDetector`` architecture.
 
 ``AnomalyDetector`` derives from ``ChangeDetector``. It therefore inherits bounded change buffering, event handling, optional
 visualization, delayed activation through an instance threshold, and the common change lifecycle. The public ``anomalies``
@@ -92,7 +92,7 @@ observe raw/preprocessed instances, follow an adaptive model, or consume the out
 event can then trigger observation, logging, model adaptation, or application-specific action without coupling that reaction to
 the detector itself.
 
-The active OA-Streams How-To tree currently contains no dedicated anomaly-detection script. This page therefore serves as the
+The active OA-Streams howto tree currently contains no dedicated anomaly-detection script. This page therefore serves as the
 functional entry point, while concrete class and method details are available in the API reference.
 
 
