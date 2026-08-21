@@ -1,29 +1,59 @@
 Overview
 ========
 
-MLPro has an extensive substructure of comprehensive basic functionalities, which are combined in the sub-framework MLPro-BF. 
-This is organized in a total of five layers that build on one another, as shown in the following figure:
+MLPro-BF is the common foundation stack of the MLPro ecosystem. It standardizes the infrastructure, execution models,
+mathematical abstractions, application interfaces, and machine-learning semantics that are reused throughout MLPro.
+Higher sub-frameworks can therefore concentrate on their domain-specific functionality instead of reimplementing the same
+fundamental mechanisms again and again.
+
+MLPro-BF is organized in five layers that deliberately build on one another:
 
 .. image:: images/MLPro-BF_Overview.drawio.png
     :scale: 50%
 
-The lowest :ref:`Layer 0: Elementary functions <target_bf_elementary>` provides a collection of functions for logging, 
-time measurement in simulated or real processes, persistence and data management, plotting, etc. It also contains a framework for interactive
-GUI applications.
 
-The next :ref:`Layer 1: Computation <target_bf_computation>` consists of various functionalities related to computation 
-topics, such as event handling and multitasking. Furthermore, it introduces an abstract runtime scenario with an operation 
-mode (simulation or real operation). This is one of the key concepts in MLPro to support real applications. It is reused 
-and specialized at higher levels.
+The five-layer architecture
+---------------------------
 
-On top of this, :ref:`Layer 2: Mathematics <target_bf_mathematics>` introduces elementary mathematical objects like
-dimensions, sets and elements, metric spaces, and functions. Furthermore, numeric algorithms for data normalization etc.
-are included.
+**Layer 0 - Elementary functions**
+    :ref:`Layer 0 <target_bf_elementary>` provides the elementary technical infrastructure used throughout MLPro. It covers
+    logging, time handling, persistence, data management, plotting and visualization support, scientific referencing, and
+    further reusable base services and objects.
 
-:ref:`Layer 3: Application support <target_bf_application_support>` prepares the connection to real 
-applications. It introduces powerful systematics for stream data processing/visualization and state-based systems that 
-are, in turn, prepared for communication with real hardware components like sensors and actuators.
+**Layer 1 - Computation**
+    :ref:`Layer 1 <target_bf_computation>` standardizes execution and orchestration. Its central concepts include events,
+    multitasking and asynchronous execution, tasks, workflows, shared objects, and generic operational scenarios with simulation
+    and real-operation modes. These runtime abstractions are reused by many higher MLPro components.
 
-The top :ref:`Layer 4: Machine learning <target_bf_ml>` of MLPro-BF specifies fundamental standards for machine learning. 
-All higher ML-related sub-frameworks reuse and specialize them. Topics like hyperparameters, adaptive models, and their training 
-and tuning in ML scenarios are handled here.
+**Layer 2 - Mathematics**
+    :ref:`Layer 2 <target_bf_mathematics>` provides the common mathematical object model. It introduces dimensions, sets and
+    spaces, elements, functions, normalizers, properties, geometric objects, and statistical utilities. These abstractions form
+    a shared mathematical language for application and ML layers above.
+
+**Layer 3 - Application support**
+    :ref:`Layer 3 <target_bf_application_support>` connects the generic foundation to concrete applications. It provides
+    standardized support for data stream processing, physics-related functionality, state-based systems including real hardware
+    access, and closed-loop control. This layer is where reusable runtime and mathematical concepts become application-facing
+    building blocks.
+
+**Layer 4 - Machine learning**
+    :ref:`Layer 4 <target_bf_ml>` anchors the paradigm-independent semantics of machine learning at BF level. It standardizes
+    adaptive models, ML scenarios, training and hyperparameter tuning, adaptation events, adaptive workflows, adaptive functions,
+    and adaptive systems. Higher MLPro domains can therefore build on the same definition of what an adaptive model is and remain
+    interoperable across learning paradigms.
+
+
+How the layers work together
+----------------------------
+
+The architecture can be read as a progression of abstraction levels::
+
+    Infrastructure -> Execution -> Mathematics -> Applications -> Machine Learning
+
+Each layer reuses the capabilities below it and adds a new level of semantics. A machine-learning model can therefore inherit
+persistence and logging from the elementary layer, multitasking and event handling from the computation layer, mathematical
+spaces and functions from the mathematics layer, and application abstractions such as streams or systems where needed.
+
+The same principle continues above MLPro-BF: specialized MLPro sub-frameworks reuse and refine these common foundations rather
+than defining isolated implementations of recurring concepts. This layered design is what enables consistent behavior,
+reusability, and interoperability across the MLPro ecosystem.
