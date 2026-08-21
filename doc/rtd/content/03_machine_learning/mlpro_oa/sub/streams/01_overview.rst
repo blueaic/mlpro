@@ -8,7 +8,8 @@ stream-processing abstractions of :ref:`BF-Streams <target_bf_streams>` with the
 :ref:`BF-ML <target_bf_ml>` without introducing a separate execution model.
 
 .. image:: images/oa_streams_architecture.svg
-   :width: 95%
+   :width: 62%
+   :align: center
    :alt: Simplified architecture of MLPro-OA-Streams combining BF-Streams and BF-ML
 
 The core objects are:
@@ -45,7 +46,8 @@ The fundamental processing unit remains ``InstDict``. Each entry contains an ins
 New and obsolete instances can therefore be handled differently during adaptation.
 
 .. image:: images/oa_streams_adaptation_lifecycle.svg
-   :width: 98%
+   :width: 72%
+   :align: center
    :alt: Simplified lifecycle of forward, reverse, and renormalization adaptation in an OAStreamTask
 
 Forward adaptation is the normal online-learning direction: a newly arriving instance changes the internal model. Reverse
@@ -94,20 +96,15 @@ other deterministic processing can remain in BF-Streams while only selected stag
 The same design also preserves MLPro's multitasking model. Tasks may run synchronously or asynchronously according to their
 configured processing range, and visualization/logging remain available throughout the pipeline.
 
-
-Executable examples
--------------------
-
-The OA-Streams How-Tos demonstrate adaptive normalization in 2D, 3D, and nD, hybrid pipelines containing BF and OA tasks, a more
-complex parallel preprocessing workflow, and observation of a workflow containing boundary detection, normalization, and online
+Executable howtos demonstrate adaptive normalization in 2D, 3D, and nD, hybrid pipelines containing BF and OA tasks, a complex
+parallel preprocessing workflow, and observation of workflows containing boundary detection, normalization, and online
 statistics.
-
-- :ref:`OA-Streams How-Tos <target_appendix1_OA_streams>`
-- :ref:`Complex preprocessing with parallel tasks <Howto_OA_PP_121>`
 
 
 **Cross reference**
 
+- :ref:`Howtos OA-Streams <target_appendix1_OA_streams>`
+- :ref:`Howto OA-PP-121: Complex preprocessing with parallel tasks <Howto_OA_PP_121>`
 - :ref:`API reference: MLPro-OA-Streams <target_api_oa_streams>`
 - :ref:`BF-Streams: Data stream processing <target_bf_streams>`
 - :ref:`BF-ML: Adaptive models and workflows <target_bf_ml>`
