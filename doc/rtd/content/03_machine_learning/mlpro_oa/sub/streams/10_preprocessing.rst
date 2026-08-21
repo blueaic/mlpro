@@ -13,6 +13,10 @@ same workflow, event, visualization, and adaptation model as all later analysis 
 The current native preprocessing stack contains two central building blocks: ``BoundaryDetector`` and online-adaptive
 normalizers.
 
+.. image:: ../../../../99_appendices/appendix2/sub/mlpro_oa/streams/10_preprocessing/images/MLPro-OA-Preprocessing-Tasks_class_diagram.drawio.png
+   :width: 90%
+   :alt: Class architecture of adaptive preprocessing tasks in MLPro-OA
+
 
 .. _target_oa_boundary_detector:
 
