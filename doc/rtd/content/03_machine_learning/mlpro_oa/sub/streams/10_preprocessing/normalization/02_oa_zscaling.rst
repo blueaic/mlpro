@@ -1,11 +1,6 @@
-.. _target_oa_norm_ztrans:
-Z-Scaling
-=========
+:orphan:
 
-Further descriptions coming soon...
+Adaptive Z-Transformation
+=========================
 
-
-**Cross Reference**
-
-- BF-Math: Z-Scaling
-- Howtos
+This topic is now documented directly in :ref:`Adaptive Preprocessing <target_oa_stream_preprocessing>`.
