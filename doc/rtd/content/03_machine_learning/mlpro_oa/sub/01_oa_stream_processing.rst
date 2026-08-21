@@ -10,10 +10,7 @@ Online-Adaptive Data Stream Processing (OADSP)
    streams/10_preprocessing
    streams/20_cluster_analysis
    streams/30_change_detection
-   streams/30_change_detection/10_anomaly_detection
-   streams/30_change_detection/20_drift_detection
-   streams/40_statistics
-   streams/99_helpers
+   streams/90_auxiliary_functionality
 
 
 **Cross reference**
