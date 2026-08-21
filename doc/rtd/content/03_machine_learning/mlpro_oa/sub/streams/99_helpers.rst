@@ -55,17 +55,16 @@ cluster-based anomaly/drift detection, where the structural model itself changes
 End-to-end observation
 ----------------------
 
-The OA-Streams observation How-To demonstrates a workflow combining boundary detection, adaptive MinMax normalization, moving
+The OA-Streams observation howto demonstrates a workflow combining boundary detection, adaptive MinMax normalization, moving
 average statistics, and an observer. It is a useful reference for understanding how adaptive processing and event observation
 fit together in one executable scenario.
-
-- :ref:`OA-OBS-001: Observing an adaptive stream workflow <Howto_OA_OBS_001>`
 
 
 **Cross reference**
 
+- :ref:`Howto OA-OBS-001: Observing an adaptive stream workflow <Howto_OA_OBS_001>`
+- :ref:`Howtos OA-Streams <target_appendix1_OA_streams>`
 - :ref:`OA-Streams Overview <target_oa_stream_overview>`
 - :ref:`Change Detection <target_oa_change_detection>`
 - :ref:`Online Cluster Analysis <target_oa_cluster_analysis>`
-- :ref:`OA-Streams How-Tos <target_appendix1_OA_streams>`
 - :ref:`API reference: MLPro-OA-Streams <target_api_oa_streams>`
