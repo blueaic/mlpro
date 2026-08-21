@@ -54,7 +54,8 @@ Functional scope
 ----------------
 
 .. image:: streams/images/oa_streams_functional_landscape.svg
-   :width: 98%
+   :width: 72%
+   :align: center
    :alt: Simplified functional landscape of adaptive preprocessing, cluster analysis, change detection, statistics, and observation in OA-Streams
 
 **Adaptive preprocessing**
@@ -66,9 +67,9 @@ Functional scope
     visualization, renormalization, and extensible cluster properties.
 
 **Change detection**
-    ``ChangeDetector`` and specialized anomaly/drift detectors represent detected changes as event objects with identity,
-    timestamps, on/off status, buffering, visualization, and event-handler integration. Both instance-based and cluster-based
-    change models are supported by the current source tree.
+    Change detection is the common framework-level domain for identifying relevant changes in an evolving stream. ``Change`` and
+    ``ChangeDetector`` provide the shared event, status, buffering, and visualization semantics. **Anomaly detection** and
+    **drift detection** are the two specialized detection domains built on top of this common foundation.
 
 **Online statistics**
     Tasks such as ``MovingAverage`` incrementally summarize the active stream context, can remove obsolete-instance influence,
@@ -78,18 +79,13 @@ Functional scope
     OA/change/cluster observers provide higher-level visualization and monitoring of adaptive processing chains without becoming
     part of the processing logic itself.
 
-**Experimental change prediction**
-    The source tree contains work on change and anomaly prediction, but these parts are currently disabled. They are therefore
-    not presented as active framework functionality in this documentation.
-
 
 How to read this section
 ------------------------
 
 Start with :ref:`OA-Streams Overview <target_oa_stream_overview>` for the core objects and processing lifecycle. The following
-sections then cover adaptive preprocessing, cluster analysis, change detection, anomaly and drift detection, online statistics,
-and observation. Executable examples are linked from the relevant functional pages and collected in the OA-Streams How-To
-section.
+sections then cover adaptive preprocessing, cluster analysis, change detection and its anomaly/drift specializations, online
+statistics, and observation. Executable howtos are linked from the corresponding pages through their cross-reference sections.
 
 
 .. toctree::
@@ -107,7 +103,7 @@ section.
 
 **Cross reference**
 
-- :ref:`OA-Streams How-Tos <target_appendix1_OA_streams>`
+- :ref:`Howtos OA-Streams <target_appendix1_OA_streams>`
 - :ref:`API reference: MLPro-OA-Streams <target_api_oa_streams>`
 - :ref:`BF-Streams: Data stream processing <target_bf_streams>`
 - :ref:`BF-ML: Machine learning foundations <target_bf_ml>`
