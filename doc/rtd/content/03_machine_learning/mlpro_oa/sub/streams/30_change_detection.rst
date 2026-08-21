@@ -10,6 +10,10 @@ Overview
 standardizes this through ``Change`` and ``ChangeDetector``. **Anomaly detection** and **drift detection** are specialized forms
 of change detection and reuse the same lifecycle, buffering, visualization, and event semantics.
 
+In the current development stage, this area is primarily a **template and standardization framework**. MLPro-OA defines how
+changes and detectors are represented and integrated, but it does not yet provide a broad collection of ready-to-use change
+detection algorithms. Concrete detection logic is generally implemented in specialized child classes or extensions.
+
 A detected change is not represented only by a Boolean flag. ``Change`` combines identity, timestamp, status, event behavior,
 visualization, and renormalization. This gives downstream components enough context to react to the beginning and end of a
 change and allows detectors to participate directly in MLPro's event system.
@@ -26,6 +30,9 @@ The conceptual hierarchy is::
                +-- instance-based
                +-- cluster-based
 
+Cluster-based change detection is currently under development. The corresponding data models, abstractions, and integration
+paths are being established, but this part should not yet be understood as mature ready-to-use functionality.
+
 
 The Change object
 -----------------
@@ -37,40 +44,38 @@ end. Event ids are derived from the concrete change type and its status, for exa
 ``ChangeDetector`` provides the common detector lifecycle, buffers recent change objects, assigns ids, controls execution after
 a configurable number of instances, and integrates visualization and event raising.
 
-This common contract lets different detection algorithms be exchanged while observers and downstream handlers continue to work
-with the same event semantics.
+This common contract lets different custom detection algorithms be exchanged while observers and downstream handlers continue
+to work with the same event semantics.
 
 
 Anomaly detection
 -----------------
 
-Anomaly detection specializes change detection for unusual observations, groups, contexts, or structural effects. The active
-source tree supports both **instance-based** and **cluster-based** anomaly models.
+Anomaly detection specializes change detection for unusual observations, groups, contexts, or structural effects. MLPro-OA
+provides the corresponding anomaly objects and detector templates for both **instance-based** and **cluster-based** approaches.
 
-Instance-based anomalies describe deviations associated with individual observations or groups of observations. Native anomaly
-objects include point, group, and contextual variants.
+Instance-based anomalies describe deviations associated with individual observations or groups of observations. The framework
+model includes point, group, and contextual variants.
 
-Cluster-based anomalies describe changes in the evolving cluster structure. The current anomaly model includes events such as
-new-cluster appearance, disappearance, enlargement, shrinkage, deformation, density changes, point-related cluster anomalies,
-and group effects.
+Cluster-based anomalies describe changes in the evolving cluster structure, for example appearance, disappearance, enlargement,
+shrinkage, deformation, density changes, and point/group effects around clusters. This cluster-based branch is still under
+development.
 
-This distinction is useful because an anomaly can either be visible directly in the incoming observations or emerge only after
-the stream has been summarized by an adaptive cluster model.
-
-See :ref:`Anomaly Detection <target_oa_anomaly_detection>` for the specialized framework objects and detector variants.
+See :ref:`Anomaly Detection <target_oa_anomaly_detection>` for the specialized framework objects and detector templates.
 
 
 Drift detection
 ---------------
 
-Drift detection specializes change detection for persistent changes of the underlying data-generating process. OA-Streams
-provides common drift abstractions and separates instance-based from cluster-based approaches in the source architecture.
+Drift detection specializes change detection for persistent changes of the underlying data-generating process. MLPro-OA defines
+common drift abstractions and separate template layers for instance-based and cluster-based approaches.
 
 The important framework-level distinction is that anomaly and drift detectors share the same ``Change``/``ChangeDetector``
-contract. Their results can therefore be observed and processed uniformly even though their algorithms and temporal semantics
-are different.
+contract. Their results can therefore be observed and processed uniformly even though their concrete algorithms and temporal
+semantics are different. Cluster-based drift detection is part of the same ongoing development area as cluster-based change
+detection in general.
 
-See :ref:`Drift Detection <target_oa_drift_detection>` for the specialized drift lifecycle and detector variants.
+See :ref:`Drift Detection <target_oa_drift_detection>` for the specialized drift lifecycle and detector templates.
 
 
 .. toctree::
