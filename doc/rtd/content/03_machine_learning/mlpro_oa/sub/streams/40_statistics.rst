@@ -34,17 +34,13 @@ A typical use is::
 
     Stream -> Window / BoundaryDetector -> Adaptive Normalizer -> MovingAverage -> Observer / later task
 
-The observation How-To demonstrates this pattern in an executable adaptive workflow.
-
-
-How-To
-------
-
-- :ref:`OA-OBS-001: Observing an adaptive stream workflow <Howto_OA_OBS_001>`
+The observation howto demonstrates this pattern in an executable adaptive workflow.
 
 
 **Cross reference**
 
+- :ref:`Howto OA-OBS-001: Observing an adaptive stream workflow <Howto_OA_OBS_001>`
+- :ref:`Howtos OA-Streams <target_appendix1_OA_streams>`
 - :ref:`Adaptive Preprocessing <target_oa_stream_preprocessing>`
 - :ref:`Observation and Helpers <target_oa_helpers>`
 - :ref:`OA-Streams Overview <target_oa_stream_overview>`
