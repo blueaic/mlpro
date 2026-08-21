@@ -13,7 +13,7 @@ focus is therefore on reusable templates, integration mechanisms, and selected r
 
 .. image:: images/oa_control_architecture.svg
    :width: 700 px
-   :align: center
+   :align: left
    :alt: Simplified architecture of online-adaptive closed-loop control in MLPro-OA
 
 The central design principle is separation of concerns: BF-Control defines the control-loop semantics, BF-ML defines generic
