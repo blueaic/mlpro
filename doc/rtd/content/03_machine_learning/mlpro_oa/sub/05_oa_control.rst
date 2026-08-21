@@ -10,6 +10,10 @@ MLPro-OA-Control extends the closed-loop control abstractions of :ref:`MLPro-BF-
 paradigm-independent adaptation semantics of :ref:`MLPro-BF-ML <target_bf_ml>`. Its purpose is to support controllers that can
 change their internal policy while the control loop is running.
 
+Like MLPro-OA as a whole, OA-Control is still under active development and expansion. A substantial part of the architectural and
+standardization work is already in place, but the set of ready-to-use adaptive control algorithms is still limited. The current
+focus is therefore on reusable templates, integration mechanisms, and selected reference implementations.
+
 The central abstraction is ``OAController``. It combines the classical ``Controller`` contract with the adaptive ``Model``
 contract. The controller therefore remains a regular MLPro control task, but it can additionally adapt from the control context
 observed during operation.
@@ -72,8 +76,9 @@ OA-Control provides the integration into the closed-loop control runtime.
 RLPID
 -----
 
-``RLPID`` is the current native OA-Control policy for adaptive PID control. It combines a conventional BF-Control
-``PIDController`` with an internal RL policy that tunes the PID parameters during operation.
+``RLPID`` is the current native OA-Control policy for adaptive PID control and one of the few ready-to-use algorithmic building
+blocks already available in this young sub-framework. It combines a conventional BF-Control ``PIDController`` with an internal RL
+policy that tunes the PID parameters during operation.
 
 The two levels have distinct roles:
 
