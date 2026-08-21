@@ -10,12 +10,14 @@ Anomaly detection is a specialization of :ref:`Change Detection <target_oa_chang
 in an evolving stream and represents it as explicit ``Anomaly`` objects and events while reusing the common
 ``Change``/``ChangeDetector`` architecture.
 
-``AnomalyDetector`` derives from ``ChangeDetector``. It therefore inherits bounded change buffering, event handling, optional
-visualization, delayed activation through an instance threshold, and the common change lifecycle. The public ``anomalies``
-collection is an alias of the underlying change buffer.
+In its current state, MLPro-OA mainly provides the **standardized anomaly model and detector templates**. ``AnomalyDetector``
+derives from ``ChangeDetector`` and inherits bounded change buffering, event handling, optional visualization, delayed activation
+through an instance threshold, and the common change lifecycle. The public ``anomalies`` collection is an alias of the underlying
+change buffer.
 
-Concrete algorithms should raise anomalies through the framework's anomaly-event methods so ids, timestamps, buffering, and
-registered handlers remain consistent.
+Concrete anomaly-detection logic is generally supplied by specialized child classes or extensions. The framework standardizes
+how detected anomalies are represented, buffered, visualized, and emitted rather than claiming to provide one universal anomaly
+algorithm.
 
 
 Anomaly objects
@@ -28,12 +30,12 @@ Instance-oriented anomaly objects include:
 - **Group anomalies** for a sequence or collection whose combined behavior is unusual.
 - **Contextual anomalies** for observations that are unusual only in a particular context.
 
-Cluster-oriented anomaly objects describe changes in an adaptive cluster model. The current source tree contains anomaly types
-for new-cluster appearance, disappearance, enlargement, shrinkage, deformation, density changes, and point/group effects around
+Cluster-oriented anomaly objects describe changes in an adaptive cluster model. The framework model includes anomaly types for
+new-cluster appearance, disappearance, enlargement, shrinkage, deformation, density changes, and point/group effects around
 clusters.
 
-All anomaly types still share the ``Change`` event semantics, which means downstream handlers can react consistently to
-specialized anomaly classes.
+All anomaly types share the ``Change`` event semantics, which means downstream handlers can react consistently to specialized
+anomaly classes.
 
 
 .. _target_oa_ibad:
@@ -57,21 +59,19 @@ standardizes *how* the anomaly is represented, buffered, visualized, and emitted
 Cluster-based anomaly detection
 -------------------------------
 
-Cluster-based detection operates on the structural model maintained by an online
-:ref:`Cluster Analyzer <target_oa_cluster_analysis>`. This enables anomalies that are not evident from a single sample alone to
-be detected from changes in cluster geometry, density, population, or existence.
+Cluster-based anomaly detection is part of the **cluster-based change-detection area that is currently under development**. It is
+designed to operate on the structural model maintained by an online :ref:`Cluster Analyzer <target_oa_cluster_analysis>` and to
+express anomalies derived from changes in cluster geometry, density, population, or existence.
 
-OA-Streams provides a cluster-based anomaly-detector foundation plus generic implementations and a point/group anomaly detector.
-The detector can consume cluster information and raise specialized cluster anomaly objects when the cluster model changes.
+The architectural foundations and corresponding anomaly objects/templates are already present, but this area should not yet be
+regarded as mature ready-to-use functionality. A custom cluster algorithm can expose the standardized cluster model and
+properties, while specialized detector implementations can build on the common change/anomaly semantics.
 
-This separation is important in adaptive pipelines::
+Conceptually::
 
     instances -> ClusterAnalyzer -> cluster state/properties -> cluster-based AnomalyDetector
-                    |                                      |
-                    +---------- adaptation events ---------+
 
-The clustering algorithm and the anomaly semantics remain replaceable. A custom cluster algorithm can expose the standardized
-cluster model and properties, while a detector can focus on the structural conditions it considers anomalous.
+The clustering algorithm and the anomaly semantics remain decoupled through the standardized interfaces.
 
 
 Anomaly lifecycle and triage
@@ -87,13 +87,13 @@ an anomalous condition where appropriate. Event consumers can register for the c
 Use in adaptive workflows
 -------------------------
 
-Anomaly detectors are ordinary OA stream tasks and can therefore be inserted anywhere in an ``OAStreamWorkflow``. A detector may
-observe raw/preprocessed instances, follow an adaptive model, or consume the output of online cluster analysis. An emitted anomaly
-event can then trigger observation, logging, model adaptation, or application-specific action without coupling that reaction to
-the detector itself.
+Anomaly detectors are ordinary OA stream tasks and can therefore be inserted into an ``OAStreamWorkflow``. A detector may
+observe raw/preprocessed instances, follow an adaptive model, or, for cluster-based approaches, consume an online cluster model.
+An emitted anomaly event can then trigger observation, logging, model adaptation, or application-specific action without
+coupling that reaction to the detector itself.
 
 The active OA-Streams howto tree currently contains no dedicated anomaly-detection script. This page therefore serves as the
-functional entry point, while concrete class and method details are available in the API reference.
+functional entry point, while class and method details are available in the API reference.
 
 
 **Cross reference**
