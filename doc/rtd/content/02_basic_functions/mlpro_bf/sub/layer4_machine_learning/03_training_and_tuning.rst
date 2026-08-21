@@ -1,38 +1,75 @@
 .. _target_bf_ml_train_and_tune:
 
-Training and tuning
-===================
+Training and Hyperparameter Tuning
+==================================
 
-A template for training models in their defined context is also introduced at this level. In a broader sense, this 
-also includes finding an optimal value assignment for their hyperparameters. In MLPro, the **Training** class defines 
-standards for this. Although abstract at this level, it fully implements the hyperparameter tuning here. The basic 
-concept pursued here envisages executing an ML scenario under defined conditions and allowing the model contained 
-therein to learn.
+Overview
+--------
 
+BF-ML separates the definition of a model from the process used to train, evaluate, tune, and persist it. ``Training`` provides
+the generic orchestration layer for this process and operates on a :ref:`Machine Learning Scenario <target_bf_ml_scenario>`.
 
-**Persistence of training results**
-
-At the end of the training, the training results are saved in the file system. In particular, the entire scenario is 
-saved here for later operational use. This includes both the trained model and the context in the last state.
+This keeps the training lifecycle independent of the concrete learning paradigm. Higher ML frameworks specialize what happens in
+a training cycle, how a score is determined, and when training is considered finished, while reusing the same execution,
+result-management, and tuning interfaces.
 
 
-**Scoring**
+Training lifecycle
+------------------
 
-One of the training results is the **highscore**. Its determination is of course heavily dependent on the type of 
-learning and can therefore only be specified in higher layers of MLPro. In any case, however, it is basically a real 
-number that allows a qualitative statement about the learning performance of the model in its scenario.
+A ``Training`` instance is configured with a scenario class and optional limits for training cycles and adaptations. Without
+hyperparameter tuning, the training creates the scenario directly and executes custom training cycles until the configured
+termination condition is reached.
+
+``run_cycle()`` handles the common lifecycle around the custom ``_run_cycle()`` implementation. It manages run initialization,
+training/evaluation counters, cycle limits, result handling, persistence, and completion logging. ``run()`` executes the complete
+training and returns the resulting ``TrainingResults`` object.
+
+The training distinguishes two generic modes:
+
+- ``C_MODE_TRAIN`` for adaptation/training cycles.
+- ``C_MODE_EVAL`` for evaluation cycles that do not count toward the training-cycle total.
+
+The concrete interpretation of these modes is left to the specialized training implementation.
 
 
-**Hyperparameter tuning**
+Training results and persistence
+--------------------------------
 
-Hyperparameter tuning is an optional training function performed by its own **HyperParamTuner** class. In particular, 
-it defines the **maximize** method, which maximizes the highscore of a designated training by varying the hyperparameters 
-of the model it contains. The optimization itself is not performed natively by MLPro, but by third-party packages. To this purpose, MLPro provides 
-wrappers for :ref:`Optuna <Wrapper Optuna>` and :ref:`Hyperopt <Wrapper Hyperopt>`.
+``TrainingResults`` provides a common result container. It records, among other values:
+
+- start and end timestamps and total duration;
+- start/end cycle ids;
+- numbers of training and evaluation cycles;
+- number of adaptations;
+- a generic ``highscore``;
+- arbitrary custom results added by specialized training implementations.
+
+If a training path is configured, the completed scenario is persisted below the training run. This preserves both the trained
+model and its surrounding application context for later operational use. A tabular summary can additionally be written through
+``TrainingResults.save()``.
+
+The meaning of ``highscore`` is deliberately not defined at BF level. It is the common scalar optimization target used by higher
+ML domains and their tuning implementations.
+
+
+Hyperparameter tuning
+---------------------
+
+``HyperParamTuner`` defines the paradigm-independent tuning interface. Its public ``maximize()`` method receives the training
+class, number of trials, root path, and training parameters and delegates the actual optimization strategy to ``_maximize()``.
+
+This design allows third-party optimization technology to be connected without changing the BF-ML training contract. The tuner
+varies the model's hyperparameters through the common BF-ML hyperparameter abstractions and returns the ``TrainingResults`` of the
+best trial.
+
+``HyperParamTuner.save()`` can persist the best parameter assignment and score. Concrete tuner wrappers can additionally provide
+trial-level data storage.
 
 
 **Cross reference**
 
+- :ref:`Adaptive models and hyperparameters <target_bf_ml_model>`
+- :ref:`Machine Learning Scenarios <target_bf_ml_scenario>`
+- :ref:`Howto BF-ML-010: Hyperparameters <Howto BF ML 010>`
 - :ref:`API reference BF-ML <target_api_bf_ml>`
-- :ref:`Wrapper for Optuna <Wrapper Optuna>`
-- :ref:`Wrapper for Hyperopt <Wrapper Hyperopt>`
