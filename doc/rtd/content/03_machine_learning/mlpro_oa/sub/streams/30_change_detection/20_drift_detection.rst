@@ -10,11 +10,13 @@ Drift detection is a specialization of :ref:`Change Detection <target_oa_change_
 the underlying data-generating process while reusing the same generic ``Change``/``ChangeDetector`` architecture as anomaly
 detection.
 
-``DriftDetector`` derives from ``ChangeDetector`` and exposes its buffered changes through the public ``drifts`` collection. It
-provides dedicated methods for buffering, removing, and raising ``Drift`` objects and a drift-specific triage hook for cleanup.
+In its current state, MLPro-OA primarily provides **drift models and detector templates** rather than a broad pool of ready-to-use
+drift algorithms. ``DriftDetector`` derives from ``ChangeDetector`` and exposes its buffered changes through the public ``drifts``
+collection. It provides dedicated methods for buffering, removing, and raising ``Drift`` objects and a drift-specific triage hook
+for cleanup.
 
-A drift event can describe both the beginning and the end of a drift, which is useful for long-running streams where a changed
-regime may persist over many instances.
+Concrete drift criteria are supplied by specialized detector implementations. MLPro-OA standardizes how drifts are represented,
+integrated into workflows, buffered, visualized, and emitted as events.
 
 
 Drift versus anomaly
@@ -33,11 +35,11 @@ algorithms and reaction policies.
 Instance-based drift detection
 ------------------------------
 
-Instance-based drift detection derives evidence directly from the arriving observations or statistics calculated from them. The
+Instance-based drift detection derives evidence directly from arriving observations or statistics calculated from them. The
 source architecture provides a dedicated instance-based detector layer beneath the common ``DriftDetector`` template.
 
-Typical implementations can compare recent observations or statistics with an earlier reference state and raise a drift when a
-persistent distributional change is detected. OA-Streams supplies the event, buffering, timestamp, status, and lifecycle
+Typical custom implementations can compare recent observations or statistics with an earlier reference state and raise a drift
+when a persistent distributional change is detected. OA-Streams supplies the event, buffering, timestamp, status, and lifecycle
 semantics; the concrete statistical criterion remains algorithm-specific.
 
 
@@ -46,15 +48,16 @@ semantics; the concrete statistical criterion remains algorithm-specific.
 Cluster-based drift detection
 -----------------------------
 
-Cluster-based drift detection observes the evolving structural description produced by an online cluster analyzer. Changes in
-cluster positions, geometry, density, membership, relations, appearance, or disappearance can provide evidence of a changing
-data-generating process.
+Cluster-based drift detection belongs to the **cluster-based change-detection area that is currently under development**. It is
+designed to observe the evolving structural description produced by an online cluster analyzer and to derive drift evidence from
+changes in cluster positions, geometry, density, membership, relations, appearance, or disappearance.
 
-Because :ref:`Online Cluster Analysis <target_oa_cluster_analysis>` exposes clusters and their properties through standardized
-objects, drift detection can be decoupled from a particular clustering algorithm. The source tree provides a dedicated
-cluster-based drift-detector layer for this purpose.
+The corresponding architectural layers and interfaces are being established, but this area should not yet be interpreted as
+mature ready-to-use functionality. Because :ref:`Online Cluster Analysis <target_oa_cluster_analysis>` exposes clusters and their
+properties through standardized objects, future and custom drift detectors can remain decoupled from a particular clustering
+algorithm.
 
-A representative pipeline is::
+Conceptually::
 
     Stream -> adaptive preprocessing -> ClusterAnalyzer -> DriftDetector
                                       |                  |
@@ -82,7 +85,7 @@ architectures in which detection and reaction remain separate, for example a dri
 adaptation mode or triggers reinitialization of selected pipeline stages.
 
 The active OA-Streams howto tree currently contains no dedicated drift-detection script. Concrete APIs and available detector
-classes are documented in the API reference.
+templates are documented in the API reference.
 
 
 **Cross reference**
