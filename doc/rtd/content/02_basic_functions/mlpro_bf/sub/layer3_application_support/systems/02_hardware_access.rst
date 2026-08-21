@@ -7,8 +7,8 @@ MLPro-BF-Systems uses the same ``System`` abstraction for simulated and real sys
 actuator commands are connected to the system through a **sensor/actuator gateway** (``SAGateway``).
 
 .. image::
-    images/hardware_access.drawio.png
-    :width: 400 px
+    images/hardware_access.svg
+    :width: 650 px
 
 The hardware-facing objects are intentionally small and composable:
 
