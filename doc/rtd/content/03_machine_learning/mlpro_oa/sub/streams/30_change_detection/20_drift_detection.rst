@@ -6,9 +6,9 @@ Drift Detection
 Overview
 --------
 
-Drift detection addresses persistent changes of the underlying data-generating process. In MLPro-OA it shares the same generic
-``Change``/``ChangeDetector`` architecture as anomaly detection, so drift events can be handled by the same event-oriented
-workflow mechanisms while retaining drift-specific semantics.
+Drift detection is a specialization of :ref:`Change Detection <target_oa_change_detection>`. It addresses persistent changes of
+the underlying data-generating process while reusing the same generic ``Change``/``ChangeDetector`` architecture as anomaly
+detection.
 
 ``DriftDetector`` derives from ``ChangeDetector`` and exposes its buffered changes through the public ``drifts`` collection. It
 provides dedicated methods for buffering, removing, and raising ``Drift`` objects and a drift-specific triage hook for cleanup.
@@ -20,9 +20,9 @@ regime may persist over many instances.
 Drift versus anomaly
 --------------------
 
-An anomaly usually describes an unusual observation, group, or structural event. Drift describes a change in the process itself.
-The distinction is semantic rather than infrastructural: both are specialized ``Change`` objects and both are emitted by
-specialized ``ChangeDetector`` tasks.
+Both anomaly and drift detection are specialized forms of change detection. An anomaly usually describes an unusual observation,
+group, or structural event. Drift describes a persistent change in the process itself. The distinction is semantic rather than
+infrastructural: both are specialized ``Change`` objects and both are emitted by specialized ``ChangeDetector`` tasks.
 
 This shared model allows a workflow to treat anomaly and drift detection uniformly at the event level while using different
 algorithms and reaction policies.
@@ -81,7 +81,7 @@ A drift detector can be connected to observation, model adaptation, or applicati
 architectures in which detection and reaction remain separate, for example a drift event that switches a model into a stronger
 adaptation mode or triggers reinitialization of selected pipeline stages.
 
-The active OA-Streams How-To tree currently contains no dedicated drift-detection script. Concrete APIs and available detector
+The active OA-Streams howto tree currently contains no dedicated drift-detection script. Concrete APIs and available detector
 classes are documented in the API reference.
 
 
