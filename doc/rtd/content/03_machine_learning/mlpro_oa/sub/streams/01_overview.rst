@@ -7,9 +7,9 @@ MLPro-OA-Streams is the common runtime and adaptation layer for online-adaptive 
 stream-processing abstractions of :ref:`BF-Streams <target_bf_streams>` with the adaptive-model abstractions of
 :ref:`BF-ML <target_bf_ml>` without introducing a separate execution model.
 
-.. image:: ../../../../99_appendices/appendix2/sub/mlpro_oa/streams/00_basics/images/MLPro-OA-Stream-Processing_class_diagram.drawio.png
-   :width: 90%
-   :alt: Core class architecture of online-adaptive stream processing in MLPro-OA
+.. image:: images/oa_streams_architecture.svg
+   :width: 95%
+   :alt: Simplified architecture of MLPro-OA-Streams combining BF-Streams and BF-ML
 
 The core objects are:
 
@@ -44,20 +44,9 @@ From stream processing to online adaptation
 The fundamental processing unit remains ``InstDict``. Each entry contains an instance id, an instance type, and an ``Instance``.
 New and obsolete instances can therefore be handled differently during adaptation.
 
-The default ``OAStreamTask.adapt()`` lifecycle is::
-
-    incoming InstDict
-          |
-      _adapt_pre()
-          |
-    +-------------------------------+
-    | new instance      -> _adapt() |
-    | obsolete instance -> _adapt_reverse()
-    +-------------------------------+
-          |
-      _adapt_post()
-          |
-    OAStreamAdaptation event(s)
+.. image:: images/oa_streams_adaptation_lifecycle.svg
+   :width: 98%
+   :alt: Simplified lifecycle of forward, reverse, and renormalization adaptation in an OAStreamTask
 
 Forward adaptation is the normal online-learning direction: a newly arriving instance changes the internal model. Reverse
 adaptation is the complementary mechanism for forgetting or compensating an instance that leaves the active processing context,
