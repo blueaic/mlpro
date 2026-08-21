@@ -14,6 +14,8 @@ The current native preprocessing stack contains two central building blocks: ``B
 normalizers.
 
 
+.. _target_oa_boundary_detector:
+
 Boundary detection
 ------------------
 
@@ -31,15 +33,21 @@ The detector therefore fits naturally into workflows where the valid data range 
 adaptation of downstream tasks instead of being handled by application-specific glue code.
 
 
+.. _target_oa_streams_normalization:
+
 Online-adaptive normalization
 -----------------------------
 
 ``OAStreamNormalizer`` is the common template that combines a mathematical ``Normalizer`` with ``OAStreamTask``. Native
 implementations currently include:
 
+.. _target_oa_norm_minmax:
+
 **NormalizerMinMax**
     Adapts MinMax normalization parameters to changing input boundaries and transforms incoming feature values to configurable
     destination boundaries, by default ``[-1, 1]``.
+
+.. _target_oa_norm_ztrans:
 
 **NormalizerZTrans**
     Provides online-adaptive Z-transformation based on the evolving statistics of the stream.
