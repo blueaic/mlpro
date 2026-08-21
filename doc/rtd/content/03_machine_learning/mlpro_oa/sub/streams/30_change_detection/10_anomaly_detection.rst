@@ -1,37 +1,104 @@
 .. _target_oa_anomaly_detection:
-Anomaly detection
+
+Anomaly Detection
 =================
 
-Anomaly detection involves identifying instances that are structurally or dimensionally similar to non-anomalous data but deviate significantly from the normal data distribution or pattern. In real-world problems, anomaly detection helps uncover unusual activities in banking and finance, abnormalities in medical test results, uncommon behavior or sensor readings of machines, defective products in manufacturing lines, or malicious activities in network traffic monitoring. Detecting and analyzing these instances or behaviors is crucial for taking immediate action, preventing future occurrences of undesirable events, and ensuring data quality. Moreover, anomaly detection plays a pivotal role in making unbiased and accurate decisions across various domains.
+Overview
+--------
 
-Anomaly detection techniques can be broadly classified into two categories based on the under- lying principles and methodologies. The two categories are Statistical anomaly detectors and Machine Learning anomaly detectors.
+Anomaly detection identifies unusual behavior in an evolving stream and represents it as explicit ``Anomaly`` objects and
+events. In MLPro-OA, anomaly detection is a specialization of the generic :ref:`Change Detection <target_oa_change_detection>`
+architecture rather than a separate runtime subsystem.
 
-**Types of anomalies**
-There are three main types of anomalies- Point anomalies, Contextual anomalies and Collective anomalies.
+``AnomalyDetector`` derives from ``ChangeDetector``. It therefore inherits bounded change buffering, event handling, optional
+visualization, delayed activation through an instance threshold, and the common change lifecycle. The public ``anomalies``
+collection is an alias of the underlying change buffer.
 
-  (a) Point Anomalies : Type I anomalies or point anomalies are individual data instances that are significantly different from the rest of the dataset. Also known as global anomalies, these do not fit the normal distribution or pattern of the dataset.
-  (b) Contextual Anomalies : Type II anomalies or contextual anomalies are data instances that are anomalies only in a particular context or subset of the dataset. Also known as conditional anomalies, these are not necessarily anomalies in the context of the whole dataset but anomalous within a specific context or condition.
-  (c) Group Anomalies : Type III anomalies or group anomalies or collective anomalies are anomalous data instances when taken as a group or subset of the dataset. They may or may not be anomalies when considered individually. Also known as group anomalies, these occur when there is a deviation or unexpected relationship or behaviour among a group of data instances from the normal distribution of data.
-
-**Classification of anomaly detectors**
-Anomaly detection techniques can be broadly classified into two categories based on the under- lying principles and methodologies. The two categories are Statistical anomaly detectors and Machine Learning anomaly detectors.
-
-  (a) Statistical Anomaly Detectors : Statistical anomaly detectors use statistical methods to find data point deviations from the normal distribution. Common algorithms for this category of anomaly detectors are Z-score, Kernel Density Estimate, and Gaussian Mixture Models (GMM).
-  (b) Machine Learning Anomaly Detectors : The anomaly detectors which employ machine learning algorithms by training a model against labelled or unlabeled data to detect anomalies are categorized as machine learning anomaly detectors. In general, based on the type of data and amount of labelled used to train the ML model, ML anomaly detectors can be classified into supervised, semi-supervised and unsupervised, requiring all labelled, some labelled, and all unlabeled datasets respectively. Based on the methodologies used to detect anomalies, the three types can be further classified into cluster-based, information-theoretic, rule-based, deep-learning, etc. Based on whether the data is offline-available or online streaming and the type of learning methods employed, ML anomaly detectors can be categorized into three categories: offline learning, semi-online learning, and online learning.
+Concrete algorithms should raise anomalies through the framework's anomaly-event methods so ids, timestamps, buffering, and
+registered handlers remain consistent.
 
 
-**Learn more**
+Anomaly objects
+---------------
 
-.. toctree::
-   :maxdepth: 2
-   :glob:
+The OA anomaly model distinguishes different structural meanings instead of reducing every deviation to one generic flag.
+Instance-oriented anomaly objects include:
 
-   30_anomaly_detection/*
+- **Point anomalies** for individual unusual observations.
+- **Group anomalies** for a sequence or collection whose combined behavior is unusual.
+- **Contextual anomalies** for observations that are unusual only in a particular context.
+
+Cluster-oriented anomaly objects describe changes in an adaptive cluster model. The current source tree contains anomaly types
+for new-cluster appearance, disappearance, enlargement, shrinkage, deformation, density changes, and point/group effects around
+clusters.
+
+All anomaly types still share the ``Change`` event semantics, which means downstream handlers can react consistently to
+specialized anomaly classes.
+
+
+.. _target_oa_ibad:
+
+Instance-based anomaly detection
+--------------------------------
+
+Instance-based detectors work directly on stream observations or model outputs associated with individual observations. The
+common template is ``AnomalyDetectorIB``.
+
+``AnomalyDetectorIBPG`` extends this concept with optional group-anomaly formation. Consecutive point anomalies can be combined
+into a group anomaly, allowing a detector to represent a persistent unusual episode rather than emitting an unrelated sequence
+of point events.
+
+This layer is intentionally algorithm-neutral: concrete detectors decide *why* an instance is anomalous, while OA-Streams
+standardizes *how* the anomaly is represented, buffered, visualized, and emitted.
+
+
+.. _target_oa_cbad:
+
+Cluster-based anomaly detection
+-------------------------------
+
+Cluster-based detection operates on the structural model maintained by an online
+:ref:`Cluster Analyzer <target_oa_cluster_analysis>`. This enables anomalies that are not evident from a single sample alone to
+be detected from changes in cluster geometry, density, population, or existence.
+
+OA-Streams provides a cluster-based anomaly-detector foundation plus generic implementations and a point/group anomaly detector.
+The detector can consume cluster information and raise specialized cluster anomaly objects when the cluster model changes.
+
+This separation is important in adaptive pipelines::
+
+    instances -> ClusterAnalyzer -> cluster state/properties -> cluster-based AnomalyDetector
+                    |                                      |
+                    +---------- adaptation events ---------+
+
+The clustering algorithm and the anomaly semantics remain replaceable. A custom cluster algorithm can expose the standardized
+cluster model and properties, while a detector can focus on the structural conditions it considers anomalous.
+
+
+Anomaly lifecycle and triage
+----------------------------
+
+Anomalies can be buffered automatically. ``AnomalyDetector`` also provides a triage hook that lets specialized detectors decide
+whether an existing anomaly should remain in the active history or be discarded during cleanup.
+
+Because anomaly objects inherit the status semantics of ``Change``, algorithms may represent both the beginning and the end of
+an anomalous condition where appropriate. Event consumers can register for the corresponding on/off event ids.
+
+
+Use in adaptive workflows
+-------------------------
+
+Anomaly detectors are ordinary OA stream tasks and can therefore be inserted anywhere in an ``OAStreamWorkflow``. A detector may
+observe raw/preprocessed instances, follow an adaptive model, or consume the output of online cluster analysis. An emitted anomaly
+event can then trigger observation, logging, model adaptation, or application-specific action without coupling that reaction to
+the detector itself.
+
+The active OA-Streams How-To tree currently contains no dedicated anomaly-detection script. This page therefore serves as the
+functional entry point, while concrete class and method details are available in the API reference.
 
 
 **Cross reference**
 
-.. - Selected open access papers
-.. - Howtos
+- :ref:`Change Detection <target_oa_change_detection>`
+- :ref:`Online Cluster Analysis <target_oa_cluster_analysis>`
+- :ref:`Observation and Helpers <target_oa_helpers>`
 - :ref:`API reference: MLPro-OA-Streams - Anomaly detection <target_api_oa_stream_tasks_ad>`
-
