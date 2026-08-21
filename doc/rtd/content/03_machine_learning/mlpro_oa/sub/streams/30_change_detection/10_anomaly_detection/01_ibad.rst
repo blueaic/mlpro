@@ -1,11 +1,6 @@
-.. _target_oa_ibad:
-Instance-based anomaly detection
+:orphan:
+
+Instance-Based Anomaly Detection
 ================================
 
-...
-
-
-**Cross reference**
-
-- Howtos
-- API
+This topic is now documented directly in :ref:`Anomaly Detection <target_oa_anomaly_detection>`.
