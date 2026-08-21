@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">OA-Streams adaptation lifecycle</title>
+  <desc id="desc">Incoming stream changes pass through pre-adaptation, forward or reverse adaptation, post-adaptation and typed adaptation events. Renormalization can be triggered independently by an upstream adaptive normalizer.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#05235E"/>
+    </marker>
+    <marker id="arrow2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#6A4FB3"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1200" height="620" rx="24" fill="#F7F9FC"/>
+  <text x="600" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#05235E">Adaptation lifecycle of an OAStreamTask</text>
+
+  <rect x="410" y="80" width="380" height="66" rx="16" fill="#FFFFFF" stroke="#05235E" stroke-width="2.5"/>
+  <text x="600" y="121" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#05235E">Incoming InstDict</text>
+  <line x1="600" y1="146" x2="600" y2="180" stroke="#05235E" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="430" y="185" width="340" height="62" rx="15" fill="#EAF0FA" stroke="#05235E" stroke-width="2"/>
+  <text x="600" y="223" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#05235E">Optional _adapt_pre()</text>
+
+  <line x1="600" y1="247" x2="600" y2="278" stroke="#05235E" stroke-width="3"/>
+  <line x1="600" y1="278" x2="350" y2="278" stroke="#05235E" stroke-width="3"/>
+  <line x1="600" y1="278" x2="850" y2="278" stroke="#05235E" stroke-width="3"/>
+  <line x1="350" y1="278" x2="350" y2="302" stroke="#05235E" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="850" y1="278" x2="850" y2="302" stroke="#05235E" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="155" y="307" width="390" height="115" rx="18" fill="#FFFFFF" stroke="#05235E" stroke-width="2.5"/>
+  <text x="350" y="342" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#05235E">New instance</text>
+  <text x="350" y="376" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#25324A">_adapt(instance)</text>
+  <text x="350" y="402" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#25324A">Forward adaptation</text>
+
+  <rect x="655" y="307" width="390" height="115" rx="18" fill="#FFFFFF" stroke="#05235E" stroke-width="2.5"/>
+  <text x="850" y="342" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#05235E">Obsolete instance</text>
+  <text x="850" y="376" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#25324A">_adapt_reverse(instance)</text>
+  <text x="850" y="402" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#25324A">Reverse adaptation</text>
+
+  <line x1="350" y1="422" x2="350" y2="457" stroke="#05235E" stroke-width="3"/>
+  <line x1="850" y1="422" x2="850" y2="457" stroke="#05235E" stroke-width="3"/>
+  <line x1="350" y1="457" x2="600" y2="457" stroke="#05235E" stroke-width="3"/>
+  <line x1="850" y1="457" x2="600" y2="457" stroke="#05235E" stroke-width="3"/>
+  <line x1="600" y1="457" x2="600" y2="482" stroke="#05235E" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="430" y="487" width="340" height="62" rx="15" fill="#EAF0FA" stroke="#05235E" stroke-width="2"/>
+  <text x="600" y="525" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#05235E">Optional _adapt_post()</text>
+  <line x1="600" y1="549" x2="600" y2="575" stroke="#05235E" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="600" y="603" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#05235E">OAStreamAdaptation event: FORWARD / REVERSE</text>
+
+  <rect x="875" y="75" width="260" height="74" rx="16" fill="#F4EEFF" stroke="#6A4FB3" stroke-width="2.5"/>
+  <text x="1005" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#5C419E">Upstream normalizer</text>
+  <text x="1005" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#4B3B68">parameters changed</text>
+  <line x1="1005" y1="149" x2="1005" y2="200" stroke="#6A4FB3" stroke-width="3" marker-end="url(#arrow2)"/>
+  <rect x="875" y="205" width="260" height="88" rx="16" fill="#F4EEFF" stroke="#6A4FB3" stroke-width="2.5"/>
+  <text x="1005" y="237" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#5C419E">renormalize_on_event()</text>
+  <text x="1005" y="264" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#4B3B68">_renormalize(buffered state)</text>
+  <line x1="875" y1="249" x2="785" y2="249" stroke="#6A4FB3" stroke-width="3" marker-end="url(#arrow2)"/>
+  <text x="970" y="325" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#5C419E">RENORM adaptation event</text>
+</svg>
