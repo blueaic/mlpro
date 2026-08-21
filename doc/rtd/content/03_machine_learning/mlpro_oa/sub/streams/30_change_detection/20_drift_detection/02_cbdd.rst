@@ -1,21 +1,6 @@
-.. _target_oa_cbdd:
-Cluster-based drift detection
+:orphan:
+
+Cluster-Based Drift Detection
 =============================
 
-Further descriptions coming soon...
-
-
-**New types of drift**
-
-...
-
-
-**Special dependencies on cluster algorithms**
-
-...
-
-
-**Cross reference**
-
-- Howtos
-- API
+This topic is now documented directly in :ref:`Drift Detection <target_oa_drift_detection>`.
