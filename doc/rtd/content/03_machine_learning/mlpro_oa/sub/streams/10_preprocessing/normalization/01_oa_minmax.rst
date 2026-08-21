@@ -1,11 +1,6 @@
-.. _target_oa_norm_minmax:
-MinMax-Normalization
-====================
+:orphan:
 
-Further descriptions coming soon...
+Adaptive MinMax Normalization
+=============================
 
-
-**Cross Reference**
-
-- BF-Math: MinMax-Normalization
-- Howtos
+This topic is now documented directly in :ref:`Adaptive Preprocessing <target_oa_stream_preprocessing>`.
