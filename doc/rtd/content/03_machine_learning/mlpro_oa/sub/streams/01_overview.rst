@@ -14,7 +14,7 @@ reusable templates for custom implementations.
 
 .. image:: images/oa_streams_architecture.svg
    :width: 680 px
-   :align: center
+   :align: left
    :alt: Simplified architecture of MLPro-OA-Streams combining BF-Streams and BF-ML
 
 At the object level this combination is explicit: ``OAStreamTask`` combines ``StreamTask`` and ``Model``;
@@ -54,7 +54,7 @@ these situations explicit through a stream-specific adaptation lifecycle.
 
 .. image:: images/oa_streams_adaptation_lifecycle.svg
    :width: 720 px
-   :align: center
+   :align: left
    :alt: Simplified lifecycle of forward, reverse, and renormalization adaptation in an OAStreamTask
 
 ``OAStreamTask`` supports forward adaptation on new stream instances, reverse adaptation on obsolete or removed instances,
@@ -74,7 +74,7 @@ The active functional scope is summarized below.
 
 .. image:: images/oa_streams_functional_landscape.svg
    :width: 760 px
-   :align: center
+   :align: left
    :alt: Simplified functional landscape of adaptive preprocessing, cluster analysis, change detection, and auxiliary functionality in OA-Streams
 
 **Adaptive preprocessing**
