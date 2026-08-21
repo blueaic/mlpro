@@ -4,7 +4,7 @@ Online-Adaptive Data Stream Processing (OADSP)
 ==============================================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    streams/01_overview
    streams/10_preprocessing
