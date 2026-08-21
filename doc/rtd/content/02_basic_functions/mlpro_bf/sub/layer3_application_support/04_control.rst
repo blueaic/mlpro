@@ -58,7 +58,7 @@ than hidden in a deeper documentation hierarchy.
 
     .. image::
         control/control_scenarios/images/01_control_system.drawio.png
-        :width: 620 px
+        :width: 520 px
 
     See :ref:`Howto BF-CONTROL-001 <Howto BF CONTROL 001>` for an executable example.
 
@@ -68,7 +68,7 @@ than hidden in a deeper documentation hierarchy.
 
     .. image::
         control/control_scenarios/images/02_control_system_with_integrator.drawio.png
-        :width: 620 px
+        :width: 520 px
 
     See :ref:`Howto BF-CONTROL-002 <Howto BF CONTROL 002>`.
 
@@ -79,7 +79,7 @@ than hidden in a deeper documentation hierarchy.
 
     .. image::
         control/control_scenarios/images/03_cascade_control_system.drawio.png
-        :width: 700 px
+        :width: 900 px
 
     See :ref:`Howto BF-CONTROL-003 <Howto BF CONTROL 003>`.
 
