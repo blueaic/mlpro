@@ -10,17 +10,10 @@ MLPro-BF-Control provides a workflow-based model for closed-loop control. It bui
 instance flow, tasks, workflows, shared state, and scenarios, and on :ref:`BF-Systems <target_bf_systems>` for the controlled
 plant.
 
-The module covers the complete control loop from setpoint to controlled variable. Its central objects are:
-
-- **ControlData** and its specializations ``SetPoint``, ``ControlError``, ``ControlVariable``, and ``ControlledVariable``.
-- **ControlTask** as the common base for control-processing tasks.
-- **Operator** for reusable transformations inside the control workflow.
-- **Controller** for mapping a control error to a control variable.
-- **ControlledSystem** for wrapping a BF-System as a task inside the control workflow.
-- **ControlWorkflow** for composing controllers, operators, controlled systems, and nested sub-control loops.
-- **ControlShared** for shared process state, timing, unique control-instance ids, latency handling, and setpoint management.
-- **ControlSystem** as the scenario-level orchestrator of the control process.
-- **ControlPanel** as an interface for external start/stop and setpoint changes.
+The module covers the complete loop from setpoint to controlled variable. Its central objects are ``ControlData`` with the
+specializations ``SetPoint``, ``ControlError``, ``ControlVariable``, and ``ControlledVariable``; ``ControlTask`` and ``Operator``
+for processing; ``Controller`` and ``ControlledSystem`` for the active loop components; ``ControlWorkflow`` and ``ControlShared``
+for orchestration, timing, and shared state; and ``ControlSystem`` and ``ControlPanel`` at scenario level.
 
 A basic loop can be read as::
 
@@ -38,65 +31,105 @@ A basic loop can be read as::
               |
      ControlledVariable
 
+All control signals are ``ControlData`` instances and therefore participate in the same ``InstDict``-based processing model as
+BF-Streams. ``ControlWorkflow`` specializes ``StreamWorkflow`` and keeps the predecessor-based task graph, execution ranges, and
+visualization model. ``ControlledSystem`` wraps a :class:`mlpro.bf.systems.System` and translates between control variables and
+the System API's ``Action`` and ``State`` objects.
 
-Control data and workflow architecture
---------------------------------------
-
-All control signals are represented as ``ControlData`` instances and therefore participate in the same instance-processing model
-as BF-Streams. ``SetPoint`` stores the desired value, ``ControlledVariable`` the measured system output, ``ControlError`` their
-difference, and ``ControlVariable`` the controller output. Helper functions ``get_ctrl_data()`` and ``replace_ctrl_data()`` allow
-tasks to locate and replace these typed objects in an ``InstDict``.
-
-A ``ControlWorkflow`` is a specialized ``StreamWorkflow``. This means control applications can use the same predecessor-based task
-graphs, asynchronous execution ranges, and visualization mechanisms as stream-processing applications. Control-specific shared
-state adds process timing and latency coordination on top of that infrastructure.
-
-``ControlledSystem`` wraps a :class:`mlpro.bf.systems.System` and translates between ``ControlVariable``/``ControlledVariable``
-and the System API's ``Action``/``State`` objects. The latency of the wrapped system participates in the workflow's time
-management and therefore determines when actions are updated and when system transitions are processed.
+Control-specific shared state adds process timing, unique instance ids, latency coordination, and setpoint handling. The latency
+of the controlled system therefore becomes part of the execution model rather than an external detail.
 
 
-Control systems and cascades
-----------------------------
+.. _target_bf_control_scenarios:
+.. _target_bf_control_scenario_basic:
+.. _target_bf_control_scenario_basic_int:
+.. _target_bf_control_scenario_cascade:
 
-``ControlSystem`` is the scenario-level template. A custom implementation creates its ``ControlWorkflow`` in ``_setup()``; every
-scenario cycle then executes that workflow. The ready-to-use ``BasicControlSystem`` builds a synchronous loop from one controller
-and one controlled system and can optionally insert an ``Integrator`` after the controller.
+Basic control scenarios
+-----------------------
 
-``CascadeControlSystem`` generalizes this model to nested control loops. It creates one ``ControlWorkflow`` per cascade level and
-uses ``Converter`` tasks to pass a superior controller output as the setpoint of the next inner loop and to return the inner
-controlled variable to the outer workflow. Shared timing information is propagated across the nested workflows so different
-latencies can be coordinated consistently.
+The fundamental control configurations are part of the BF-Control basics and are intentionally presented directly here rather
+than hidden in a deeper documentation hierarchy.
 
+**Basic control system**
+    ``BasicControlSystem`` combines one controller with one controlled system. Internally, a ``Comparator`` creates the
+    ``ControlError``, the controller computes the ``ControlVariable``, and the wrapped system returns the next
+    ``ControlledVariable``.
+
+    .. image::
+        control/control_scenarios/images/01_control_system.drawio.png
+        :width: 620 px
+
+    See :ref:`Howto BF-CONTROL-001 <Howto BF CONTROL 001>` for an executable example.
+
+**Basic control system with integrator**
+    The same container can insert an ``Integrator`` after the controller. The operator accumulates successive control variables
+    before they are handed to the controlled system.
+
+    .. image::
+        control/control_scenarios/images/02_control_system_with_integrator.drawio.png
+        :width: 620 px
+
+    See :ref:`Howto BF-CONTROL-002 <Howto BF CONTROL 002>`.
+
+**Cascade control system**
+    ``CascadeControlSystem`` builds nested ``ControlWorkflow`` objects. The output of an outer controller is converted into the
+    setpoint of the next inner loop, while the inner controlled variable is converted back into the signal expected by the outer
+    workflow. Shared timing information coordinates different latencies across the cascade.
+
+    .. image::
+        control/control_scenarios/images/03_cascade_control_system.drawio.png
+        :width: 700 px
+
+    See :ref:`Howto BF-CONTROL-003 <Howto BF CONTROL 003>`.
+
+
+.. _target_bf_control_pool_objects:
+.. _target_bf_control_pool_operators:
+.. _target_bf_control_pool_controllers:
+.. _target_bf_control_pool_systems:
+.. _target_bf_control_pid:
 
 Ready-to-use building blocks
 ----------------------------
 
-The current pool provides:
+BF-Control ships with a compact pool of reusable components that fit directly into the workflow model.
 
-- operators ``Comparator``, ``Converter``, and ``Integrator``;
-- ``PIDController`` and the example ``Hunter`` controller;
-- ``BasicControlSystem`` and ``CascadeControlSystem`` containers;
-- integration of arbitrary BF-System implementations through ``ControlledSystem``.
+**Operators**
+    ``Comparator`` computes ``SetPoint - ControlledVariable`` and replaces the incoming values by a ``ControlError``.
+    ``Converter`` changes one ``ControlData`` type into another while preserving values and time stamp. ``Integrator`` buffers
+    and cumulatively adds incoming ``ControlVariable`` values.
 
-The supplied How-Tos cover a basic loop, a loop with an additional control-variable integrator, a cascade control system, and PID
-controllers applied to PT1/PT2 systems.
+**Controllers**
+    ``Controller`` is the template for mapping a ``ControlError`` to a ``ControlVariable``. ``PIDController`` provides a ready
+    SISO PID implementation with proportional, integral, and derivative terms, timestamp-based integration/differentiation,
+    optional anti-windup, and clipping to the output-space boundaries. The pool also contains the example ``Hunter`` controller.
+
+**Controlled systems**
+    ``ControlledSystem`` wraps any BF-System for use as a ``ControlTask``. Ready-to-use system models such as PT1 and PT2 from
+    :ref:`BF-Systems <target_bf_systems>` can therefore be inserted directly into a control workflow.
+
+**Control-system containers**
+    ``BasicControlSystem`` and ``CascadeControlSystem`` assemble the recurring loop structures described above. Custom
+    ``ControlSystem`` implementations can build arbitrary task graphs in ``_setup()`` when the supplied containers are not
+    sufficient.
 
 
-**Learn more**
+How-Tos and API
+---------------
 
-.. toctree::
-   :maxdepth: 1
-   :glob:
-
-   control/*
-
+The BF-Control How-Tos cover the basic loop, the additional integrator, cascade control, and PID controllers with PT1/PT2 plants.
+The API reference provides the detailed class and method documentation for custom implementations.
 
 **Cross reference**
 
-- :ref:`Control scenarios <target_bf_control_scenarios>`
-- :ref:`Ready-to-use control objects <target_bf_control_pool_objects>`
 - :ref:`Howtos BF-Control <target_howto_bf_control>`
+- :ref:`Howto BF-CONTROL-001: Basic control system <Howto BF CONTROL 001>`
+- :ref:`Howto BF-CONTROL-002: Control system with integrator <Howto BF CONTROL 002>`
+- :ref:`Howto BF-CONTROL-003: Cascade control system <Howto BF CONTROL 003>`
+- :ref:`Howto BF-CONTROL-101: PID controller with PT1 system <Howto_BF_CONTROL_101>`
+- :ref:`Howto BF-CONTROL-102: PID controller with PT2 system <Howto_BF_CONTROL_102>`
+- :ref:`Howto BF-CONTROL-103: Cascaded PID controller <Howto_BF_CONTROL_103>`
 - :ref:`BF-Systems <target_bf_systems>`
 - :ref:`BF-Streams <target_bf_streams>`
 - :ref:`API Reference BF-Control <target_api_bf_control>`
