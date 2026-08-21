@@ -1,15 +1,8 @@
+:orphan:
+
 .. _target_oa_helper_oabserver:
-Observer for online-adaptations
+
+Observer for Online Adaptations
 ===============================
 
-Further descriptions coming soon...
-
-
-
-
-**Cross reference**
-
-.. - Selected open access papers
-.. - Howtos
-.. - :ref:`API reference: MLPro-OA-Streams - Anomaly detection <target_api_oa_stream_tasks_ad>`
-
+The OA observer is now documented on :ref:`Observation and Helpers <target_oa_helpers>`.

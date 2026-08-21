@@ -1,11 +1,6 @@
-.. _target_oa_boundary_detector:
-Boundary detection
+:orphan:
+
+Boundary Detection
 ==================
 
-Further descriptions coming soon...
-
-
-**Cross reference**
-
-- Related Howtos
-- API
+This topic is now documented directly in :ref:`Adaptive Preprocessing <target_oa_stream_preprocessing>`.

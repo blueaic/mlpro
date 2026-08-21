@@ -1,6 +1,6 @@
-.. _target_oa_stream_workflows:
-Online-adaptive stream workflows
+:orphan:
+
+Online-Adaptive Stream Workflows
 ================================
 
-
-...
+This topic is now documented directly in :ref:`OA-Streams Overview <target_oa_stream_overview>`.
