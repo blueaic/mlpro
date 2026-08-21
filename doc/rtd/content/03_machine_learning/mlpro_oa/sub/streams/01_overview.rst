@@ -3,14 +3,19 @@
 Overview
 ========
 
-MLPro-OA-Streams is the common runtime and adaptation layer for online-adaptive stream processing in MLPro. It combines the
-stream-processing abstractions of :ref:`BF-Streams <target_bf_streams>` with the adaptive-model abstractions of
-:ref:`BF-ML <target_bf_ml>` without introducing a separate execution model.
+MLPro-OA-Streams extends the generic data-stream processing model of :ref:`MLPro-BF-Streams <target_bf_streams>` with the
+paradigm-independent adaptation semantics of :ref:`MLPro-BF-ML <target_bf_ml>`. The result is a framework for building stream
+processing pipelines whose tasks can continuously adapt while data is flowing through them.
 
 .. image:: images/oa_streams_architecture.svg
    :width: 62%
    :align: center
    :alt: Simplified architecture of MLPro-OA-Streams combining BF-Streams and BF-ML
+
+At the object level this combination is explicit: ``OAStreamTask`` combines ``StreamTask`` and ``Model``;
+``OAStreamWorkflow`` combines ``StreamWorkflow`` and ``AWorkflow``; and ``OAStreamScenario`` specializes the stream-scenario
+model for adaptive workflows. This keeps OA processing interoperable with the execution, multitasking, visualization, event,
+and persistence mechanisms already defined in the lower MLPro layers.
 
 The core objects are:
 
@@ -38,67 +43,54 @@ The core objects are:
     Stream-specific adaptation events. In addition to the generic BF-ML adaptation semantics they distinguish reverse and
     renormalization adaptations and carry the number of affected stream instances.
 
-
-From stream processing to online adaptation
--------------------------------------------
-
-The fundamental processing unit remains ``InstDict``. Each entry contains an instance id, an instance type, and an ``Instance``.
-New and obsolete instances can therefore be handled differently during adaptation.
+A stream is not only a sequence of new samples. In dynamic processing chains, instances can also become obsolete, preprocessing
+parameters can change, and downstream models may keep internal state that depends on earlier transformations. OA-Streams makes
+these situations explicit through a stream-specific adaptation lifecycle.
 
 .. image:: images/oa_streams_adaptation_lifecycle.svg
    :width: 72%
    :align: center
    :alt: Simplified lifecycle of forward, reverse, and renormalization adaptation in an OAStreamTask
 
-Forward adaptation is the normal online-learning direction: a newly arriving instance changes the internal model. Reverse
-adaptation is the complementary mechanism for forgetting or compensating an instance that leaves the active processing context,
-for example when a sliding window evicts old data.
+``OAStreamTask`` supports forward adaptation on new stream instances, reverse adaptation on obsolete or removed instances,
+pre- and post-adaptation hooks around the instance-wise adaptation loop, renormalization after changing normalization parameters,
+and typed adaptation events through ``OAStreamAdaptation`` and ``OAStreamAdaptationType``.
 
-The pre/post hooks allow algorithms to perform one adaptation step around a complete batch of incoming instance changes instead
-of only reacting instance by instance.
-
-
-Event-oriented adaptation chains
----------------------------------
-
-Online adaptation becomes especially useful when tasks cooperate. OA-Streams builds on MLPro's event system so that one task can
-react to a structural change in another without hard-coded control flow.
-
-A typical preprocessing chain is::
-
-    Stream
-      |
-    BoundaryDetector
-      |  changed boundaries
-      v
-    Adaptive Normalizer
-      |  changed normalization parameters
-      v
-    Downstream OA task(s)
-      |  renormalize buffered internal data
-      v
-    Further processing / analysis
-
-``renormalize_on_event()`` is provided by ``OAStreamTask`` exactly for this purpose. A task can register the handler on an
-adaptive normalizer and implement ``_renormalize()`` for its own internal buffers. A successful renormalization is reported as
-an ``OAStreamAdaptationType.RENORM`` adaptation.
-
-This mechanism turns adaptation into a coordinated property of the workflow rather than an isolated behavior of one task.
-
-
-Composition with BF-Streams
----------------------------
+This event-oriented interaction is particularly important in multi-stage pipelines. For example, an adaptive boundary detector
+may change the observed data range, an adaptive normalizer can react to the new boundaries, and downstream tasks can then
+renormalize buffered state. Adaptation therefore becomes a property of the complete processing chain rather than an isolated
+method call inside one algorithm.
 
 OA workflows are intentionally hybrid. A workflow may contain adaptive OA tasks and ordinary BF stream tasks side by side. This
 is useful because not every processing step needs to learn. Rearranging dimensions, buffering a window, deriving features, or
 other deterministic processing can remain in BF-Streams while only selected stages adapt online.
 
-The same design also preserves MLPro's multitasking model. Tasks may run synchronously or asynchronously according to their
-configured processing range, and visualization/logging remain available throughout the pipeline.
+The active functional scope is summarized below.
 
-Executable howtos demonstrate adaptive normalization in 2D, 3D, and nD, hybrid pipelines containing BF and OA tasks, a complex
-parallel preprocessing workflow, and observation of workflows containing boundary detection, normalization, and online
-statistics.
+.. image:: ../images/oa_streams_functional_landscape.svg
+   :width: 72%
+   :align: center
+   :alt: Simplified functional landscape of adaptive preprocessing, cluster analysis, change detection, statistics, and observation in OA-Streams
+
+**Adaptive preprocessing**
+    Boundary detection and online-adaptive MinMax/Z-transformation normalizers provide continuously updated preprocessing.
+
+**Online cluster analysis**
+    ``ClusterAnalyzer`` standardizes adaptive cluster management, memberships and influences, cluster creation/removal events,
+    visualization, renormalization, and extensible cluster properties.
+
+**Change detection**
+    Change detection is the common framework-level domain for identifying relevant changes in an evolving stream. ``Change`` and
+    ``ChangeDetector`` provide the shared event, status, buffering, and visualization semantics. **Anomaly detection** and
+    **drift detection** are the two specialized detection domains built on top of this common foundation.
+
+**Online statistics**
+    Tasks such as ``MovingAverage`` incrementally summarize the active stream context, can remove obsolete-instance influence,
+    and can renormalize their internal state when an upstream normalizer adapts.
+
+**Observation**
+    OA/change/cluster observers provide higher-level visualization and monitoring of adaptive processing chains without becoming
+    part of the processing logic itself.
 
 
 **Cross reference**
