@@ -9,9 +9,13 @@ stream-processing abstractions of :ref:`BF-Streams <target_bf_streams>` with the
 
 The core objects are:
 
+.. _target_oa_stream_tasks:
+
 **OAStreamTask**
     The elementary adaptive processing unit. It inherits the stream-processing behavior of ``StreamTask`` and the adaptation,
     event, buffering, visualization, and model semantics of ``Model``.
+
+.. _target_oa_stream_workflows:
 
 **OAStreamWorkflow**
     A processing graph for adaptive and non-adaptive stream tasks. Because it also inherits from ``AWorkflow``, the complete
