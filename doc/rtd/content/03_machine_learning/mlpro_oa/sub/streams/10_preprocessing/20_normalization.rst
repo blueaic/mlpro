@@ -1,14 +1,6 @@
-.. _target_oa_streams_normalization:
-Normalization
-=============
+:orphan:
 
-Further descriptions coming soon...
+Online-Adaptive Normalization
+=============================
 
-
-**Learn more**
-
-.. toctree::
-   :maxdepth: 2
-   :glob:
-
-   normalization/*
+This topic is now documented directly in :ref:`Adaptive Preprocessing <target_oa_stream_preprocessing>`.
