@@ -53,6 +53,10 @@ method call inside one algorithm.
 Functional scope
 ----------------
 
+.. image:: streams/images/oa_streams_functional_landscape.svg
+   :width: 98%
+   :alt: Simplified functional landscape of adaptive preprocessing, cluster analysis, change detection, statistics, and observation in OA-Streams
+
 **Adaptive preprocessing**
     Boundary detection and online-adaptive MinMax/Z-transformation normalizers provide continuously updated preprocessing.
     OA processing tasks can be combined with non-adaptive BF-Streams tasks such as rearrangers or windows in the same workflow.
