@@ -6,13 +6,25 @@ Change Detection
 Overview
 --------
 
-Change detection turns structural deviations in an evolving stream into explicit, observable framework objects. MLPro-OA
-standardizes this through the classes ``Change`` and ``ChangeDetector`` and then specializes the model for anomaly and drift
-detection.
+**Change detection is the common framework-level domain for detecting relevant changes in an evolving stream.** MLPro-OA
+standardizes this through ``Change`` and ``ChangeDetector``. **Anomaly detection** and **drift detection** are specialized forms
+of change detection and reuse the same lifecycle, buffering, visualization, and event semantics.
 
 A detected change is not represented only by a Boolean flag. ``Change`` combines identity, timestamp, status, event behavior,
 visualization, and renormalization. This gives downstream components enough context to react to the beginning and end of a
 change and allows detectors to participate directly in MLPro's event system.
+
+The conceptual hierarchy is::
+
+    Change Detection
+        |
+        +-- Anomaly Detection
+        |      +-- instance-based
+        |      +-- cluster-based
+        |
+        +-- Drift Detection
+               +-- instance-based
+               +-- cluster-based
 
 
 The Change object
@@ -32,7 +44,8 @@ with the same event semantics.
 Anomaly detection
 -----------------
 
-The active source tree supports both **instance-based** and **cluster-based** anomaly models.
+Anomaly detection specializes change detection for unusual observations, groups, contexts, or structural effects. The active
+source tree supports both **instance-based** and **cluster-based** anomaly models.
 
 Instance-based anomalies describe deviations associated with individual observations or groups of observations. Native anomaly
 objects include point, group, and contextual variants.
@@ -44,16 +57,20 @@ and group effects.
 This distinction is useful because an anomaly can either be visible directly in the incoming observations or emerge only after
 the stream has been summarized by an adaptive cluster model.
 
+See :ref:`Anomaly Detection <target_oa_anomaly_detection>` for the specialized framework objects and detector variants.
+
 
 Drift detection
 ---------------
 
-Drift detection addresses longer-term changes of the underlying data-generating process. OA-Streams provides common drift
-abstractions and separates instance-based from cluster-based approaches in the source architecture.
+Drift detection specializes change detection for persistent changes of the underlying data-generating process. OA-Streams
+provides common drift abstractions and separates instance-based from cluster-based approaches in the source architecture.
 
 The important framework-level distinction is that anomaly and drift detectors share the same ``Change``/``ChangeDetector``
-contract. Their results can therefore be observed and processed uniformly even though the algorithms and temporal semantics are
-different.
+contract. Their results can therefore be observed and processed uniformly even though their algorithms and temporal semantics
+are different.
+
+See :ref:`Drift Detection <target_oa_drift_detection>` for the specialized drift lifecycle and detector variants.
 
 
 Event-driven processing
@@ -81,16 +98,11 @@ Detectors can keep a bounded history in ``changes``. OA helper classes complemen
 presenting them together with the processing workflow. See :ref:`Observation and Helpers <target_oa_helpers>`.
 
 
-Experimental change prediction
-------------------------------
-
-The repository also contains work on anomaly/change prediction, including time-series-forecasting based concepts. These modules
-are currently disabled in the source tree and are intentionally not documented as active framework functionality yet.
-
-
 **Cross reference**
 
-- :ref:`OA-Streams Overview <target_oa_stream_overview>`
+- :ref:`Anomaly Detection <target_oa_anomaly_detection>`
+- :ref:`Drift Detection <target_oa_drift_detection>`
 - :ref:`Online Cluster Analysis <target_oa_cluster_analysis>`
 - :ref:`Observation and Helpers <target_oa_helpers>`
+- :ref:`OA-Streams Overview <target_oa_stream_overview>`
 - :ref:`API reference: MLPro-OA-Streams <target_api_oa_streams>`
