@@ -1,46 +1,103 @@
 .. _target_bf_control:
+
 Closed-loop control
 ===================
 
-Closed-loop control, also known as feedback control, is a fundamental principle in classical control engineering. In this approach, 
-the controller continuously measures the actual output of a system and compares it to a defined reference or setpoint. The resulting 
-error signal is used to adjust the control input in real time to reduce deviations and ensure that the system output follows the desired 
-trajectory.
+Overview
+--------
 
-This feedback mechanism makes closed-loop control robust against disturbances and modeling inaccuracies, as it automatically compensates 
-for unexpected changes in the system or its environment. Typical examples include proportional-integral-derivative (PID) controllers, 
-which are widely applied due to their simplicity and effectiveness.
+MLPro-BF-Control provides a workflow-based model for closed-loop control. It builds on :ref:`BF-Streams <target_bf_streams>` for
+instance flow, tasks, workflows, shared state, and scenarios, and on :ref:`BF-Systems <target_bf_systems>` for the controlled
+plant.
 
-Closed-loop control is essential in automation technology, electrical engineering, and mechanical engineering whenever precise and stable 
-regulation of dynamic systems is required — such as in temperature control, motor speed regulation, and industrial process automation.
+The module covers the complete control loop from setpoint to controlled variable. Its central objects are:
 
-The MLPro-BF-Control sub-framework implements the standard process model of the control loop and provides common operators and templates for building 
-custom controllers. It inherits the basic technology of the :ref:`BF-Streams <target_bf_streams>` sub-framework and transfers its structural elements 
-to the world of control engineering. Thus, an individual control loop can be constructed as a **control workflow** consisting of various **control tasks** 
-(controllers, operators, controlled system, sub-control loops, etc.). Stream tasks can also be integrated, which, for example, perform data 
-preprocessing or data analysis. A **control system** is ultimately a derivative of the stream scenario, which embeds the control workflow and handles 
-process control and time management. The **controlled system**, with its latency, sets the pace in the control system. Accordingly, different timing 
-patterns can occur in **cascaded control loops**.
+- **ControlData** and its specializations ``SetPoint``, ``ControlError``, ``ControlVariable``, and ``ControlledVariable``.
+- **ControlTask** as the common base for control-processing tasks.
+- **Operator** for reusable transformations inside the control workflow.
+- **Controller** for mapping a control error to a control variable.
+- **ControlledSystem** for wrapping a BF-System as a task inside the control workflow.
+- **ControlWorkflow** for composing controllers, operators, controlled systems, and nested sub-control loops.
+- **ControlShared** for shared process state, timing, unique control-instance ids, latency handling, and setpoint management.
+- **ControlSystem** as the scenario-level orchestrator of the control process.
+- **ControlPanel** as an interface for external start/stop and setpoint changes.
 
-The visualization from the :ref:`BF-Streams <target_bf_streams>` sub-framework is taken over here, enabling real-time monitoring of control applications.
-The functionalities from the sub-framework :ref:`BF-Systems <target_bf_systems>` can be used to create controlled systems.
+A basic loop can be read as::
 
-[**Image: Basic elements of a closed-loop control system in MLPro-BF-Control**]
+    SetPoint + ControlledVariable
+              |
+          Comparator
+              |
+         ControlError
+              |
+          Controller
+              |
+        ControlVariable
+              |
+       ControlledSystem
+              |
+     ControlledVariable
+
+
+Control data and workflow architecture
+--------------------------------------
+
+All control signals are represented as ``ControlData`` instances and therefore participate in the same instance-processing model
+as BF-Streams. ``SetPoint`` stores the desired value, ``ControlledVariable`` the measured system output, ``ControlError`` their
+difference, and ``ControlVariable`` the controller output. Helper functions ``get_ctrl_data()`` and ``replace_ctrl_data()`` allow
+tasks to locate and replace these typed objects in an ``InstDict``.
+
+A ``ControlWorkflow`` is a specialized ``StreamWorkflow``. This means control applications can use the same predecessor-based task
+graphs, asynchronous execution ranges, and visualization mechanisms as stream-processing applications. Control-specific shared
+state adds process timing and latency coordination on top of that infrastructure.
+
+``ControlledSystem`` wraps a :class:`mlpro.bf.systems.System` and translates between ``ControlVariable``/``ControlledVariable``
+and the System API's ``Action``/``State`` objects. The latency of the wrapped system participates in the workflow's time
+management and therefore determines when actions are updated and when system transitions are processed.
+
+
+Control systems and cascades
+----------------------------
+
+``ControlSystem`` is the scenario-level template. A custom implementation creates its ``ControlWorkflow`` in ``_setup()``; every
+scenario cycle then executes that workflow. The ready-to-use ``BasicControlSystem`` builds a synchronous loop from one controller
+and one controlled system and can optionally insert an ``Integrator`` after the controller.
+
+``CascadeControlSystem`` generalizes this model to nested control loops. It creates one ``ControlWorkflow`` per cascade level and
+uses ``Converter`` tasks to pass a superior controller output as the setpoint of the next inner loop and to return the inner
+controlled variable to the outer workflow. Shared timing information is propagated across the nested workflows so different
+latencies can be coordinated consistently.
+
+
+Ready-to-use building blocks
+----------------------------
+
+The current pool provides:
+
+- operators ``Comparator``, ``Converter``, and ``Integrator``;
+- ``PIDController`` and the example ``Hunter`` controller;
+- ``BasicControlSystem`` and ``CascadeControlSystem`` containers;
+- integration of arbitrary BF-System implementations through ``ControlledSystem``.
+
+The supplied How-Tos cover a basic loop, a loop with an additional control-variable integrator, a cascade control system, and PID
+controllers applied to PT1/PT2 systems.
+
 
 **Learn more**
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :glob:
 
    control/*
 
 
-**Cross Reference**
+**Cross reference**
 
-- `Control theory (Wikipedia) <https://en.wikipedia.org/wiki/Control_theory>`_
+- :ref:`Control scenarios <target_bf_control_scenarios>`
+- :ref:`Ready-to-use control objects <target_bf_control_pool_objects>`
 - :ref:`Howtos BF-Control <target_howto_bf_control>`
+- :ref:`BF-Systems <target_bf_systems>`
+- :ref:`BF-Streams <target_bf_streams>`
 - :ref:`API Reference BF-Control <target_api_bf_control>`
 - :ref:`API Reference BF-Control Pool Objects <target_pool_bf_control>`
-- :ref:`BF-Systems - Basics of state-based systems <target_bf_systems>`
-- :ref:`BF-Streams - Basics of stream processing <target_bf_streams>`
