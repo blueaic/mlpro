@@ -7,12 +7,17 @@ Overview
 --------
 
 Online cluster analysis continuously maintains a structural description of a data stream while new observations arrive and old
-observations may disappear from the active context. MLPro-OA provides ``ClusterAnalyzer`` as the common adaptive template for
-this task.
+observations may disappear from the active context. In its current development stage, MLPro-OA primarily provides the
+**standardized framework and templates for implementing custom online cluster analyzers** rather than a broad collection of
+ready-to-use clustering algorithms.
 
-``ClusterAnalyzer`` is an ``OAStreamTask`` and therefore participates in the same forward/reverse adaptation lifecycle as other
-OA processing tasks. A concrete clustering algorithm implements how new and obsolete instances change the current cluster model,
-while the framework standardizes cluster management, events, results, properties, visualization, and renormalization.
+``ClusterAnalyzer`` is the common adaptive template for this task. It is an ``OAStreamTask`` and therefore participates in the
+same forward/reverse adaptation lifecycle as other OA processing tasks. A concrete clustering algorithm implements how new and
+obsolete instances change the current cluster model, while the framework standardizes cluster management, events, results,
+properties, visualization, and renormalization.
+
+In other words, ``ClusterAnalyzer`` does not solve the clustering problem by itself. It defines the interoperable framework in
+which application-specific or third-party online clustering algorithms can be implemented consistently.
 
 
 Cluster model
@@ -21,7 +26,7 @@ Cluster model
 Clusters are first-class objects rather than anonymous labels. The cluster-analysis package defines a reusable cluster model with
 ``Cluster``, cluster identifiers, centroid- and body-oriented specializations, and extensible cluster properties.
 
-The analyzer maintains the current clusters and standardizes common operations such as:
+The analyzer standardizes common operations such as:
 
 - creation and removal of clusters, including ``CLUSTER_ADDED`` and ``CLUSTER_REMOVED`` events;
 - limits on the number of clusters;
@@ -65,9 +70,9 @@ than only accumulating history forever.
 Interoperability
 ----------------
 
-Cluster analyzers can be placed after adaptive preprocessing and before change detectors in one ``OAStreamWorkflow``. Cluster
-creation/removal events and evolving cluster properties can also be observed by helper classes or consumed by cluster-based
-anomaly and drift detectors.
+Custom cluster analyzers built on the MLPro-OA templates can be placed after adaptive preprocessing and before change detectors
+in one ``OAStreamWorkflow``. Cluster creation/removal events and evolving cluster properties can also be observed by helper
+classes or consumed by cluster-based anomaly and drift detectors.
 
 A typical architecture is::
 
@@ -75,8 +80,11 @@ A typical architecture is::
                                       |                 |
                                       +-> properties    +-> change events
 
-This is one of the key strengths of OA-Streams: clustering is not an isolated endpoint but a reusable adaptive model inside a
-larger event-driven processing chain.
+The standardized interfaces make clustering a reusable adaptive model inside a larger event-driven processing chain, even when
+the actual clustering algorithm is supplied by the application developer or a third-party extension.
+
+Cluster-based change detection is currently under development and should therefore be regarded as an evolving integration area
+rather than mature ready-to-use functionality.
 
 
 **Cross reference**
