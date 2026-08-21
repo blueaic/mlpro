@@ -70,7 +70,7 @@ The active functional scope is summarized below.
 .. image:: images/oa_streams_functional_landscape.svg
    :width: 72%
    :align: center
-   :alt: Simplified functional landscape of adaptive preprocessing, cluster analysis, change detection, statistics, and observation in OA-Streams
+   :alt: Simplified functional landscape of adaptive preprocessing, cluster analysis, change detection, and auxiliary functionality in OA-Streams
 
 **Adaptive preprocessing**
     Boundary detection and online-adaptive MinMax/Z-transformation normalizers provide continuously updated preprocessing.
@@ -82,15 +82,12 @@ The active functional scope is summarized below.
 **Change detection**
     Change detection is the common framework-level domain for identifying relevant changes in an evolving stream. ``Change`` and
     ``ChangeDetector`` provide the shared event, status, buffering, and visualization semantics. **Anomaly detection** and
-    **drift detection** are the two specialized detection domains built on top of this common foundation.
+    **drift detection** are subordinate specialized domains built on top of this common foundation.
 
-**Online statistics**
-    Tasks such as ``MovingAverage`` incrementally summarize the active stream context, can remove obsolete-instance influence,
-    and can renormalize their internal state when an upstream normalizer adapts.
-
-**Observation**
-    OA/change/cluster observers provide higher-level visualization and monitoring of adaptive processing chains without becoming
-    part of the processing logic itself.
+**Auxiliary functionality**
+    Supporting components complement the main processing areas without defining another primary domain. This currently includes
+    **online statistics**, such as ``MovingAverage``, and **observation and helpers** for monitoring adaptation, clusters, and
+    detected changes without becoming part of the processing logic itself.
 
 
 **Cross reference**
