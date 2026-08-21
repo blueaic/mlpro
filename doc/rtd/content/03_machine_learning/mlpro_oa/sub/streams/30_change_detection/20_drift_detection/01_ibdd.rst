@@ -1,16 +1,6 @@
-.. _target_oa_ibdd:
-Instance-based drift detection
-=============================
+:orphan:
 
-Further descriptions coming soon...
+Instance-Based Drift Detection
+==============================
 
-
-**New types of drift**
-
-...
-
-
-**Cross reference**
-
-- Howtos
-- API
+This topic is now documented directly in :ref:`Drift Detection <target_oa_drift_detection>`.
