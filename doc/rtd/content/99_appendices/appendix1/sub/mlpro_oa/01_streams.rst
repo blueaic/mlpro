@@ -3,7 +3,7 @@
 Online-Adaptive Data Stream Processing
 ======================================
 
-The OA-Streams How-Tos demonstrate the active online-adaptive stream-processing building blocks in executable form. The current
+The OA-Streams howtos demonstrate the active online-adaptive stream-processing building blocks in executable form. The current
 set covers adaptive MinMax and Z-transformation normalization, hybrid BF/OA preprocessing workflows, complex parallel
 preprocessing, and observation of adaptive workflows.
 
