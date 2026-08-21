@@ -7,6 +7,10 @@ MLPro-OA-Streams is the common runtime and adaptation layer for online-adaptive 
 stream-processing abstractions of :ref:`BF-Streams <target_bf_streams>` with the adaptive-model abstractions of
 :ref:`BF-ML <target_bf_ml>` without introducing a separate execution model.
 
+.. image:: ../../../../99_appendices/appendix2/sub/mlpro_oa/streams/00_basics/images/MLPro-OA-Stream-Processing_class_diagram.drawio.png
+   :width: 90%
+   :alt: Core class architecture of online-adaptive stream processing in MLPro-OA
+
 The core objects are:
 
 .. _target_oa_stream_tasks:
