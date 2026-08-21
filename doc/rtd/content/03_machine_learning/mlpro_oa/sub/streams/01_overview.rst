@@ -7,6 +7,11 @@ MLPro-OA-Streams extends the generic data-stream processing model of :ref:`MLPro
 paradigm-independent adaptation semantics of :ref:`MLPro-BF-ML <target_bf_ml>`. The result is a framework for building stream
 processing pipelines whose tasks can continuously adapt while data is flowing through them.
 
+In its current development stage, OA-Streams is primarily a **standardized template framework**. It already provides the common
+runtime, adaptation lifecycle, data models, events, and integration patterns needed to implement interoperable online-adaptive
+stream algorithms. Ready-to-use native algorithms are available only for selected tasks, while other areas deliberately expose
+reusable templates for custom implementations.
+
 .. image:: images/oa_streams_architecture.svg
    :width: 62%
    :align: center
@@ -73,16 +78,19 @@ The active functional scope is summarized below.
    :alt: Simplified functional landscape of adaptive preprocessing, cluster analysis, change detection, and auxiliary functionality in OA-Streams
 
 **Adaptive preprocessing**
-    Boundary detection and online-adaptive MinMax/Z-transformation normalizers provide continuously updated preprocessing.
+    Boundary detection and online-adaptive MinMax/Z-transformation normalizers provide selected ready-to-use preprocessing
+    functionality within the common OA task model.
 
 **Online cluster analysis**
-    ``ClusterAnalyzer`` standardizes adaptive cluster management, memberships and influences, cluster creation/removal events,
-    visualization, renormalization, and extensible cluster properties.
+    ``ClusterAnalyzer`` standardizes the architecture for custom online clustering algorithms: cluster management, memberships
+    and influences, creation/removal events, visualization, renormalization, and extensible cluster properties. The framework
+    currently focuses on templates rather than a broad pool of ready-to-use cluster analyzers.
 
 **Change detection**
     Change detection is the common framework-level domain for identifying relevant changes in an evolving stream. ``Change`` and
     ``ChangeDetector`` provide the shared event, status, buffering, and visualization semantics. **Anomaly detection** and
-    **drift detection** are subordinate specialized domains built on top of this common foundation.
+    **drift detection** are subordinate specialized domains built on top of this common foundation. The current focus is on
+    templates and standardized detector semantics; cluster-based change detection is still under development.
 
 **Auxiliary functionality**
     Supporting components complement the main processing areas without defining another primary domain. This currently includes
