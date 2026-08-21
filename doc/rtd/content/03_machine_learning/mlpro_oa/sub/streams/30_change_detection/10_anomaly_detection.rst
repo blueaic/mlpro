@@ -17,6 +17,10 @@ collection is an alias of the underlying change buffer.
 Concrete algorithms should raise anomalies through the framework's anomaly-event methods so ids, timestamps, buffering, and
 registered handlers remain consistent.
 
+.. image:: ../../../../../99_appendices/appendix2/sub/mlpro_oa/streams/30_change_detection/10_anomaly_detection/images/MLPro-OA-Anomaly-Detectors_class_diagram.drawio.png
+   :width: 90%
+   :alt: Class architecture of anomaly detection in MLPro-OA
+
 
 Anomaly objects
 ---------------
