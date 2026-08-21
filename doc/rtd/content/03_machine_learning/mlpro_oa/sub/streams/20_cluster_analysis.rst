@@ -14,6 +14,10 @@ this task.
 OA processing tasks. A concrete clustering algorithm implements how new and obsolete instances change the current cluster model,
 while the framework standardizes cluster management, events, results, properties, visualization, and renormalization.
 
+.. image:: ../../../../99_appendices/appendix2/sub/mlpro_oa/streams/20_cluster_analysis/images/MLPro-OA-Cluster_Analyzers_class_diagram.drawio.png
+   :width: 90%
+   :alt: Class architecture of online cluster analysis in MLPro-OA
+
 
 Cluster model
 -------------
