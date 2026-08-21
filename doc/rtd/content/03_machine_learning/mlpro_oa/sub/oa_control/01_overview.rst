@@ -12,7 +12,7 @@ standardization work is already in place, but the set of ready-to-use adaptive c
 focus is therefore on reusable templates, integration mechanisms, and selected reference implementations.
 
 .. image:: images/oa_control_architecture.svg
-   :width: 68%
+   :width: 700 px
    :align: center
    :alt: Simplified architecture of online-adaptive closed-loop control in MLPro-OA
 
