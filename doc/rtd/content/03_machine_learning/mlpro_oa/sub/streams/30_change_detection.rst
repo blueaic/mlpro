@@ -73,6 +73,13 @@ are different.
 See :ref:`Drift Detection <target_oa_drift_detection>` for the specialized drift lifecycle and detector variants.
 
 
+.. toctree::
+   :maxdepth: 1
+
+   30_change_detection/10_anomaly_detection
+   30_change_detection/20_drift_detection
+
+
 Event-driven processing
 -----------------------
 
