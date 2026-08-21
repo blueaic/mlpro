@@ -3,8 +3,8 @@
 Data Stream Processing
 ======================
 
-Why data stream processing?
----------------------------
+Overview
+--------
 
 Many applications do not work on a fixed dataset. Measurements, sensor values, transactions, events, or simulation results arrive continuously and have to be processed in the order in which they become available.
 
