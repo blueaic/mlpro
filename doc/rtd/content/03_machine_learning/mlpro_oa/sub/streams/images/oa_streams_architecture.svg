@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="500" viewBox="0 0 1100 500" role="img" aria-labelledby="title desc">
+  <title id="title">MLPro-OA-Streams architecture overview</title>
+  <desc id="desc">BF-Streams and BF-ML converge into OA-Streams, which provides adaptive tasks, workflows, scenarios and shared runtime semantics.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#05235E"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1100" height="500" rx="24" fill="#F7F9FC"/>
+  <text x="550" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#05235E">How OA-Streams is built</text>
+
+  <rect x="80" y="95" width="360" height="115" rx="18" fill="#FFFFFF" stroke="#05235E" stroke-width="2.5"/>
+  <text x="260" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#05235E">BF-Streams</text>
+  <text x="260" y="162" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#25324A">Instances · Tasks · Workflows · Scenarios</text>
+  <text x="260" y="188" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#25324A">Data-flow and execution semantics</text>
+
+  <rect x="660" y="95" width="360" height="115" rx="18" fill="#FFFFFF" stroke="#05235E" stroke-width="2.5"/>
+  <text x="840" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#05235E">BF-ML</text>
+  <text x="840" y="162" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#25324A">Models · Adaptation · Events</text>
+  <text x="840" y="188" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#25324A">Common machine-learning semantics</text>
+
+  <line x1="355" y1="210" x2="500" y2="280" stroke="#05235E" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="745" y1="210" x2="600" y2="280" stroke="#05235E" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="365" y="270" width="370" height="100" rx="20" fill="#EAF0FA" stroke="#05235E" stroke-width="3"/>
+  <text x="550" y="310" text-anchor="middle" font-family="Arial, sans-serif" font-size="27" font-weight="700" fill="#05235E">MLPro-OA-Streams</text>
+  <text x="550" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#25324A">Online-adaptive stream processing</text>
+
+  <line x1="550" y1="370" x2="550" y2="405" stroke="#05235E" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="100" y="410" width="260" height="62" rx="15" fill="#FFFFFF" stroke="#A6B3C9" stroke-width="2"/>
+  <text x="230" y="448" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="700" fill="#05235E">OAStreamTask</text>
+
+  <rect x="420" y="410" width="260" height="62" rx="15" fill="#FFFFFF" stroke="#A6B3C9" stroke-width="2"/>
+  <text x="550" y="448" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="700" fill="#05235E">OAStreamWorkflow</text>
+
+  <rect x="740" y="410" width="260" height="62" rx="15" fill="#FFFFFF" stroke="#A6B3C9" stroke-width="2"/>
+  <text x="870" y="448" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="700" fill="#05235E">OAStreamScenario</text>
+</svg>
