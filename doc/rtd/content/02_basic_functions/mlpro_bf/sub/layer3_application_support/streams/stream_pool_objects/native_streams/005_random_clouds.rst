@@ -1,7 +1,7 @@
 .. _target_bf_streams_generators:
 
-Random Cluster and Multi-Cluster Stream Generators
---------------------------------------------------
+Random Cluster and Multi-Cluster Benchmark Streams
+-------------------------------------------------
 
 MLPro-BF provides a generator framework for producing synthetic data streams in a configurable, d-dimensional feature space.
 The current implementation replaces the former random-cloud generators with a more structured generator architecture based on
@@ -20,9 +20,18 @@ For cluster-shaped data, the active generator stack is located below
 - ``MultiStreamGenCluster`` combines several cluster generators and therefore supports synthetic multi-cluster streams with
   independently configurable cluster behavior.
 
-This architecture supports both compact static test streams and dynamic scenarios in which clusters move, change their size, or
-are combined into more complex multi-cluster arrangements. It is intended as reusable infrastructure for testing stream
-processing, visualization, clustering, change detection, and other data-driven algorithms.
+These generators have an explicit **benchmark character**. They make the underlying cluster structure controllable and repeatable,
+so that clustering algorithms can be evaluated against known synthetic scenarios rather than opaque real-world data. Static
+configurations are useful for checking basic cluster identification and memberships, while dynamic configurations can challenge
+an analyzer with moving, growing, shrinking, appearing, or otherwise changing cluster structures.
+
+This is particularly relevant for :ref:`Online Cluster Analysis <target_oa_cluster_analysis>` in MLPro-OA-Streams. The
+multi-cluster streams provide standardized input scenarios for developing, debugging, demonstrating, and comparing custom
+``ClusterAnalyzer`` implementations. Because MLPro-OA standardizes the analyzer API and cluster handling while leaving the actual
+clustering algorithm open, reproducible BF-Streams benchmarks form a natural counterpart to that architecture.
+
+The same benchmark streams can also support downstream experiments in cluster-based anomaly and drift detection as these areas
+mature.
 
 The former module ``mlpro.bf.streams.streams.clouds`` is deprecated and is no longer part of the active stream API. Existing
 applications that still use the legacy cloud generators should migrate to the generator classes described above.
@@ -30,6 +39,7 @@ applications that still use the legacy cloud generators should migrate to the ge
 
 **Cross reference**
 
+- :ref:`Online Cluster Analysis <target_oa_cluster_analysis>`
 - :ref:`Howto BF-STREAMS-CLUSTER-001: One Static Random 2D Cluster <Howto BF STREAMS CLUSTER 001>`
 - :ref:`Howto BF-STREAMS-CLUSTER-002 <Howto BF STREAMS CLUSTER 002>`
 - :ref:`Howto BF-STREAMS-CLUSTER-003 <Howto BF STREAMS CLUSTER 003>`
