@@ -9,5 +9,11 @@ Howto BF-STREAMS-CLUSTER-001: One Static Random 2D Cluster
    :language: python
 
 
+**Results**
+
+.. image:: images/howto_bf_streams_cluster_001.gif
+   :width: 420 px
+
+
 **Cross Reference**
     - :ref:`API Reference: Streams <target_ap_bf_streams>`
