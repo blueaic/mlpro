@@ -12,7 +12,7 @@
 ## -- 2026-08-18  2.0.0     DA       Review and updates
 ## -------------------------------------------------------------------------------------------------
 
-name: Deployment PyPI
+name: 3 Deployment PyPI
 
 on:
   release:
