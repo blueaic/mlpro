@@ -5,12 +5,26 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-19  1.0.0     DA       Creation/First implementation
+## -- 2026-08-22  1.0.1     DA       Extended module documentation
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-09-19)
+Ver. 1.0.1 (2026-08-22)
 
-This module demonstrates ...
+This module demonstrates a two-dimensional benchmark stream containing two independently moving and
+reshaping clusters with randomly generated states. The scenario provides non-trivial but reproducible
+cluster dynamics for evaluating whether online cluster analyzers can track multiple structures over
+time without relying on a hand-crafted trajectory.
+
+You will learn:
+
+1) How to configure dynamic ``StreamGenCluster`` objects with randomly generated ``ClusterState`` values.
+
+2) How to control state transitions through ``p_transition_steps``.
+
+3) How to combine independent dynamic clusters in one ``MultiStreamGenCluster`` benchmark.
+
+4) How to run and visualize the resulting 2D multi-cluster scenario.
 
 """
 
