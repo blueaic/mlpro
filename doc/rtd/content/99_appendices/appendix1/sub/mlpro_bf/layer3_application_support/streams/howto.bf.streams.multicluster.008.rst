@@ -9,5 +9,11 @@ Howto BF-STREAMS-MULTICLUSTER-008: Two Dynamic Random 3D Clusters
    :language: python
 
 
+**Results**
+
+.. image:: images/howto_bf_streams_multicluster_008.gif
+   :width: 420 px
+
+
 **Cross Reference**
     - :ref:`API Reference: Streams <target_ap_bf_streams>`
