@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath("../../src"))
 
 project = "MLPro Documentations"
 copyright = "2026 blueAIC UG (haftungsbeschränkt), Germany"
-author = "Detlef Arend, Steve Yuwono, Mochammad Rizky Diprasetya, Laxmikant Shrikant Baheti et al"
+author = "blueAIC"
 
 # The full version, including alpha/beta/rc tags
 release = "2.2.0"
