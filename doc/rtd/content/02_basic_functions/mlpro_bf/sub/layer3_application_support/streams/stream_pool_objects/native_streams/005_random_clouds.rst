@@ -1,7 +1,7 @@
 .. _target_bf_streams_generators:
 
 Random Cluster and Multi-Cluster Benchmark Streams
--------------------------------------------------
+---------------------------------------------------
 
 MLPro-BF provides a generator framework for producing synthetic data streams in a configurable, d-dimensional feature space.
 The current implementation replaces the former random-cloud generators with a more structured generator architecture based on
