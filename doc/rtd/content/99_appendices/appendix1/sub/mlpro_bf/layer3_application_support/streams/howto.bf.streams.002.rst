@@ -11,7 +11,7 @@ Howto BF-STREAMS-002: Accessing Data From CSV Files
 
 **Results**
 
-.. code-block:: bashh
+.. code-block:: bash
 
     YYYY-MM-DD  HH:MM:SS.SSSSSS  I  Stream "": Instantiated 
 
