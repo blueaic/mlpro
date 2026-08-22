@@ -14,7 +14,7 @@
 ## -- 2026-08-18  2.5.0     DA       Migration to blueAIC, updated GitHub Actions and reduced PAT usage
 ## -------------------------------------------------------------------------------------------------
 
-name: 2 Update Extension Hub
+name: WF02 - Update Extension Hub
 
 on:
   schedule:
