@@ -13,7 +13,7 @@
 ## -- 2026-08-22  1.0.0     DA       Creation
 ## -------------------------------------------------------------------------------------------------
 
-name: 4 Build RTD Documentation
+name: WF04 - Build RTD Documentation
 
 on:
   push:
