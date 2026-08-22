@@ -103,6 +103,23 @@ The resulting responsibility split can be summarized as::
 application-specific or third-party online clustering algorithms can be implemented consistently.
 
 
+Benchmarking with native BF-Streams
+-----------------------------------
+
+The native stream pool in MLPro-BF provides reproducible benchmark inputs for developing and evaluating online cluster analyzers.
+Of particular importance are the :ref:`Random Cluster and Multi-Cluster Benchmark Streams <target_bf_streams_generators>`.
+They can generate known static or dynamic cluster structures in configurable dimensionality and with reproducible random seeds.
+
+This creates a useful separation between **benchmark definition** and **analyzer implementation**: BF-Streams defines controlled
+input scenarios, while OA-Streams standardizes how an online cluster analyzer represents, updates, and exposes its cluster model.
+A custom ``ClusterAnalyzer`` can therefore be tested repeatedly against the same benchmark stream and compared with alternative
+implementations under equivalent conditions.
+
+Single-cluster scenarios are useful for validating basic model behavior, membership semantics, and adaptation to movement or size
+changes. Multi-cluster scenarios are especially relevant for evaluating separation, competing memberships and influences,
+cluster limits, and the response of an analyzer to evolving cluster configurations.
+
+
 Cluster model and properties
 ----------------------------
 
@@ -154,6 +171,8 @@ integration area rather than mature ready-to-use functionality.
 
 **Cross reference**
 
+- :ref:`BF-Streams: Native Benchmark Streams <target_bf_streams_native_streams_pool>`
+- :ref:`BF-Streams: Random Cluster and Multi-Cluster Benchmark Streams <target_bf_streams_generators>`
 - :ref:`OA-Streams Overview <target_oa_stream_overview>`
 - :ref:`Change Detection <target_oa_change_detection>`
 - :ref:`BF-Math: Mathematics and properties <target_bf_mathematics>`
