@@ -33,7 +33,7 @@
 ## --                                - dependency auto-commit disabled for pull requests
 ## -------------------------------------------------------------------------------------------------
 
-name: Unit Tests
+name: 1 Unit Tests
 
 on:
   push:
