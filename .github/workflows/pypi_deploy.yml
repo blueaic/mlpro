@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: Deployment PyPI
+      name: deployment pypi
       url: https://pypi.org/p/mlpro
 
     permissions:
