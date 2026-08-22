@@ -6,7 +6,7 @@
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.6653484-blue)](https://doi.org/10.5281/zenodo.6653484)
 
 
-# MLPro 
+# MLPro
 
 <img src="https://github.com/blueaic/mlpro/blob/main/doc/logo/original/logo.png?raw=True" align="right" width="30%"/>
 
