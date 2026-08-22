@@ -2,8 +2,8 @@
 name: Feature request
 about: Suggest an idea for this project
 title: 'Idea: ...'
-labels: idea
-assignees: detlefarend, steveyuwono
+labels: ''
+assignees: detlefarend
 
 ---
 
