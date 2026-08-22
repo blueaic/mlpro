@@ -1,0 +1,46 @@
+## -------------------------------------------------------------------------------------------------
+## -- Project : MLPro - The integrative middleware framework for standardized machine learning
+## -- Workflow: build_rtd_docs.yml
+## -------------------------------------------------------------------------------------------------
+## -- Notes   :
+## -- - Triggers a Read the Docs build for the latest version
+## -- - Runs automatically on documentation changes in branch main
+## -- - Can also be triggered manually
+## -- - Requires repository secret RTD_API_TOKEN
+## -------------------------------------------------------------------------------------------------
+## -- History :
+## -- yyyy-mm-dd  Ver.      Auth.    Description
+## -- 2026-08-22  1.0.0     DA       Creation
+## -------------------------------------------------------------------------------------------------
+
+name: 4 Build RTD Documentation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'doc/**'
+      - '.readthedocs.yaml'
+
+  workflow_dispatch:
+
+
+permissions:
+  contents: read
+
+
+jobs:
+  trigger_rtd:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Read the Docs build
+        run: |
+          curl \
+            --fail-with-body \
+            --silent \
+            --show-error \
+            -X POST \
+            -H "Authorization: Token ${{ secrets.RTD_API_TOKEN }}" \
+            https://app.readthedocs.org/api/v3/projects/mlpro/versions/latest/builds/
