@@ -5,12 +5,26 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-19  1.0.0     DA       Creation/First implementation
+## -- 2026-08-22  1.0.1     DA       Extended module documentation
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-09-19)
+Ver. 1.0.1 (2026-08-22)
 
-This module demonstrates ...
+This module demonstrates a two-dimensional benchmark stream with two compact clusters following
+controlled trajectories that cross in the center of the feature space. The crossing creates an
+ambiguous structural situation and is therefore a useful benchmark for evaluating cluster identity,
+separation, and tracking behavior of online cluster analyzers.
+
+You will learn:
+
+1) How to define deterministic trajectories for two dynamic ``StreamGenCluster`` objects.
+
+2) How to synchronize their state transitions so that the clusters cross each other.
+
+3) How to combine both generators in a ``MultiStreamGenCluster`` benchmark stream.
+
+4) How to run and visualize the crossing-cluster scenario in 2D.
 
 """
 
