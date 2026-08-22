@@ -5,12 +5,26 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-19  1.0.0     DA       Creation/First implementation
+## -- 2026-08-22  1.0.1     DA       Extended module documentation
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-09-19)
+Ver. 1.0.1 (2026-08-22)
 
-This module demonstrates ...
+This module demonstrates a two-dimensional multi-cluster benchmark in which two static clusters are
+activated sequentially. The controlled change from one cluster to another provides a simple benchmark
+for testing how online cluster analyzers react to the disappearance and later appearance of cluster
+structure in a data stream.
+
+You will learn:
+
+1) How to configure two fixed ``StreamGenCluster`` objects with different seeds and geometries.
+
+2) How to combine them with ``MultiStreamGenCluster`` using start positions and batch sizes.
+
+3) How to create a sequential two-cluster benchmark for online cluster-analysis experiments.
+
+4) How to run and visualize the benchmark in a ``StreamScenario``.
 
 """
 
