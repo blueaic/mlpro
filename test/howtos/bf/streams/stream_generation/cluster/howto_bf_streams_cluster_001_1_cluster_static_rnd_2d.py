@@ -5,12 +5,24 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-19  1.0.0     DA       Creation/First implementation
+## -- 2026-08-22  1.0.1     DA       Extended module documentation
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-09-19)
+Ver. 1.0.1 (2026-08-22)
 
-This module demonstrates...
+This module demonstrates how to generate and visualize a single static two-dimensional cluster with
+randomly initialized center and radii using MLPro's native ``StreamGenCluster`` benchmark stream.
+The resulting reproducible stream provides a compact baseline scenario for testing stream-processing
+and online cluster-analysis algorithms.
+
+You will learn:
+
+1) How to instantiate a two-dimensional ``StreamGenCluster`` with random cluster geometry.
+
+2) How to embed the generated benchmark stream in a ``StreamScenario`` and ``StreamWorkflow``.
+
+3) How to visualize the generated cluster stream in MLPro's 2D stream plot.
 
 """
 

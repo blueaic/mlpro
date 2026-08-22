@@ -5,12 +5,26 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-19  1.0.0     DA       Creation/First implementation
+## -- 2026-08-22  1.0.1     DA       Extended module documentation
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-09-19)
+Ver. 1.0.1 (2026-08-22)
 
-This module demonstrates...
+This module demonstrates a static two-dimensional cluster benchmark stream with synthetic outliers
+and strongly rescaled feature boundaries. It shows how the same geometric cluster concept can be
+mapped to heterogeneous feature ranges while preserving a controlled benchmark setup for online
+cluster analysis and anomaly detection.
+
+You will learn:
+
+1) How to configure a static ``StreamGenCluster`` with controlled outlier generation.
+
+2) How to rescale individual feature dimensions through ``p_boundaries_rescale``.
+
+3) How to react to generated outliers through the stream generator's outlier event.
+
+4) How to visualize the resulting rescaled benchmark stream in a ``StreamScenario``.
 
 """
 

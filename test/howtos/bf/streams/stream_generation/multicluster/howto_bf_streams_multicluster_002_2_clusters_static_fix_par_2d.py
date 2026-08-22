@@ -5,12 +5,26 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-19  1.0.0     DA       Creation/First implementation
+## -- 2026-08-22  1.0.1     DA       Extended module documentation
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-09-19)
+Ver. 1.0.1 (2026-08-22)
 
-This module demonstrates ...
+This module demonstrates a two-dimensional multi-cluster benchmark with two static clusters that are
+active in an overlapping time range. The delayed start and different batch sizes provide a controlled
+scenario for evaluating whether an online cluster analyzer can maintain two persistent structures
+under changing sampling proportions.
+
+You will learn:
+
+1) How to configure two fixed two-dimensional ``StreamGenCluster`` objects.
+
+2) How to combine them in one ``MultiStreamGenCluster`` with different start positions and batch sizes.
+
+3) How to construct an overlapping two-cluster benchmark for online cluster-analysis algorithms.
+
+4) How to run and visualize the benchmark in a ``StreamScenario``.
 
 """
 

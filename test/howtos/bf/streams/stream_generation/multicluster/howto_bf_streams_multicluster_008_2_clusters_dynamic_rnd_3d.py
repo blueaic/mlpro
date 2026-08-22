@@ -5,12 +5,26 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-19  1.0.0     DA       Creation/First implementation
+## -- 2026-08-22  1.0.1     DA       Extended module documentation
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-09-19)
+Ver. 1.0.1 (2026-08-22)
 
-This module demonstrates ...
+This module demonstrates a three-dimensional benchmark stream containing two independently moving
+and reshaping clusters with randomly generated start and target states. The scenario provides
+reproducible multi-cluster dynamics for testing whether online cluster analyzers can track several
+changing structures in 3D.
+
+You will learn:
+
+1) How to configure dynamic three-dimensional ``StreamGenCluster`` objects with random states.
+
+2) How to control their temporal evolution through ``p_transition_steps``.
+
+3) How to combine both generators in one ``MultiStreamGenCluster`` benchmark stream.
+
+4) How to run and visualize the dynamic benchmark in MLPro's 3D view.
 
 """
 

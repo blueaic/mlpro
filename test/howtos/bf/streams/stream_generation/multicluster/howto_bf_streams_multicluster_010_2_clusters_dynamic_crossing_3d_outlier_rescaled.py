@@ -5,12 +5,28 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-21  1.0.0     DA       Creation/First implementation
+## -- 2026-08-22  1.0.1     DA       Extended module documentation
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-09-21)
+Ver. 1.0.1 (2026-08-22)
 
-This module demonstrates ...
+This module demonstrates an advanced three-dimensional multi-cluster benchmark with two crossing
+clusters, synthetic outliers, and strongly rescaled feature dimensions. It combines structural
+ambiguity, contamination, and heterogeneous feature ranges in one reproducible scenario for stress-
+testing online cluster-analysis and anomaly-detection algorithms.
+
+You will learn:
+
+1) How to define two controlled 3D cluster trajectories that cross each other.
+
+2) How to rescale the benchmark to heterogeneous feature boundaries.
+
+3) How to inject synthetic outliers and react to the corresponding generator event.
+
+4) How to combine these effects in one ``MultiStreamGenCluster`` benchmark stream.
+
+5) How to run and visualize the resulting stress-test scenario in MLPro's 3D view.
 
 """
 

@@ -11,44 +11,154 @@ observations may disappear from the active context. In its current development s
 **standardized framework and templates for implementing custom online cluster analyzers** rather than a broad collection of
 ready-to-use clustering algorithms.
 
-``ClusterAnalyzer`` is the common adaptive template for this task. It is an ``OAStreamTask`` and therefore participates in the
-same forward/reverse adaptation lifecycle as other OA processing tasks. A concrete clustering algorithm implements how new and
-obsolete instances change the current cluster model, while the framework standardizes cluster management, events, results,
-properties, visualization, and renormalization.
+The current architecture separates the cluster-analysis contract, reusable cluster-management infrastructure, and integration
+into an online-adaptive stream task. Three classes are central:
 
-In other words, ``ClusterAnalyzer`` does not solve the clustering problem by itself. It defines the interoperable framework in
-which application-specific or third-party online clustering algorithms can be implemented consistently.
+- ``ClusterActions`` defines the common public API through which cluster-based functionality can access a current cluster model.
+- ``ClusterInfrastructure`` implements reusable, task-internal handling of clusters, properties, memberships, influences, and
+  cluster lifecycle operations.
+- ``ClusterAnalyzer`` combines that infrastructure with ``OAStreamTask`` and thereby turns a concrete clustering algorithm into
+  an online-adaptive stream-processing task.
+
+This separation is important for custom implementations. A component that only needs to consume cluster results can depend on
+``ClusterActions`` instead of a particular analyzer implementation, while analyzer developers can reuse
+``ClusterInfrastructure`` for the common mechanics of cluster handling and concentrate their own implementation on the actual
+clustering algorithm.
 
 
-Cluster model
--------------
+ClusterActions: common cluster-analysis API
+-------------------------------------------
+
+``ClusterActions`` is the smallest common contract of the cluster-analysis stack. It exposes the current ``clusters`` collection
+and standardizes queries that relate an ``Instance`` to that cluster model.
+
+The two principal operations are:
+
+- ``get_cluster_memberships()`` for relative membership values;
+- ``get_cluster_influences()`` for relative influence values.
+
+Both operations use the common ``ResultItem`` representation consisting of a cluster id, a result value, and the corresponding
+cluster object. Result scopes allow callers either to inspect all applicable clusters or to request only the strongest result.
+
+For integrations, this class is therefore the preferred API boundary whenever a consumer needs cluster information without
+requiring the full adaptive task interface of ``ClusterAnalyzer``.
+
+
+ClusterInfrastructure: reusable cluster handling
+------------------------------------------------
+
+``ClusterInfrastructure`` implements the common mechanics behind cluster-based tasks. It derives from ``ClusterActions`` and
+provides the standardized internal machinery needed by cluster analyzers and potentially other cluster-oriented components.
+
+Its responsibilities include:
+
+- storage of the current clusters and generation of cluster ids;
+- checking limits before new clusters are created;
+- protected operations for adding and removing clusters;
+- declaration and alignment of cluster properties through ``C_CLUSTER_PROPERTIES``;
+- common computation of cluster memberships and influences;
+- result scopes and optional influence thresholds;
+- access to the configured cluster class.
+
+The architectural intention is to keep these recurring concerns out of the concrete clustering algorithm. An implementation can
+therefore focus on *when* and *how* its model changes, while ``ClusterInfrastructure`` standardizes *how clusters are represented,
+managed, and queried* inside the task.
+
+
+ClusterAnalyzer: adaptive stream-task integration
+-------------------------------------------------
+
+``ClusterAnalyzer`` combines ``OAStreamTask`` and ``ClusterInfrastructure``. It is the common adaptive template for online
+clustering in an ``OAStreamWorkflow``.
+
+A concrete analyzer supplies the algorithm-specific adaptation behavior for newly arriving and obsolete instances. The inherited
+infrastructure provides the cluster model and cluster operations, while ``OAStreamTask`` contributes the common OA lifecycle,
+execution model, adaptivity switch, workflow integration, and event-driven interaction with other stream tasks.
+
+``ClusterAnalyzer`` additionally integrates cluster visualization and renormalization. If an upstream adaptive normalizer changes
+its parameters, the maintained cluster model can be renormalized so that its geometric representation remains consistent with the
+new coordinate system.
+
+The resulting responsibility split can be summarized as::
+
+    consumer / downstream component
+                |
+                v
+         ClusterActions
+        common query API
+                ^
+                |
+    ClusterInfrastructure
+    common cluster mechanics
+                ^
+                |
+         ClusterAnalyzer
+    OAStreamTask integration
+                ^
+                |
+      concrete algorithm
+    _adapt() / _adapt_reverse()
+
+``ClusterAnalyzer`` therefore does not solve the clustering problem by itself. It defines the standardized environment in which
+application-specific or third-party online clustering algorithms can be implemented consistently.
+
+
+Benchmarking with native BF-Streams
+-----------------------------------
+
+The native stream pool in MLPro-BF provides reproducible benchmark inputs for developing and evaluating online cluster analyzers.
+Of particular importance are the :ref:`Random Cluster and Multi-Cluster Benchmark Streams <target_bf_streams_generators>`.
+They can generate known static or dynamic cluster structures in configurable dimensionality and with reproducible random seeds.
+
+This creates a useful separation between **benchmark definition** and **analyzer implementation**: BF-Streams defines controlled
+input scenarios, while OA-Streams standardizes how an online cluster analyzer represents, updates, and exposes its cluster model.
+A custom ``ClusterAnalyzer`` can therefore be tested repeatedly against the same benchmark stream and compared with alternative
+implementations under equivalent conditions.
+
+Single-cluster scenarios are useful for validating basic model behavior, membership semantics, and adaptation to movement or size
+changes. Multi-cluster scenarios are especially relevant for evaluating separation, competing memberships and influences,
+cluster limits, and the response of an analyzer to evolving cluster configurations.
+
+A few representative benchmark scenarios are shown below. The complete visual benchmark gallery is available in
+:ref:`BF-Streams <target_bf_streams_generators>`.
+
+.. list-table::
+   :widths: 25 25 25 25
+
+   * - :ref:`Single / dynamic 2D <Howto BF STREAMS CLUSTER 003>`
+
+       .. image:: ../../../../99_appendices/appendix1/sub/mlpro_bf/layer3_application_support/streams/images/howto_bf_streams_cluster_003.gif
+          :width: 140 px
+          :alt: Dynamic single-cluster 2D benchmark
+     - :ref:`Multi / static 2D <Howto BF STREAMS MULTICLUSTER 002>`
+
+       .. image:: ../../../../99_appendices/appendix1/sub/mlpro_bf/layer3_application_support/streams/images/howto_bf_streams_multicluster_002.gif
+          :width: 140 px
+          :alt: Static multi-cluster 2D benchmark
+     - :ref:`Multi / crossing 2D <Howto BF STREAMS MULTICLUSTER 004>`
+
+       .. image:: ../../../../99_appendices/appendix1/sub/mlpro_bf/layer3_application_support/streams/images/howto_bf_streams_multicluster_004.gif
+          :width: 140 px
+          :alt: Crossing multi-cluster 2D benchmark
+     - :ref:`Multi / crossing 3D + outliers <Howto BF STREAMS MULTICLUSTER 010>`
+
+       .. image:: ../../../../99_appendices/appendix1/sub/mlpro_bf/layer3_application_support/streams/images/howto_bf_streams_multicluster_010.gif
+          :width: 140 px
+          :alt: Crossing multi-cluster 3D benchmark with rescaled outliers
+
+
+Cluster model and properties
+----------------------------
 
 Clusters are first-class objects rather than anonymous labels. The cluster-analysis package defines a reusable cluster model with
 ``Cluster``, cluster identifiers, centroid- and body-oriented specializations, and extensible cluster properties.
 
-The analyzer standardizes common operations such as:
+Algorithms declare the properties they maintain through ``C_CLUSTER_PROPERTIES``. New clusters can receive those definitions,
+and property settings can be aligned with external consumers. The native property pool includes reusable concepts around cluster
+centroids and bodies as well as derived properties such as **density** and **deformation index**.
 
-- creation and removal of clusters, including ``CLUSTER_ADDED`` and ``CLUSTER_REMOVED`` events;
-- limits on the number of clusters;
-- cluster memberships and cluster influences for incoming data;
-- selection of all relevant results or the strongest result through result scopes;
-- relations between clusters;
-- synchronization of property definitions across cooperating algorithms;
-- visualization and renormalization after changes in upstream preprocessing.
-
-This separates the generic semantics of an online cluster model from the concrete clustering algorithm.
-
-
-Cluster properties
-------------------
-
-A particularly important part of the design is the property system. Algorithms declare the properties they maintain through
-``C_CLUSTER_PROPERTIES``. New clusters receive those definitions automatically, and property settings can be aligned with
-external consumers.
-
-The native property pool includes reusable concepts around cluster centroids and bodies as well as derived properties such as
-**density** and **deformation index**. Because the property mechanism builds on the generic BF-Math property abstractions, cluster
-metadata can be extended without changing the core analyzer contract.
+Because the property mechanism builds on the generic BF-Math property abstractions, cluster metadata can be extended without
+changing the common ``ClusterActions`` API or the fundamental analyzer lifecycle.
 
 
 Forward and reverse adaptation
@@ -71,24 +181,25 @@ Interoperability
 ----------------
 
 Custom cluster analyzers built on the MLPro-OA templates can be placed after adaptive preprocessing and before change detectors
-in one ``OAStreamWorkflow``. Cluster creation/removal events and evolving cluster properties can also be observed by helper
-classes or consumed by cluster-based anomaly and drift detectors.
+in one ``OAStreamWorkflow``. Downstream functionality that only needs cluster memberships, influences, or direct access to the
+current cluster model can program against ``ClusterActions`` instead of depending on a concrete analyzer class.
 
 A typical architecture is::
 
-    Stream -> adaptive preprocessing -> ClusterAnalyzer -> cluster-based change detection
+    Stream -> adaptive preprocessing -> ClusterAnalyzer -> cluster-based consumer
                                       |                 |
-                                      +-> properties    +-> change events
+                                      |                 +-> ClusterActions API
+                                      +-> cluster model / properties
 
-The standardized interfaces make clustering a reusable adaptive model inside a larger event-driven processing chain, even when
-the actual clustering algorithm is supplied by the application developer or a third-party extension.
-
-Cluster-based change detection is currently under development and should therefore be regarded as an evolving integration area
-rather than mature ready-to-use functionality.
+This makes clustering a reusable adaptive model inside a larger processing chain while keeping the actual clustering algorithm
+replaceable. Cluster-based change detection is still under development and should therefore be regarded as an evolving
+integration area rather than mature ready-to-use functionality.
 
 
 **Cross reference**
 
+- :ref:`BF-Streams: Native Benchmark Streams <target_bf_streams_native_streams_pool>`
+- :ref:`BF-Streams: Random Cluster and Multi-Cluster Benchmark Streams <target_bf_streams_generators>`
 - :ref:`OA-Streams Overview <target_oa_stream_overview>`
 - :ref:`Change Detection <target_oa_change_detection>`
 - :ref:`BF-Math: Mathematics and properties <target_bf_mathematics>`

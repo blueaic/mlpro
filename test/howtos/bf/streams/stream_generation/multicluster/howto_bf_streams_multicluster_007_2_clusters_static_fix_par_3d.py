@@ -5,12 +5,26 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-19  1.0.0     DA       Creation/First implementation
+## -- 2026-08-22  1.0.1     DA       Extended module documentation
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-09-19)
+Ver. 1.0.1 (2026-08-22)
 
-This module demonstrates ...
+This module demonstrates a three-dimensional multi-cluster benchmark with two static clusters that
+coexist after a delayed start of the second stream. Different batch sizes change their relative
+sampling frequency, which makes the scenario useful for evaluating whether an online cluster analyzer
+can maintain two persistent 3D structures under unequal data rates.
+
+You will learn:
+
+1) How to configure two fixed three-dimensional ``StreamGenCluster`` objects.
+
+2) How to combine them with different start positions and batch sizes in ``MultiStreamGenCluster``.
+
+3) How to create an overlapping 3D two-cluster benchmark for online cluster-analysis algorithms.
+
+4) How to run and visualize the scenario in MLPro's 3D stream view.
 
 """
 

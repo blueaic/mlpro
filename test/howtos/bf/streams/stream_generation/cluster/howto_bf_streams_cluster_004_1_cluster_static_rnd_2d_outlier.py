@@ -5,12 +5,24 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-19  1.0.0     DA       Creation/First implementation
+## -- 2026-08-22  1.0.1     DA       Extended module documentation
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-09-19)
+Ver. 1.0.1 (2026-08-22)
 
-This module demonstrates...
+This module demonstrates a static two-dimensional cluster benchmark stream with randomly generated
+outliers. The scenario combines a well-defined cluster body with controlled contamination and is
+therefore useful for testing the robustness of stream-processing, cluster-analysis, and anomaly-
+detection algorithms.
+
+You will learn:
+
+1) How to configure a static ``StreamGenCluster`` with fixed geometry.
+
+2) How to enable synthetic outliers through ``p_outlier_rate``.
+
+3) How to run and visualize the contaminated benchmark stream in a ``StreamScenario``.
 
 """
 

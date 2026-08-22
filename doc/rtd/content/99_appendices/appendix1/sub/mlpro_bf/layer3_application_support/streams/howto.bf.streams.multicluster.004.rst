@@ -9,5 +9,11 @@ Howto BF-STREAMS-MULTICLUSTER-004: Two Dynamic Crossing 2D Clusters
    :language: python
 
 
+**Results**
+
+.. image:: images/howto_bf_streams_multicluster_004.gif
+   :width: 420 px
+
+
 **Cross Reference**
     - :ref:`API Reference: Streams <target_ap_bf_streams>`

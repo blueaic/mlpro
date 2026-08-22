@@ -2,6 +2,10 @@
 Cluster analysis
 ================
 
+The cluster-analysis API is organized in three layers: ``ClusterActions`` defines the common consumer-facing cluster API,
+``ClusterInfrastructure`` provides reusable internal cluster-management functionality, and ``ClusterAnalyzer`` combines this
+infrastructure with ``OAStreamTask`` for online-adaptive stream processing.
+
 .. image:: 20_cluster_analysis/images/MLPro-OA-Cluster_Analyzers_class_diagram.drawio.png
    :scale: 50%
    

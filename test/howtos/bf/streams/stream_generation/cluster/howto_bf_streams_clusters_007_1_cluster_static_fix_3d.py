@@ -5,12 +5,23 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-19  1.0.0     DA       Creation/First implementation
+## -- 2026-08-22  1.0.1     DA       Extended module documentation
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-09-19)
+Ver. 1.0.1 (2026-08-22)
 
-This module demonstrates...
+This module demonstrates a single static three-dimensional cluster with explicitly defined center
+and radii. The fixed geometry provides a deterministic benchmark stream for validating 3D stream
+visualization and for comparing online cluster-analysis algorithms against a known cluster shape.
+
+You will learn:
+
+1) How to define a fixed three-dimensional ``ClusterState``.
+
+2) How to instantiate a static ``StreamGenCluster`` from that state.
+
+3) How to run and visualize the deterministic benchmark stream in a ``StreamScenario``.
 
 """
 

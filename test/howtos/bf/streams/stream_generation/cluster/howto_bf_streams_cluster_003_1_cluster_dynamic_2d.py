@@ -5,12 +5,24 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-19  1.0.0     DA       Creation/First implementation
+## -- 2026-08-22  1.0.1     DA       Extended module documentation
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-09-19)
+Ver. 1.0.1 (2026-08-22)
 
-This module demonstrates...
+This module demonstrates a dynamic two-dimensional cluster benchmark stream whose center and radii
+change over a sequence of explicitly defined ``ClusterState`` objects. It is suited for evaluating
+whether stream-processing and online cluster-analysis algorithms can follow controlled structural
+changes over time.
+
+You will learn:
+
+1) How to describe a cluster trajectory through multiple ``ClusterState`` objects.
+
+2) How to control movement and size changes with ``p_transition_steps``.
+
+3) How to run and visualize the resulting dynamic ``StreamGenCluster`` benchmark scenario.
 
 """
 

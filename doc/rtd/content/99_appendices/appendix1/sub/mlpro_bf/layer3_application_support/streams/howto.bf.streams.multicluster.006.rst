@@ -9,5 +9,11 @@ Howto BF-STREAMS-MULTICLUSTER-006: Two Static Fixed 3D Clusters (Sequential)
    :language: python
 
 
+**Results**
+
+.. image:: images/howto_bf_streams_multicluster_006.gif
+   :width: 420 px
+
+
 **Cross Reference**
     - :ref:`API Reference: Streams <target_ap_bf_streams>`

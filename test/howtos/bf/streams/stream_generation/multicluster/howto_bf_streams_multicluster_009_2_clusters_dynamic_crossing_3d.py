@@ -5,12 +5,26 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-19  1.0.0     DA       Creation/First implementation
+## -- 2026-08-22  1.0.1     DA       Extended module documentation
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-09-19)
+Ver. 1.0.1 (2026-08-22)
 
-This module demonstrates ...
+This module demonstrates a three-dimensional benchmark stream with two compact clusters following
+controlled trajectories that cross in the center of the feature space. The temporary overlap creates
+a challenging structural ambiguity and is particularly useful for evaluating cluster identity,
+separation, and tracking behavior of online cluster analyzers in 3D.
+
+You will learn:
+
+1) How to define deterministic 3D trajectories for two dynamic ``StreamGenCluster`` objects.
+
+2) How to synchronize their state transitions so that both clusters cross each other.
+
+3) How to combine the generators in one ``MultiStreamGenCluster`` benchmark stream.
+
+4) How to run and visualize the crossing-cluster scenario in MLPro's 3D view.
 
 """
 
