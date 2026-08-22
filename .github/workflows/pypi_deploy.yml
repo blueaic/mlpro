@@ -12,7 +12,7 @@
 ## -- 2026-08-18  2.0.0     DA       Review and updates
 ## -------------------------------------------------------------------------------------------------
 
-name: WF04 - Deployment PyPI
+name: WF03 - Deployment PyPI
 
 on:
   release:
