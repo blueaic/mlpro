@@ -5,12 +5,23 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-19  1.0.0     DA       Creation/First implementation
+## -- 2026-08-22  1.0.1     DA       Extended module documentation
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-09-19)
+Ver. 1.0.1 (2026-08-22)
 
-This module demonstrates...
+This module demonstrates a dynamic three-dimensional cluster benchmark stream whose center and radii
+change over a sequence of defined states. The controlled trajectory is useful for evaluating whether
+online cluster-analysis algorithms can follow spatial movement and shape changes in three dimensions.
+
+You will learn:
+
+1) How to define a 3D cluster trajectory through multiple ``ClusterState`` objects.
+
+2) How to control movement and shape transitions through ``p_transition_steps``.
+
+3) How to run and visualize the dynamic ``StreamGenCluster`` benchmark in MLPro's 3D view.
 
 """
 
