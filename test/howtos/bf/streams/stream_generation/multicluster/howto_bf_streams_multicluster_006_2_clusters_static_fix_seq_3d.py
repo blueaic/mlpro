@@ -5,12 +5,26 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-19  1.0.0     DA       Creation/First implementation
+## -- 2026-08-22  1.0.1     DA       Extended module documentation
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-09-19)
+Ver. 1.0.1 (2026-08-22)
 
-This module demonstrates ...
+This module demonstrates a three-dimensional multi-cluster benchmark in which two static clusters
+are activated sequentially. The controlled replacement of one cluster by another provides a simple
+3D benchmark for testing how online cluster analyzers react to disappearing and newly appearing
+cluster structure.
+
+You will learn:
+
+1) How to configure two fixed three-dimensional ``StreamGenCluster`` objects.
+
+2) How to schedule them sequentially in a ``MultiStreamGenCluster`` with start positions and batch sizes.
+
+3) How to create a reproducible appearance/disappearance benchmark for online cluster analysis.
+
+4) How to run and visualize the benchmark in MLPro's 3D stream view.
 
 """
 
