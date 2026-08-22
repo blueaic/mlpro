@@ -5,12 +5,24 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-19  1.0.0     DA       Creation/First implementation
+## -- 2026-08-22  1.0.1     DA       Extended module documentation
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-09-19)
+Ver. 1.0.1 (2026-08-22)
 
-This module demonstrates...
+This module demonstrates how to generate and visualize a single static three-dimensional cluster
+with randomly initialized geometry using MLPro's native ``StreamGenCluster`` benchmark stream. The
+scenario is a simple 3D baseline for validating visualization, stream-processing, and online cluster-
+analysis algorithms on reproducible synthetic data.
+
+You will learn:
+
+1) How to instantiate a three-dimensional ``StreamGenCluster`` with random cluster geometry.
+
+2) How to embed the benchmark stream in a ``StreamScenario`` and ``StreamWorkflow``.
+
+3) How to visualize the generated cluster stream using MLPro's 3D stream plot.
 
 """
 
