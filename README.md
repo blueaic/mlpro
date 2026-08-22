@@ -5,11 +5,10 @@
 [![PyPI Last Month Downloads](https://static.pepy.tech/personalized-badge/mlpro?period=month&units=international_system&left_color=blue&right_color=orange&left_text=PyPI%20Last%20Month%20Downloads)](https://pepy.tech/project/mlpro)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.6653484-blue)](https://doi.org/10.5281/zenodo.6653484)
 
-<img src="https://github.com/blueaic/mlpro/blob/main/doc/logo/original/logo.png?raw=True" align="right" width="30%"/>
-
-<img src="https://github.com/blueaic/mlpro/blob/main/doc/logo/original/logo.png?raw=True" align="right" width="30%"/>
 
 # MLPro
+
+<img src="https://github.com/blueaic/mlpro/blob/main/doc/logo/original/logo.png?raw=True" align="right" width="30%"/>
 
 **MLPro is an open-source Python framework for machine learning research, development, and education.**
 
