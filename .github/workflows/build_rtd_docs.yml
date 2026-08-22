@@ -5,12 +5,14 @@
 ## -- Notes   :
 ## -- - Triggers a Read the Docs build for the latest version
 ## -- - Runs automatically on documentation changes in branch main
+## -- - Runs automatically when a new GitHub release is published
 ## -- - Can also be triggered manually
 ## -- - Requires repository secret RTD_API_TOKEN
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2026-08-22  1.0.0     DA       Creation
+## -- 2026-08-22  1.1.0     DA       Added trigger for published GitHub releases
 ## -------------------------------------------------------------------------------------------------
 
 name: WF03 - Build RTD Documentation
@@ -22,6 +24,9 @@ on:
     paths:
       - 'doc/**'
       - '.readthedocs.yaml'
+
+  release:
+    types: [published]
 
   workflow_dispatch:
 
