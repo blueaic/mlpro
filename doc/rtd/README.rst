@@ -14,4 +14,4 @@ Read MLPro documentation online at https://mlpro.readthedocs.io/
 Optionally, to build the documentation yourself from the ``doc/docs/`` folder::
 
   clone repository
-  open MLPro/doc/docs/_build/html/index.html on your browser
+  open MLPro/doc/docs/_build/html/index.html on your browser 
