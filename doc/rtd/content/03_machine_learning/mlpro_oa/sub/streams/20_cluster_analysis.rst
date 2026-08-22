@@ -119,6 +119,33 @@ Single-cluster scenarios are useful for validating basic model behavior, members
 changes. Multi-cluster scenarios are especially relevant for evaluating separation, competing memberships and influences,
 cluster limits, and the response of an analyzer to evolving cluster configurations.
 
+A few representative benchmark scenarios are shown below. The complete visual benchmark gallery is available in
+:ref:`BF-Streams <target_bf_streams_generators>`.
+
+.. list-table::
+   :widths: 25 25 25 25
+
+   * - :ref:`Single / dynamic 2D <Howto BF STREAMS CLUSTER 003>`
+
+       .. image:: ../../../../99_appendices/appendix1/sub/mlpro_bf/layer3_application_support/streams/images/howto_bf_streams_cluster_003.gif
+          :width: 140 px
+          :alt: Dynamic single-cluster 2D benchmark
+     - :ref:`Multi / static 2D <Howto BF STREAMS MULTICLUSTER 002>`
+
+       .. image:: ../../../../99_appendices/appendix1/sub/mlpro_bf/layer3_application_support/streams/images/howto_bf_streams_multicluster_002.gif
+          :width: 140 px
+          :alt: Static multi-cluster 2D benchmark
+     - :ref:`Multi / crossing 2D <Howto BF STREAMS MULTICLUSTER 004>`
+
+       .. image:: ../../../../99_appendices/appendix1/sub/mlpro_bf/layer3_application_support/streams/images/howto_bf_streams_multicluster_004.gif
+          :width: 140 px
+          :alt: Crossing multi-cluster 2D benchmark
+     - :ref:`Multi / crossing 3D + outliers <Howto BF STREAMS MULTICLUSTER 010>`
+
+       .. image:: ../../../../99_appendices/appendix1/sub/mlpro_bf/layer3_application_support/streams/images/howto_bf_streams_multicluster_010.gif
+          :width: 140 px
+          :alt: Crossing multi-cluster 3D benchmark with rescaled outliers
+
 
 Cluster model and properties
 ----------------------------
