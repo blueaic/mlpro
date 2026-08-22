@@ -2,7 +2,7 @@
 name: Release-Checklist
 about: List of all necessary steps before, during and after a release.
 title: Release vX.Y.Z
-labels: admin
+labels: ''
 assignees: detlefarend
 
 ---
@@ -11,22 +11,19 @@ Release Checklist
 -------------------
 
 **1 Preparation**
-- [ ] 1.1 Inform the team on slack to stop merging to main
-- [ ] 1.2 Create a new version number in project custom field 'version'
-- [ ] 1.3 Assign new version number to all related issues and remove label 'next release'
-- [ ] 1.4 Updates in branch main 
-    - [ ] 1.4.1 Update version in ./setup.cfg
-    - [ ] 1.4.2 Update version in ./src/setup.py
-    - [ ] 1.4.3 Update version in ./doc/rtd/conf.py
-    - [ ] 1.4.4 Update ./CITATION.cff (see [Zenodo recommendation](https://zenodo.org/account/settings/github/repository/fhswf/MLPro))
-    - [ ] 1.4.5 Build and check RTD documentation
-        - [ ] 1.4.5.1 All class diagrams there?
-        - [ ] 1.4.5.2 All auto-generated code descriptions there?
-        - [ ] 1.4.5.3 Logo there?
-    - [ ] 1.4.6 Commit all changes and observe the action log
+- [ ] 1.1 Finalize the version number in project custom field 'version'
+- [ ] 1.2 Updates in branch main 
+    - [ ] 1.2.1 Update version in ./setup.cfg
+    - [ ] 1.2.2 Update version in ./src/setup.py
+    - [ ] 1.2.3 Update version in ./doc/rtd/conf.py
+    - [ ] 1.2.4 Update ./CITATION.cff (see [Zenodo recommendation](https://zenodo.org/account/settings/github/repository/fhswf/MLPro))
+    - [ ] 1.2.5 Build and check RTD documentation
+        - [ ] 1.2.5.1 All class diagrams there?
+        - [ ] 1.2.5.2 All auto-generated code descriptions there?
+    - [ ] 1.2.6 Commit all changes and observe the action log
 
 **2 Release**
-- [ ] 2.1 Create a new [release](https://github.com/fhswf/MLPro/releases)
+- [ ] 2.1 Create a new [release](https://github.com/blueaic/mlpro/releases)
 - [ ] 2.2 Generate/complete release notes
 - [ ] 2.3 Commit new release and observe the action log
 - [ ] 2.4 Activate new release in [ReadTheDocs](https://readthedocs.org) as user mlpro-admin
@@ -40,5 +37,4 @@ Release Checklist
 - [ ] 3.2 Check [MLPro in PyPI](https://pypi.org/project/mlpro/)
 - [ ] 3.3 Check [MLPro in Zenodo](https://zenodo.org/account/settings/github/repository/fhswf/MLPro)
 - [ ] 3.4 Update all open branches from main
-- [ ] 3.5 Inform the team on slack
-- [ ] 3.6 Create a news post
+- [ ] 3.5 Create a newsletter
