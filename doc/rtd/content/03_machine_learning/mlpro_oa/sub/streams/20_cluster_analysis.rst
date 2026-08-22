@@ -11,44 +11,110 @@ observations may disappear from the active context. In its current development s
 **standardized framework and templates for implementing custom online cluster analyzers** rather than a broad collection of
 ready-to-use clustering algorithms.
 
-``ClusterAnalyzer`` is the common adaptive template for this task. It is an ``OAStreamTask`` and therefore participates in the
-same forward/reverse adaptation lifecycle as other OA processing tasks. A concrete clustering algorithm implements how new and
-obsolete instances change the current cluster model, while the framework standardizes cluster management, events, results,
-properties, visualization, and renormalization.
+The current architecture separates the cluster-analysis contract, reusable cluster-management infrastructure, and integration
+into an online-adaptive stream task. Three classes are central:
 
-In other words, ``ClusterAnalyzer`` does not solve the clustering problem by itself. It defines the interoperable framework in
-which application-specific or third-party online clustering algorithms can be implemented consistently.
+- ``ClusterActions`` defines the common public API through which cluster-based functionality can access a current cluster model.
+- ``ClusterInfrastructure`` implements reusable, task-internal handling of clusters, properties, memberships, influences, and
+  cluster lifecycle operations.
+- ``ClusterAnalyzer`` combines that infrastructure with ``OAStreamTask`` and thereby turns a concrete clustering algorithm into
+  an online-adaptive stream-processing task.
+
+This separation is important for custom implementations. A component that only needs to consume cluster results can depend on
+``ClusterActions`` instead of a particular analyzer implementation, while analyzer developers can reuse
+``ClusterInfrastructure`` for the common mechanics of cluster handling and concentrate their own implementation on the actual
+clustering algorithm.
 
 
-Cluster model
--------------
+ClusterActions: common cluster-analysis API
+-------------------------------------------
+
+``ClusterActions`` is the smallest common contract of the cluster-analysis stack. It exposes the current ``clusters`` collection
+and standardizes queries that relate an ``Instance`` to that cluster model.
+
+The two principal operations are:
+
+- ``get_cluster_memberships()`` for relative membership values;
+- ``get_cluster_influences()`` for relative influence values.
+
+Both operations use the common ``ResultItem`` representation consisting of a cluster id, a result value, and the corresponding
+cluster object. Result scopes allow callers either to inspect all applicable clusters or to request only the strongest result.
+
+For integrations, this class is therefore the preferred API boundary whenever a consumer needs cluster information without
+requiring the full adaptive task interface of ``ClusterAnalyzer``.
+
+
+ClusterInfrastructure: reusable cluster handling
+------------------------------------------------
+
+``ClusterInfrastructure`` implements the common mechanics behind cluster-based tasks. It derives from ``ClusterActions`` and
+provides the standardized internal machinery needed by cluster analyzers and potentially other cluster-oriented components.
+
+Its responsibilities include:
+
+- storage of the current clusters and generation of cluster ids;
+- checking limits before new clusters are created;
+- protected operations for adding and removing clusters;
+- declaration and alignment of cluster properties through ``C_CLUSTER_PROPERTIES``;
+- common computation of cluster memberships and influences;
+- result scopes and optional influence thresholds;
+- access to the configured cluster class.
+
+The architectural intention is to keep these recurring concerns out of the concrete clustering algorithm. An implementation can
+therefore focus on *when* and *how* its model changes, while ``ClusterInfrastructure`` standardizes *how clusters are represented,
+managed, and queried* inside the task.
+
+
+ClusterAnalyzer: adaptive stream-task integration
+-------------------------------------------------
+
+``ClusterAnalyzer`` combines ``OAStreamTask`` and ``ClusterInfrastructure``. It is the common adaptive template for online
+clustering in an ``OAStreamWorkflow``.
+
+A concrete analyzer supplies the algorithm-specific adaptation behavior for newly arriving and obsolete instances. The inherited
+infrastructure provides the cluster model and cluster operations, while ``OAStreamTask`` contributes the common OA lifecycle,
+execution model, adaptivity switch, workflow integration, and event-driven interaction with other stream tasks.
+
+``ClusterAnalyzer`` additionally integrates cluster visualization and renormalization. If an upstream adaptive normalizer changes
+its parameters, the maintained cluster model can be renormalized so that its geometric representation remains consistent with the
+new coordinate system.
+
+The resulting responsibility split can be summarized as::
+
+    consumer / downstream component
+                |
+                v
+         ClusterActions
+        common query API
+                ^
+                |
+    ClusterInfrastructure
+    common cluster mechanics
+                ^
+                |
+         ClusterAnalyzer
+    OAStreamTask integration
+                ^
+                |
+      concrete algorithm
+    _adapt() / _adapt_reverse()
+
+``ClusterAnalyzer`` therefore does not solve the clustering problem by itself. It defines the standardized environment in which
+application-specific or third-party online clustering algorithms can be implemented consistently.
+
+
+Cluster model and properties
+----------------------------
 
 Clusters are first-class objects rather than anonymous labels. The cluster-analysis package defines a reusable cluster model with
 ``Cluster``, cluster identifiers, centroid- and body-oriented specializations, and extensible cluster properties.
 
-The analyzer standardizes common operations such as:
+Algorithms declare the properties they maintain through ``C_CLUSTER_PROPERTIES``. New clusters can receive those definitions,
+and property settings can be aligned with external consumers. The native property pool includes reusable concepts around cluster
+centroids and bodies as well as derived properties such as **density** and **deformation index**.
 
-- creation and removal of clusters, including ``CLUSTER_ADDED`` and ``CLUSTER_REMOVED`` events;
-- limits on the number of clusters;
-- cluster memberships and cluster influences for incoming data;
-- selection of all relevant results or the strongest result through result scopes;
-- relations between clusters;
-- synchronization of property definitions across cooperating algorithms;
-- visualization and renormalization after changes in upstream preprocessing.
-
-This separates the generic semantics of an online cluster model from the concrete clustering algorithm.
-
-
-Cluster properties
-------------------
-
-A particularly important part of the design is the property system. Algorithms declare the properties they maintain through
-``C_CLUSTER_PROPERTIES``. New clusters receive those definitions automatically, and property settings can be aligned with
-external consumers.
-
-The native property pool includes reusable concepts around cluster centroids and bodies as well as derived properties such as
-**density** and **deformation index**. Because the property mechanism builds on the generic BF-Math property abstractions, cluster
-metadata can be extended without changing the core analyzer contract.
+Because the property mechanism builds on the generic BF-Math property abstractions, cluster metadata can be extended without
+changing the common ``ClusterActions`` API or the fundamental analyzer lifecycle.
 
 
 Forward and reverse adaptation
@@ -71,20 +137,19 @@ Interoperability
 ----------------
 
 Custom cluster analyzers built on the MLPro-OA templates can be placed after adaptive preprocessing and before change detectors
-in one ``OAStreamWorkflow``. Cluster creation/removal events and evolving cluster properties can also be observed by helper
-classes or consumed by cluster-based anomaly and drift detectors.
+in one ``OAStreamWorkflow``. Downstream functionality that only needs cluster memberships, influences, or direct access to the
+current cluster model can program against ``ClusterActions`` instead of depending on a concrete analyzer class.
 
 A typical architecture is::
 
-    Stream -> adaptive preprocessing -> ClusterAnalyzer -> cluster-based change detection
+    Stream -> adaptive preprocessing -> ClusterAnalyzer -> cluster-based consumer
                                       |                 |
-                                      +-> properties    +-> change events
+                                      |                 +-> ClusterActions API
+                                      +-> cluster model / properties
 
-The standardized interfaces make clustering a reusable adaptive model inside a larger event-driven processing chain, even when
-the actual clustering algorithm is supplied by the application developer or a third-party extension.
-
-Cluster-based change detection is currently under development and should therefore be regarded as an evolving integration area
-rather than mature ready-to-use functionality.
+This makes clustering a reusable adaptive model inside a larger processing chain while keeping the actual clustering algorithm
+replaceable. Cluster-based change detection is still under development and should therefore be regarded as an evolving
+integration area rather than mature ready-to-use functionality.
 
 
 **Cross reference**
