@@ -29,7 +29,7 @@ It provides a common infrastructure for different machine learning paradigms and
 * [Examples](https://mlpro.readthedocs.io/en/latest/content/99_appendices/appendix1/main.html)
 * [Extensions](https://mlpro.readthedocs.io/en/latest/content/04_extensions/main.html)
 * [PyPI](https://pypi.org/project/mlpro/)
-* [Publications](https://mlpro.readthedocs.io/en/latest/content/99_appendices/appendix2/main.html)
+* [Publications](https://mlpro.readthedocs.io/en/latest/content/99_appendices/appendix3/sub/02_publications.html)
 * [MLPro Newsletter](https://www.blueaic.com/newsletter-mlpro) – Project updates and release announcements
 
 
