@@ -1,13 +1,12 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
-title: "Github repository blueaic/mlpro"
+title: "MLPro (GitHub repository blueaic/mlpro)"
 authors:
 - family-names: "Arend"
   given-names: "Detlef"
   orcid: "https://orcid.org/0000-0002-8315-2346"
   affiliation: "blueAIC UG (haftungsbeschränkt), Germany"
 license: "Apache-2.0"
-version: "2.2.0"
-date-released: 2026-08-22
-doi: 10.5281/zenodo.6653484
-url: "https://github.com/blueaic/mlpro"
+version: "2.2.1"
+date-released: 2026-08-23
+repository-code: "https://github.com/blueaic/mlpro"
