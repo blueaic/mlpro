@@ -2,7 +2,7 @@ from setuptools import setup
 
 
 setup(name='mlpro',
-version='2.2.0',
+version='2.2.1',
 description='MLPro - The integrative middleware framework for standardized machine learning',
 author='blueAIC',
 author_mail='mlpro@blueaic.com',

@@ -23,7 +23,7 @@ copyright = "2026 blueAIC UG (haftungsbeschränkt), Germany"
 author = "blueAIC"
 
 # The full version, including alpha/beta/rc tags
-release = "2.2.0"
+release = "2.2.1"
 
 
 # -- General configuration ---------------------------------------------------
