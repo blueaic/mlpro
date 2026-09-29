@@ -46,10 +46,11 @@
 ## -- 2024-12-11  2.4.0     DA       New method Workflow.remove_plot()
 ## -- 2025-07-18  2.5.0     DA       Refactoring
 ## -- 2025-10-09  2.6.0     DA       Method Async._create_so(): additional parameter p_kwargs
+## -- 2026-09-29  2.7.0     DA       Method Async.__init__(): additional parameter p_kwargs
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.6.0 (2025-10-09)
+Ver. 2.7.0 (2026-09-29)
 
 This module provides classes for multitasking with optional interprocess communication (IPC) based
 on shared objects. Multitasking in MLPro combines multrithreading and multiprocessing and simplifies
@@ -67,15 +68,10 @@ import threading as mt
 import multiprocess as mp
 from multiprocess.managers import BaseManager
 
-try:
-    from matplotlib.figure import Figure
-except:
-    class Figure : pass
-
 from mlpro.bf.exceptions import *
 from mlpro.bf.various import *
 from mlpro.bf.events import EventManager, Event
-from mlpro.bf.plot import PlotSettings, Plottable
+from mlpro.bf.plot import Figure, PlotSettings, Plottable
 
 
 
@@ -85,7 +81,6 @@ __all__ = [ 'Range',
             'Async',
             'Task',
             'Workflow' ]
-
 
 
 
@@ -324,13 +319,16 @@ class Async (Range, Log):
         Optional class for a shared object (class Shared or a child class of Shared)
     p_logging
         Log level (see constants of class Log). Default: Log.C_LOG_ALL   
+    p_kwargs : dict
+        Optional parameters for a shared object.
     """
 
 ## -------------------------------------------------------------------------------------------------
     def __init__( self,
                   p_range_max:int=Range.C_RANGE_PROCESS,
                   p_class_shared=None, 
-                  p_logging=Log.C_LOG_ALL ):
+                  p_logging=Log.C_LOG_ALL,
+                  **p_kwargs ):
 
         Log.__init__(self, p_logging=p_logging)
         Range.__init__(self, p_range=p_range_max)
@@ -339,7 +337,9 @@ class Async (Range, Log):
         self._mpmanager     = None
         self._class_shared  = p_class_shared
 
-        self._so : Shared   = self._create_so(p_range=p_range_max, p_class_shared=p_class_shared)
+        self._so : Shared = self._create_so( p_range = p_range_max, 
+                                             p_class_shared = p_class_shared,
+                                             **p_kwargs )
 
 
 ## -------------------------------------------------------------------------------------------------
