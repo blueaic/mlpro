@@ -152,8 +152,8 @@ class OAStreamTask (StreamTask, Model):
         If True, instances will be duplicated before processing. Default = False.
     p_event_config : EventConfig, optional
         Optional event configuration passed to the inherited event manager. ML-specific event
-        switches may use :class:`EventModeML`. If omitted, queried events default to
-        :attr:`EventMode.EVENT`.
+        switches may use :class:`mlpro.bf.ml.EventModeML`. If omitted, queried events default to
+        :attr:`mlpro.bf.events.EventMode.EVENT`.
     p_visualize : bool
         Boolean switch for visualisation. Default = False.
     p_logging
