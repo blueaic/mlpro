@@ -34,6 +34,8 @@ A custom task usually only needs to specialize ``_run()``:
 
 ``StreamTask.run()`` handles integration with the shared workflow state. If ``p_duplicate_data=True`` is configured, the incoming instances are copied before processing; otherwise a task works on the objects forwarded by its predecessors.
 
+**Event configuration.** ``StreamTask`` inherits ``EventManager`` through ``Task`` and accepts an optional ``p_event_config``. A concrete stream task can therefore define implementation-specific events using an ``EventConfig`` child class. The task should call ``_get_event_mode()`` before constructing an ``Event`` object. This is especially useful for stream events that may occur once per instance, because disabled events can then be skipped without object-creation overhead.
+
 **Shared processing state.** After a task has run, its resulting instance dictionary is stored in the workflow's **StreamShared** object under the task id. A dependent task retrieves the instance sets of its predecessor tasks from this shared object. This gives every task a well-defined input while still allowing the workflow to coordinate parallel branches.
 
 Stream workflows
