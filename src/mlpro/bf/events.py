@@ -30,9 +30,9 @@ that allows event-capable classes to enable or disable individual events.
 
 The property class EventManager adds event handling functionality to child classes by inheritance.
 It manages event-handler registration and dispatch. Concrete EventConfig child classes may define
-arbitrary event switches. By convention, the name of an event switch should be identical to the
-corresponding EventId. This convention is implemented and documented by the concrete event-capable
-class; it is not enforced by EventManager.
+arbitrary event switches. By convention, event ids and the names of their corresponding switches
+are written in upper case and must be identical. This convention is implemented and documented by
+the concrete event-capable class; it is not enforced automatically by EventManager.
 """
 
 from datetime import datetime
@@ -109,9 +109,9 @@ class EventConfig:
     The type of a switch is typically :class:`EventMode` or a specialized derivative introduced
     by a higher-level MLPro package.
 
-    By convention, the attribute name of an event switch should be identical to the corresponding
-    :class:`EventId`. The concrete event-capable implementation is responsible for maintaining
-    this relation; it is deliberately not enforced by MLPro.
+    By convention, event ids and the names of their corresponding event switches are written in
+    upper case and must be identical. The concrete event-capable implementation is responsible for
+    maintaining this relation; it is deliberately not enforced automatically by MLPro.
 
     Notes
     -----
@@ -194,15 +194,16 @@ class EventManager:
     EventManager manages handler registration and dispatch for string-based :class:`EventId`
     values. An optional :class:`EventConfig` can be supplied to configure individual events.
 
-    For backward compatibility, events that are not covered by a configuration are treated as
-    :attr:`EventMode.EVENT`. Consequently, existing event-capable classes retain their previous
-    behaviour unless they explicitly evaluate an event configuration and disable an event.
+    For backward compatibility, :meth:`_get_event_mode` returns :attr:`EventMode.EVENT` if no
+    event configuration is supplied. If a configuration is supplied, every queried event id must
+    have a matching attribute in that configuration. A mismatch is treated as an implementation
+    error.
 
     Parameters
     ----------
     p_event_config : EventConfig, optional
-        Event configuration used by the concrete event-capable implementation. If omitted,
-        all events default to :attr:`EventMode.EVENT`.
+        Optional event configuration used by the concrete event-capable implementation. If omitted,
+        :meth:`_get_event_mode` returns :attr:`EventMode.EVENT` for every event id.
 
     Notes
     -----
@@ -270,8 +271,9 @@ class EventManager:
         Parameters
         ----------
         p_event_id : EventId
-            Unique event identifier. By convention, the identifier matches the corresponding
-            attribute name in the concrete :class:`EventConfig` child class.
+            Unique event identifier. By convention, the identifier is written in upper case and
+            exactly matches the corresponding attribute name in the concrete
+            :class:`EventConfig` child class.
 
         Returns
         -------
