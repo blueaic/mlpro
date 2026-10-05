@@ -46,6 +46,7 @@ from mlpro.bf.various import Log, TStamp, TStampType, KWArgs
 
 # Export list for public API
 __all__ = [ 'EventId',
+            'ImplementationError',
             'EventMode',
             'EventConfig',
             'Event',
@@ -54,6 +55,23 @@ __all__ = [ 'EventId',
 
 
 EventId: TypeAlias = str
+
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
+class ImplementationError(Exception):
+    """
+    Indicates an inconsistency in the implementation of an event-capable class.
+
+    This exception is raised if an event configuration is present but does not provide a switch for
+    an event id queried by the concrete implementation. In this case, the implementation violates
+    the convention that the event id and the corresponding EventConfig attribute name must match.
+    """
+
+    pass
+
+
 
 
 
@@ -259,22 +277,35 @@ class EventManager:
         -------
         EventMode
             Configured event mode. :attr:`EventMode.EVENT` is returned if no event configuration
-            is supplied or if the given event identifier is not represented by the configuration.
+            is supplied.
+
+        Raises
+        ------
+        ImplementationError
+            If an event configuration is supplied but does not provide an attribute matching the
+            given event id.
 
         Notes
         -----
-        The fallback to :attr:`EventMode.EVENT` preserves the behaviour of existing MLPro event
-        implementations.
+        The fallback to :attr:`EventMode.EVENT` in the absence of an event configuration preserves
+        the behaviour of existing MLPro event implementations. If a configuration is supplied, the
+        concrete implementation must ensure that each queried event id has a matching attribute.
         """
 
         if self._event_config is None:
             return EventMode.EVENT
 
-        return getattr(
-            self._event_config,
-            p_event_id,
-            EventMode.EVENT,
-        )        
+        try:
+            return getattr(
+                self._event_config,
+                p_event_id,
+            )
+        except AttributeError:
+            raise ImplementationError(
+                'Event configuration does not provide an attribute for event id "'
+                + p_event_id
+                + '". Check the event implementation and its EventConfig class.'
+            )        
 
 
 ## -------------------------------------------------------------------------------------------------
