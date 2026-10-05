@@ -17,6 +17,8 @@
 ## -- 2026-10-05  2.0.0     DA       Refactoring: 
 ## --                                - logging removed from EventManager
 ## --                                - tuned method EventManager._raise_event
+## --                                - new type EventId
+## --                                - new classes EventMode, EventConfig
 ## -------------------------------------------------------------------------------------------------
 
 """
@@ -27,14 +29,51 @@ provided to add event functionality to child classes by inheritence.
 """
 
 from datetime import datetime
+from typing import TypeAlias
+from dataclasses import dataclass
+from enum import IntEnum
+
 from mlpro.bf.various import Log, TStamp, TStampType, KWArgs
-from mlpro.bf.exceptions import *
 
 
 
 # Export list for public API
-__all__ = [ 'Event',
+__all__ = [ 'EventId',
+            'EventMode',
+            'EventConfig',
+            'Event',
             'EventManager' ]
+
+
+
+EventId: TypeAlias = str
+
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
+class EventMode(IntEnum):
+    """
+    ...
+    """
+
+    OFF   = 0
+    EVENT = 1
+
+
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
+@dataclass
+class EventConfig:
+    """
+    ...
+    """
+
+    pass    
+
+
 
 
 
@@ -87,12 +126,13 @@ class EventManager:
     """
 
 ## -------------------------------------------------------------------------------------------------
-    def __init__(self):
+    def __init__(self, p_event_config : EventConfig = None):
         self._registered_handlers = {}
+        self._event_config        = p_event_config
 
 
 ## -------------------------------------------------------------------------------------------------
-    def register_event_handler(self, p_event_id:str, p_event_handler):
+    def register_event_handler(self, p_event_id : EventId, p_event_handler):
         """
         Registers an event handler. 
 
@@ -111,7 +151,7 @@ class EventManager:
 
 
 ## -------------------------------------------------------------------------------------------------
-    def remove_event_handler(self, p_event_id:str, p_event_handler):
+    def remove_event_handler(self, p_event_id : EventId, p_event_handler):
         """
         Removes an already registered event handler.
 
@@ -130,7 +170,20 @@ class EventManager:
 
 
 ## -------------------------------------------------------------------------------------------------
-    def _raise_event(self, p_event_id:str, p_event_object:Event):
+    def _get_event_mode(self, p_event_id : EventId) -> EventMode:
+
+        if self._event_config is None:
+            return EventMode.EVENT
+
+        return getattr(
+            self._event_config,
+            p_event_id,
+            EventMode.EVENT,
+        )        
+
+
+## -------------------------------------------------------------------------------------------------
+    def _raise_event(self, p_event_id : EventId, p_event_object:Event):
         """
         Raises an event and calls all registered handlers. To be used inside an event manager class.
 
@@ -142,10 +195,12 @@ class EventManager:
             Event object with further context informations
         """
 
+        # 1 Check for registered event handlers
         handlers = self._registered_handlers.get(p_event_id)
-
         if not handlers: return
 
+
+        # 2 Call all registered handlers
         for handler in handlers:
             handler( p_event_id=p_event_id,
                      p_event_object=p_event_object )   
