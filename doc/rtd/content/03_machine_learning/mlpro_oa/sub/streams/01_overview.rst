@@ -64,6 +64,10 @@ may change the observed data range, an adaptive normalizer can react to the new 
 renormalize buffered state. Adaptation therefore becomes a property of the complete processing chain rather than an isolated
 method call inside one algorithm.
 
+``OAStreamTask`` also receives the optional ``p_event_config`` parameter through its ``Model`` and ``StreamTask`` parents. Concrete online-adaptive algorithms can therefore expose implementation-specific events and configure them with ``EventModeML``. The modes ``OFF`` and ``EVENT`` control event emission, while ``ADAPTATION`` allows an implementation to treat a specific event additionally as a model adaptation. MLPro deliberately leaves the interpretation of this third mode to the concrete algorithm.
+
+For efficient online processing, an implementation should query the configured mode before creating the event object. This makes it practical to offer even high-frequency events, such as per-instance state transitions, without imposing the same overhead when the event is disabled.
+
 OA workflows are intentionally hybrid. A workflow may contain adaptive OA tasks and ordinary BF stream tasks side by side. This
 is useful because not every processing step needs to learn. Rearranging dimensions, buffering a window, deriving features, or
 other deterministic processing can remain in BF-Streams while only selected stages adapt online.
