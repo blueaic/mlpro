@@ -524,8 +524,9 @@ class Task (Async, EventManager, Plottable, Persistent, KWArgs):
     p_class_shared
         Optional class for a shared object (class Shared or a child class of Shared)
     p_event_config : EventConfig, optional
-        Event configuration used by the concrete event-capable implementation. If omitted,
-        all events default to :attr:`EventMode.EVENT`.
+        Optional event configuration passed to :class:`EventManager`. Concrete event-capable
+        implementations can query it through :meth:`EventManager._get_event_mode`. If omitted,
+        queried events default to :attr:`EventMode.EVENT`.
     p_visualize : bool
         Boolean switch for env/agent visualisation. Default = False.
     p_logging
@@ -741,7 +742,21 @@ class Task (Async, EventManager, Plottable, Persistent, KWArgs):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def _raise_event(self, p_event_id: str, p_event_object: Event):
+    def _raise_event(self, p_event_id: EventId, p_event_object: Event):
+        """
+        Raises a task event and forwards it to all registered handlers.
+
+        Before dispatching :attr:`C_EVENT_FINISHED`, the task-specific hook
+        :meth:`_on_finished` is executed.
+
+        Parameters
+        ----------
+        p_event_id : EventId
+            Unique event identifier.
+        p_event_object : Event
+            Event object carrying the event context.
+        """
+
         if p_event_id == self.C_EVENT_FINISHED: self._on_finished()
         EventManager._raise_event(self, p_event_id, p_event_object)
 
@@ -749,24 +764,25 @@ class Task (Async, EventManager, Plottable, Persistent, KWArgs):
 ## -------------------------------------------------------------------------------------------------
     def _on_finished(self):
         """
-        Custom method that is called before an event C_EVENT_FINISHED is raised.
+        Custom hook that is called immediately before :attr:`C_EVENT_FINISHED` is dispatched.
         """
         pass
 
 
 ## -------------------------------------------------------------------------------------------------
-    def run_on_event(self, p_event_id, p_event_object:Event):
+    def run_on_event(self, p_event_id: EventId, p_event_object: Event):
         """
-        Can be used as event handler - in particular for other tasks in a workflow in combination 
-        with event C_EVENT_FINISHED. Method self.run() is called if the last predecessor task in a
-        workflow has raised event C_EVENT_FINISHED.
+        Event handler that starts the task after predecessor events.
+
+        In a workflow this handler is typically registered for :attr:`C_EVENT_FINISHED` of all
+        predecessor tasks. The task is started after the last predecessor has reported completion.
 
         Parameters
         ----------
-        p_event_id 
-            Event id.
+        p_event_id : EventId
+            Unique event identifier.
         p_event_object : Event
-            Event object with further context informations.
+            Event object carrying the event context and optional parameters for :meth:`run`.
         """
 
         if p_event_id == self.C_EVENT_FINISHED:
