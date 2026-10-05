@@ -47,10 +47,11 @@
 ## -- 2025-07-18  2.5.0     DA       Refactoring
 ## -- 2025-10-09  2.6.0     DA       Method Async._create_so(): additional parameter p_kwargs
 ## -- 2026-09-29  2.7.0     DA       Method Async.__init__(): additional parameter p_kwargs
+## -- 2026-10-05  2.8.0     DA       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.7.0 (2026-09-29)
+Ver. 2.8.0 (2026-10-05)
 
 This module provides classes for multitasking with optional interprocess communication (IPC) based
 on shared objects. Multitasking in MLPro combines multrithreading and multiprocessing and simplifies
@@ -564,7 +565,7 @@ class Task (Async, EventManager, Plottable, Persistent, KWArgs):
             self.set_name(str(self.get_id()))
             
         Async.__init__(self, p_range_max=p_range_max, p_class_shared=p_class_shared, p_logging=p_logging)
-        EventManager.__init__(self, p_logging=p_logging)
+        EventManager.__init__(self)
         Plottable.__init__(self, p_visualize=p_visualize)
         Persistent.__init__(self, p_id=p_id, p_logging=p_logging)
 

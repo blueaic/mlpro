@@ -45,10 +45,11 @@
 ## -- 2025-07-11  3.0.1     DA       Bugfix in method Scaler.rescale()
 ## -- 2025-10-02  3.1.0     DA       Refactoring: removed try/except from Function.map()
 ## -- 2026-08-18  3.2.0     DA       Class Element: alignment with higher numpy versions
+## -- 2026-10-05  3.3.0     DA       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 3.2.0 (2026-08-18)
+Ver. 3.3.0 (2026-10-05)
 
 This module provides basic mathematical classes.
 """
@@ -84,7 +85,7 @@ __all__ = [ 'Dimension',
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class Dimension (EventManager, KWArgs):
+class Dimension (EventManager, Log, KWArgs):
     """
     Objects of this type specify properties of a dimension of a set.
 
@@ -134,11 +135,12 @@ class Dimension (EventManager, KWArgs):
                   p_boundaries:list=[], 
                   p_description='',
                   p_symmetrical:bool=False,
-                  p_logging=Log.C_LOG_NOTHING,
+                  p_logging = Log.C_LOG_ALL,
                   **p_kwargs ):
 
         KWArgs.__init__(self, **p_kwargs)
-        EventManager.__init__(self, p_logging=p_logging)
+        EventManager.__init__(self)
+        Log.__init__(self, p_logging=p_logging)
 
         self._id = str(uuid.uuid4())
         self._name_short    = self.C_NAME = p_name_short

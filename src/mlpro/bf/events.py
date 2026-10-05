@@ -14,10 +14,13 @@
 ## -- 2024-05-23  1.3.0     DA       Method EventManger._raise_event(): reduction to TypeError   
 ## -- 2025-05-27  1.4.0     DA       Class Event: new parent class KWArgs
 ## -- 2025-07-18  1.5.0     DA       Refactoring
+## -- 2026-10-05  2.0.0     DA       Refactoring: 
+## --                                - logging removed from EventManager
+## --                                - tuned method EventManager._raise_event
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.5.0 (2025-07-18)
+Ver. 2.0.0 (2026-10-05)
 
 This module provides classes for event handling. To this regard, the property class Eventmanager is
 provided to add event functionality to child classes by inheritence.
@@ -32,7 +35,6 @@ from mlpro.bf.exceptions import *
 # Export list for public API
 __all__ = [ 'Event',
             'EventManager' ]
-
 
 
 
@@ -78,23 +80,14 @@ class Event (TStamp, KWArgs):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class EventManager (Log):
+class EventManager:
     """
     This property class provides universal event management functionalities to be inherited to child
     classes.
-
-    Parameters
-    ----------
-    p_logging
-        Log level (see constants of class Log). Default: Log.C_LOG_ALL
-
     """
 
-    C_TYPE      = 'EventManager'
-
 ## -------------------------------------------------------------------------------------------------
-    def __init__(self, p_logging=Log.C_LOG_ALL):
-        Log.__init__(self, p_logging=p_logging)
+    def __init__(self):
         self._registered_handlers = {}
 
 
@@ -149,26 +142,10 @@ class EventManager (Log):
             Event object with further context informations
         """
 
-        # 0 Intro
-        self.log(Log.C_LOG_TYPE_S, 'Event "' + p_event_id + '" fired')
+        handlers = self._registered_handlers.get(p_event_id)
 
+        if not handlers: return
 
-        # 1 Get list of registered handlers for given event id
-        try:
-            handlers = self._registered_handlers[p_event_id]
-        except:
-            handlers = []
-
-        if len(handlers) == 0:
-            self.log(Log.C_LOG_TYPE_I, 'No handlers registered for event "' + p_event_id + '"')
-            return
-
-
-        # 2 Call all registered handlers
-        for i, handler in enumerate(handlers):
-            try:
-                self.log(Log.C_LOG_TYPE_I, 'Calling handler', i)
-                handler( p_event_id=p_event_id, p_event_object=p_event_object )
-            except TypeError:
-                self.log(Log.C_LOG_TYPE_E, 'Handler not compatible! Check your code!')
-                raise TypeError
+        for handler in handlers:
+            handler( p_event_id=p_event_id,
+                     p_event_object=p_event_object )   
