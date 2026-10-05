@@ -89,7 +89,6 @@ This module provides the fundamental templates and processes for machine learnin
 
 import random
 from datetime import datetime
-from dataclasses import dataclass
 from enum import IntEnum
 import os
 
@@ -268,7 +267,6 @@ class Adaptation (Event):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-@dataclass
 class EventModeML(IntEnum):
     """
     Extends :class:`mlpro.bf.events.EventMode` with ML-specific adaptation semantics.
