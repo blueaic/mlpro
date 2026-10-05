@@ -1120,6 +1120,10 @@ class StreamTask (Task):
         Maximum range of asynchonicity. See class Range. Default is Range.C_RANGE_PROCESS.
     p_duplicate_data : bool
         If True, instances will be duplicated before processing. Default = False.
+    p_event_config : EventConfig, optional
+        Optional event configuration passed to the inherited event manager. Concrete event-capable
+        stream tasks can query it through :meth:`EventManager._get_event_mode`. If omitted, queried
+        events default to :attr:`EventMode.EVENT`.
     p_visualize : bool
         Boolean switch for visualisation. Default = False.
     p_logging
