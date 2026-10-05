@@ -40,13 +40,13 @@ from typing import TypeAlias
 from dataclasses import dataclass
 from enum import IntEnum
 
-from mlpro.bf.various import Log, TStamp, TStampType, KWArgs
+from mlpro.bf.various import TStamp, TStampType, KWArgs
+from mlpro.bf.exceptions import ImplementationError
 
 
 
 # Export list for public API
 __all__ = [ 'EventId',
-            'ImplementationError',
             'EventMode',
             'EventConfig',
             'Event',
@@ -55,23 +55,6 @@ __all__ = [ 'EventId',
 
 
 EventId: TypeAlias = str
-
-
-
-## -------------------------------------------------------------------------------------------------
-## -------------------------------------------------------------------------------------------------
-class ImplementationError(Exception):
-    """
-    Indicates an inconsistency in the implementation of an event-capable class.
-
-    This exception is raised if an event configuration is present but does not provide a switch for
-    an event id queried by the concrete implementation. In this case, the implementation violates
-    the convention that the event id and the corresponding EventConfig attribute name must match.
-    """
-
-    pass
-
-
 
 
 
