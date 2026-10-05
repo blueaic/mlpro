@@ -302,7 +302,9 @@ class EventManager:
             )
         except AttributeError:
             raise ImplementationError(
-                'Event configuration does not provide an attribute for event id "'
+                'Event configuration of type "'
+                + type(self._event_config).__name__
+                + '" does not provide an attribute for event id "'
                 + p_event_id
                 + '". Check the event implementation and its EventConfig class.'
             )        
