@@ -107,6 +107,8 @@ class OAStreamAdaptation (Adaptation):
         Type of adaptation.
     p_tstamp : TStampType = None
         Time stamp of adaptation.
+    p_num_inst : int
+        Number of stream instances related to the adaptation. Default = 1.
     **p_kwargs
         Further keyword arguments to be transported by the event.
     """
@@ -149,8 +151,9 @@ class OAStreamTask (StreamTask, Model):
     p_duplicate_data : bool
         If True, instances will be duplicated before processing. Default = False.
     p_event_config : EventConfig, optional
-        Event configuration used by the concrete event-capable implementation. If omitted,
-        all events default to :attr:`EventMode.EVENT`.
+        Optional event configuration passed to the inherited event manager. ML-specific event
+        switches may use :class:`EventModeML`. If omitted, queried events default to
+        :attr:`EventMode.EVENT`.
     p_visualize : bool
         Boolean switch for visualisation. Default = False.
     p_logging
@@ -209,7 +212,21 @@ class OAStreamTask (StreamTask, Model):
                       p_num_inst = 1,
                       **p_kwargs ):
         """
-        
+        Updates the adaptation state using an online-adaptive stream adaptation event.
+
+        Parameters
+        ----------
+        p_adapted : bool
+            Adaptation flag.
+        p_subtype : OAStreamAdaptationType
+            Type of online-adaptive stream adaptation.
+        p_tstamp : TStampType, optional
+            Optional explicit time stamp. If omitted, the current stream time stamp is used if
+            available.
+        p_num_inst : int
+            Number of stream instances related to the adaptation. Default = 1.
+        **p_kwargs
+            Additional event-specific data forwarded to the adaptation event.
         """
         
         if p_tstamp is None:
@@ -229,6 +246,24 @@ class OAStreamTask (StreamTask, Model):
 
 ## -------------------------------------------------------------------------------------------------
     def adapt(self, p_instances : InstDict) -> bool:
+        """
+        Adapts the task to new and obsolete stream instances.
+
+        New instances are processed by :meth:`_adapt`, obsolete instances by
+        :meth:`_adapt_reverse`. Optional pre- and postprocessing hooks may report additional
+        adaptation types. If adaptations occur, corresponding adaptation events are generated via
+        :meth:`_set_adapted`.
+
+        Parameters
+        ----------
+        p_instances : InstDict
+            Dictionary of new and obsolete stream instances to be processed.
+
+        Returns
+        -------
+        bool
+            True if at least one forward or reverse adaptation was performed, otherwise False.
+        """
 
         # 0 Intro
         if not self._adaptivity: return False
@@ -403,18 +438,20 @@ class OAStreamTask (StreamTask, Model):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def renormalize_on_event(self, p_event_id: str, p_event_object: Event):
+    def renormalize_on_event(self, p_event_id: EventId, p_event_object: Event):
         """
-        Event handler method to be registered on event Model.C_EVENT_ADAPTED of an online adaptive
-        normalizer task. It carries out the task-specific renormalization of internally buffered
-        data by calling the custom method _renormalize().
+        Handles adaptation events of an online-adaptive normalizer.
+
+        The handler invokes :meth:`_renormalize` with the event's raising object and marks the task
+        as adapted with subtype :attr:`OAStreamAdaptationType.RENORM` after successful
+        renormalization.
 
         Parameters
         ----------
-        p_event_id : str
-            Unique event id
+        p_event_id : EventId
+            Unique identifier of the triggering event, typically :attr:`Model.C_EVENT_ADAPTED`.
         p_event_object : Event
-            Event object with further context informations
+            Adaptation event whose raising object is expected to provide the normalizer.
         """
 
         self.log(Log.C_LOG_TYPE_I, 'Renormalization triggered')
