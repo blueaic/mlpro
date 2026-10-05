@@ -116,23 +116,15 @@ class Event (TStamp, KWArgs):
     Parameters
     ----------
     p_raising_object
-        Reference to object that raised the event.
-    **p_kwargs 
-        List of named parameters
+        Reference to the object that raises the event.
+    p_tstamp : TStampType, optional
+        Time stamp of the event. If omitted, the current date and time are used.
+    **p_kwargs
+        Additional event-specific data passed to registered handlers.
     """
 
 ## -------------------------------------------------------------------------------------------------
     def __init__(self, p_raising_object, p_tstamp:TStampType = None, **p_kwargs):
-        """
-        Parameters
-        ----------
-        p_raising_object
-            Reference to the object that raises the event.
-        p_tstamp : TStampType, optional
-            Time stamp of the event. If omitted, the current date and time are used.
-        **p_kwargs
-            Additional event-specific data passed to registered handlers.
-        """
 
         self._raising_object = p_raising_object
 
@@ -188,6 +180,12 @@ class EventManager:
     :attr:`EventMode.EVENT`. Consequently, existing event-capable classes retain their previous
     behaviour unless they explicitly evaluate an event configuration and disable an event.
 
+    Parameters
+    ----------
+    p_event_config : EventConfig, optional
+        Event configuration used by the concrete event-capable implementation. If omitted,
+        all events default to :attr:`EventMode.EVENT`.
+
     Notes
     -----
     Event configuration is intentionally evaluated through :meth:`_get_event_mode` by the concrete
@@ -198,13 +196,6 @@ class EventManager:
 
 ## -------------------------------------------------------------------------------------------------
     def __init__(self, p_event_config : EventConfig = None):
-        """
-        Parameters
-        ----------
-        p_event_config : EventConfig, optional
-            Event configuration used by the concrete event-capable implementation. If omitted,
-            all events default to :attr:`EventMode.EVENT`.
-        """
 
         self._registered_handlers = {}
         self._event_config        = p_event_config
