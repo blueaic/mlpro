@@ -270,6 +270,20 @@ class Adaptation (Event):
 ## -------------------------------------------------------------------------------------------------
 @dataclass
 class EventModeML(IntEnum):
+    """
+    Extends :class:`mlpro.bf.events.EventMode` with ML-specific adaptation semantics.
+
+    Attributes
+    ----------
+    OFF : int
+        Event is disabled.
+    EVENT : int
+        Event is enabled and may be raised without implying model adaptation.
+    ADAPTATION : int
+        Event is enabled and additionally represents a model adaptation. Concrete ML
+        implementations are responsible for evaluating this mode and integrating it into their
+        adaptation logic.
+    """
 
     OFF        = EventMode.OFF.value
     EVENT      = EventMode.EVENT.value
@@ -311,8 +325,9 @@ class Model (Task, ScientificObject):
     p_class_shared
         Optional class for a shared object (class Shared or a child class of it)
     p_event_config : EventConfig, optional
-        Event configuration used by the concrete event-capable implementation. If omitted,
-        all events default to :attr:`EventModeML.EVENT`.
+        Optional event configuration passed to the inherited event manager. ML-specific event
+        switches may use :class:`EventModeML`. If omitted, queried events default to
+        :attr:`EventMode.EVENT`.
     p_visualize : bool
         Boolean switch for visualisation. Default = False.
     p_logging
@@ -469,12 +484,14 @@ class Model (Task, ScientificObject):
                       p_tstamp : TStampType = None,
                       **p_kwargs ):
         """
-        Sets the adapted flag and raises an adaptation event.
+        Updates the internal adaptation state and, if applicable, raises the model's adaptation
+        event.
 
         Parameters
         ----------
         p_adapted : bool
-            Adaptation flag. If True and event handlers are registered an adaptation event is raised.
+            Adaptation flag. If True and at least one event handler is registered, an adaptation
+            event of type :attr:`C_EVENT_CLS` is dispatched under :attr:`C_EVENT_ADAPTED`.
         p_subtype : AdaptationType
             Subtype of adaptation. See class AdaptationType for further details.
         p_tstamp : TStampType = None
@@ -553,17 +570,19 @@ class Model (Task, ScientificObject):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def adapt_on_event(self, p_event_id:str, p_event_object:Event):
+    def adapt_on_event(self, p_event_id: EventId, p_event_object: Event):
         """
-        Method to be used as event handler for event-based adaptations. Calls custom method 
-        _adapt_on_event() and updates the internal adaptation state.
+        Handles an incoming event by triggering an event-based model adaptation.
+
+        The concrete adaptation logic is delegated to :meth:`_adapt_on_event`. Its return value is
+        forwarded to :meth:`_set_adapted` using :attr:`AdaptationType.EVENT`.
 
         Parameters
         ----------
-        p_event_id : str
-            Event id.
+        p_event_id : EventId
+            Unique identifier of the triggering event.
         p_event_object : Event
-            Object with further context informations about the event.
+            Event object carrying the event context.
         """
 
         self._set_adapted( p_adapted = self._adapt_on_event( p_event_id=p_event_id, 
@@ -572,21 +591,21 @@ class Model (Task, ScientificObject):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def _adapt_on_event(self, p_event_id:str, p_event_object:Event) -> bool:
+    def _adapt_on_event(self, p_event_id: EventId, p_event_object: Event) -> bool:
         """
-        Custom method to be used for event-based adaptation. See method adapt_on_event().
+        Custom method implementing an event-based adaptation.
 
         Parameters
         ----------
-        p_event_id : str
-            Event id.
+        p_event_id : EventId
+            Unique identifier of the triggering event.
         p_event_object : Event
-            Object with further context informations about the event.
+            Event object carrying the event context.
 
         Returns
         -------
         adapted : bool
-            True, if something was adapted. False otherwise.
+            True if the model was adapted, otherwise False.
         """
 
         raise NotImplementedError
@@ -1554,8 +1573,9 @@ class AdaptiveFunction (Function, Model):
     p_class_shared
         Optional class for a shared object (class Shared or a child class of it)
     p_event_config : EventConfig, optional
-        Event configuration used by the concrete event-capable implementation. If omitted,
-        all events default to :attr:`EventMode.EVENT`.
+        Optional event configuration passed to the inherited event manager. ML-specific event
+        switches may use :class:`EventModeML`. If omitted, queried events default to
+        :attr:`EventMode.EVENT`.
     p_visualize : bool
         Boolean switch for visualisation. Default = False.
     p_logging
