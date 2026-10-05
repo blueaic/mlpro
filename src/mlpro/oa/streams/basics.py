@@ -36,16 +36,17 @@
 ## --                                - setup() and _setup()   
 ## -- 2025-07-15  1.4.2     DA       Class OAStreamAdaptationType: new parent class AdaptationType   
 ## -- 2025-07-16  1.4.3     DA       Refactoring 
+## -- 2026-10-05  1.5.0     DA       Class OAStreamTask: new parameter p_event_config
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.4.3 (2025-07-16)
+Ver. 1.5.0 (2026-10-05)
 
 Core classes for online-adaptive data stream processing (OADSP).
 
 """
 
-from mlpro.bf.mt import Event
+from mlpro.bf.events import *
 from mlpro.bf.various import Log, TStampType
 from mlpro.bf.plot import PlotSettings
 from mlpro.bf.mt import Task
@@ -147,6 +148,9 @@ class OAStreamTask (StreamTask, Model):
         Initial size of internal data buffer. Defaut = 0 (no buffering).
     p_duplicate_data : bool
         If True, instances will be duplicated before processing. Default = False.
+    p_event_config : EventConfig, optional
+        Event configuration used by the concrete event-capable implementation. If omitted,
+        all events default to :attr:`EventMode.EVENT`.
     p_visualize : bool
         Boolean switch for visualisation. Default = False.
     p_logging
@@ -171,6 +175,7 @@ class OAStreamTask (StreamTask, Model):
                   p_ada : bool = True, 
                   p_buffer_size : int = 0,
                   p_duplicate_data : bool = False,
+                  p_event_config : EventConfig = None,
                   p_visualize : bool = False,
                   p_logging = Log.C_LOG_ALL, 
                   **p_kwargs ):
@@ -182,6 +187,7 @@ class OAStreamTask (StreamTask, Model):
                         p_autorun = Task.C_AUTORUN_NONE,
                         p_class_shared = None,
                         p_buffer_size = p_buffer_size,
+                        p_event_config = p_event_config,
                         p_visualize = p_visualize,
                         p_logging = p_logging )    
 
@@ -189,6 +195,7 @@ class OAStreamTask (StreamTask, Model):
                              p_name = p_name,
                              p_range_max = p_range_max,
                              p_duplicate_data = p_duplicate_data,
+                             p_event_config = p_event_config,
                              p_visualize = p_visualize,
                              p_logging = p_logging,
                              **p_kwargs )                             

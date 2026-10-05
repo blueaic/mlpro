@@ -71,7 +71,7 @@ from multiprocess.managers import BaseManager
 
 from mlpro.bf.exceptions import *
 from mlpro.bf.various import *
-from mlpro.bf.events import EventManager, Event
+from mlpro.bf.events import *
 from mlpro.bf.plot import Figure, PlotSettings, Plottable
 
 
@@ -523,6 +523,9 @@ class Task (Async, EventManager, Plottable, Persistent, KWArgs):
         actions.    
     p_class_shared
         Optional class for a shared object (class Shared or a child class of Shared)
+    p_event_config : EventConfig, optional
+        Event configuration used by the concrete event-capable implementation. If omitted,
+        all events default to :attr:`EventMode.EVENT`.
     p_visualize : bool
         Boolean switch for env/agent visualisation. Default = False.
     p_logging
@@ -546,6 +549,7 @@ class Task (Async, EventManager, Plottable, Persistent, KWArgs):
                   p_range_max : int = Async.C_RANGE_THREAD, 
                   p_autorun = C_AUTORUN_NONE,
                   p_class_shared = None, 
+                  p_event_config : EventConfig = None,
                   p_visualize : bool = False,
                   p_logging = Log.C_LOG_ALL,
                   **p_kwargs ):
@@ -565,7 +569,7 @@ class Task (Async, EventManager, Plottable, Persistent, KWArgs):
             self.set_name(str(self.get_id()))
             
         Async.__init__(self, p_range_max=p_range_max, p_class_shared=p_class_shared, p_logging=p_logging)
-        EventManager.__init__(self)
+        EventManager.__init__(self, p_event_config=p_event_config)
         Plottable.__init__(self, p_visualize=p_visualize)
         Persistent.__init__(self, p_id=p_id, p_logging=p_logging)
 

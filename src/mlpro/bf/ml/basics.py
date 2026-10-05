@@ -76,10 +76,12 @@
 ## --                                  - Incorporation of new class Adaptation
 ## -- 2025-06-02  2.5.0     DA       New class AdaptationType
 ## -- 2025-07-15  2.5.1     DA       Class AdaptationType: replaced parent class StrEnum by str
+## -- 2026-10-05  2.6.0     DA       - New class EventModeML
+## --                                - Classes Model, AdaptiveFunction: new parameter p_event_config
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.5.1 (2025-07-15)
+Ver. 2.6.0 (2026-10-05)
 
 This module provides the fundamental templates and processes for machine learning in MLPro.
 
@@ -87,10 +89,12 @@ This module provides the fundamental templates and processes for machine learnin
 
 import random
 from datetime import datetime
+from dataclasses import dataclass
+from enum import IntEnum
 import os
 
 from mlpro.bf.various import *
-from mlpro.bf.events import Event
+from mlpro.bf.events import *
 from mlpro.bf.exceptions import *
 from mlpro.bf.plot import PlotSettings 
 from mlpro.bf.math import *
@@ -103,18 +107,19 @@ class Figure: pass
 
 
 # Export list for public API
-__all__ = [ 'Model',
-            'AWorkflow',
-            'Adaptation',
-            'AdaptationType',
-            'HyperParam',
+__all__ = [ 'HyperParam',
             'HyperParamSpace',
             'HyperParamTuple',
             'HyperParamDispatcher',
+            'AdaptationType',
+            'Adaptation',
+            'EventModeML',
+            'Model',
+            'AWorkflow',
             'Scenario',
-            'Training',
             'TrainingResults',
             'HyperParamTuner',
+            'Training',
             'AdaptiveFunction' ]
 
 
@@ -263,6 +268,19 @@ class Adaptation (Event):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
+@dataclass
+class EventModeML(IntEnum):
+
+    OFF        = EventMode.OFF.value
+    EVENT      = EventMode.EVENT.value
+    ADAPTATION = 2
+
+
+
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 class Model (Task, ScientificObject):
     """
     Fundamental template class for adaptive ML models. Supports in particular
@@ -292,6 +310,9 @@ class Model (Task, ScientificObject):
         actions.    
     p_class_shared
         Optional class for a shared object (class Shared or a child class of it)
+    p_event_config : EventConfig, optional
+        Event configuration used by the concrete event-capable implementation. If omitted,
+        all events default to :attr:`EventModeML.EVENT`.
     p_visualize : bool
         Boolean switch for visualisation. Default = False.
     p_logging
@@ -319,6 +340,7 @@ class Model (Task, ScientificObject):
                   p_range_max: int = Async.C_RANGE_PROCESS, 
                   p_autorun = Task.C_AUTORUN_NONE, 
                   p_class_shared=None, 
+                  p_event_config : EventConfig = None,
                   p_visualize: bool = False, 
                   p_logging=Log.C_LOG_ALL, 
                   **p_par ):
@@ -329,6 +351,7 @@ class Model (Task, ScientificObject):
                        p_range_max = p_range_max, 
                        p_autorun = p_autorun, 
                        p_class_shared = p_class_shared, 
+                       p_event_config = p_event_config,
                        p_visualize = p_visualize, 
                        p_logging = p_logging )
 
@@ -1530,6 +1553,9 @@ class AdaptiveFunction (Function, Model):
         actions.    
     p_class_shared
         Optional class for a shared object (class Shared or a child class of it)
+    p_event_config : EventConfig, optional
+        Event configuration used by the concrete event-capable implementation. If omitted,
+        all events default to :attr:`EventMode.EVENT`.
     p_visualize : bool
         Boolean switch for visualisation. Default = False.
     p_logging
@@ -1552,6 +1578,7 @@ class AdaptiveFunction (Function, Model):
                   p_range_max: int = Async.C_RANGE_PROCESS, 
                   p_autorun = Task.C_AUTORUN_NONE, 
                   p_class_shared=None, 
+                  p_event_config : EventConfig = None,
                   p_visualize: bool = False, 
                   p_logging=Log.C_LOG_ALL, 
                   **p_par ):
@@ -1568,6 +1595,7 @@ class AdaptiveFunction (Function, Model):
                         p_range_max = p_range_max,
                         p_autorun = p_autorun,
                         p_class_shared = p_class_shared,
+                        p_event_config = p_event_config,
                         p_visualize = p_visualize,
                         p_logging = p_logging, 
                         **p_par )
