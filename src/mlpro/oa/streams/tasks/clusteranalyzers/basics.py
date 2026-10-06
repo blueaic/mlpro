@@ -64,6 +64,7 @@ This module provides a template class for online cluster analysis.
 
 from typing import List, Tuple
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 from mlpro.bf.various import *
 from mlpro.bf.plot import *
