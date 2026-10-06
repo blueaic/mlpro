@@ -74,16 +74,21 @@ ClusterId = int
 ## -------------------------------------------------------------------------------------------------
 class ClusterBase (ABC, Id, Plottable):
     """
-    Base class for a cluster. 
+    Minimal abstract representation of a cluster.
+
+    ClusterBase defines only the generic cluster identity, optional visualization support, and the
+    two relation operations required by cluster analyzers. It is intentionally independent of
+    MLPro's property model and can therefore serve as a lightweight base for specialized or
+    high-performance cluster implementations.
 
     Parameters
     ----------
     p_id : ClusterId
-        Unique cluster id.
-    p_color : str = None
-        Plot color of the cluster.
+        Unique cluster identifier.
+    p_color : str
+        Optional plot color. Default is None.
     p_visualize : bool
-        Boolean switch for visualisation. Default = False.
+        Enables or disables visualization. Default is False.
     """
 
     C_PLOT_ACTIVE           = True
@@ -120,19 +125,20 @@ class ClusterBase (ABC, Id, Plottable):
     @abstractmethod
     def get_membership(self, p_instance : Instance ) -> float:
         """
-        Custom method to determine a scalar membership value for the given instance.
+        Determines the membership of an instance in this cluster.
+
+        Concrete cluster implementations define the membership semantics appropriate to their
+        representation.
 
         Parameters
         ----------
         p_instance : Instance
-            Instance to be examined for membership.
+            Instance to be evaluated.
 
         Returns
         -------
         float
-            A scalar value in [0,1] that determines the given instance's membership in this cluster. 
-            A value of 0 means that the given instance is not a member of the cluster at all while
-            a value of 1 confirms full membership.
+            Membership value in [0,1], where 0 denotes no membership and 1 full membership.
         """
 
         ...
@@ -142,18 +148,20 @@ class ClusterBase (ABC, Id, Plottable):
     @abstractmethod
     def get_influence(self, p_instance : Instance ) -> float:
         """
-        Custom method to compute a scalar influence value for the given instance.
+        Determines the influence of this cluster on an instance.
+
+        Concrete cluster implementations define the influence semantics appropriate to their
+        representation.
 
         Parameters
         ----------
         p_instance : Instance
-            Instance to be examined for its influence to the cluster.
+            Instance to be evaluated.
 
         Returns
         -------
         float
-            Scalar value >= 0 that determines the influence of the cluster on the specified instance. 
-            A value 0 means that the cluster has no influence on the instance at all.
+            Non-negative influence value, where 0 denotes no influence.
         """
 
         ...
@@ -166,18 +174,25 @@ class ClusterBase (ABC, Id, Plottable):
 ## -------------------------------------------------------------------------------------------------
 class Cluster (ClusterBase, Properties, KWArgs):
     """
-    Universal template class for a cluster with any number of properties added by a cluster analyzer. 
+    Property-based MLPro cluster template.
+
+    Cluster extends the lightweight ClusterBase by MLPro's generic Properties and KWArgs mechanisms.
+    It is intended for conventional MLPro cluster analyzers that benefit from dynamically configured
+    cluster properties. The concrete membership and influence semantics remain the responsibility of
+    specialized subclasses.
 
     Parameters
     ----------
     p_id : ClusterId
-        Unique cluster id.
+        Unique cluster identifier.
     p_properties : PropertyDefinitions
-        List of property definitions. 
+        Property definitions to be instantiated for the cluster.
+    p_color : str
+        Optional plot color. Default is None.
     p_visualize : bool
-        Boolean switch for visualisation. Default = False.
-    p_kwargs : dict
-        Further parameters.
+        Enables or disables visualization. Default is False.
+    **p_kwargs
+        Further keyword arguments used by the property infrastructure.
     """
 
     C_PLOT_ACTIVE           = True
@@ -219,18 +234,30 @@ class Cluster (ClusterBase, Properties, KWArgs):
 
 ## -------------------------------------------------------------------------------------------------
     def set_plot_color(self, p_color):
+        """
+        Sets the plot color of the cluster and its property-based visualization.
+
+        Parameters
+        ----------
+        p_color
+            Plot color to be applied.
+        """
+
         Properties.set_plot_color( self, p_color = p_color)
         
 
 ## -------------------------------------------------------------------------------------------------
     def update_properties(self, p_tstamp : TStampType ):
         """
-        Custom method to update inner cluster properties. To be triggered by the cluster analyzer.
+        Updates the cluster's internal properties.
+
+        This hook is intended to be triggered by the surrounding cluster analyzer and can be
+        redefined by specialized cluster classes.
 
         Parameters
         ----------
         p_tstamp : TStampType
-            Time stamp of property update.
+            Time stamp of the property update.
         """
 
         pass
