@@ -283,8 +283,8 @@ class EventModeML(IntEnum):
         adaptation logic.
     """
 
-    OFF        = EventMode.OFF.value
-    EVENT      = EventMode.EVENT.value
+    OFF        = EventMode.OFF
+    EVENT      = EventMode.EVENT
     ADAPTATION = 2
 
 

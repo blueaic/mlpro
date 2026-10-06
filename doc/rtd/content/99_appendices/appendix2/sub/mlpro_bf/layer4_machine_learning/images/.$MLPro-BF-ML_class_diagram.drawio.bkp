@@ -462,7 +462,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="tTAQENSdJZJP09zD3_8I-0" parent="WIyWlLk6GJQsqaUBKTNV-1" style="swimlane;fontStyle=3;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=1;strokeWidth=3;fillColor=#d5e8d4;strokeColor=#82b366;swimlaneFillColor=#ffffff;gradientColor=#FFFFFF;gradientDirection=south;" value="AdaptiveFunction&#xa;(bf.math.Function, Model)" vertex="1">
-          <mxGeometry height="256" width="300" x="1100" y="890" as="geometry">
+          <mxGeometry height="271" width="300" x="1100" y="890" as="geometry">
             <mxRectangle height="26" width="160" x="230" y="140" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
@@ -472,8 +472,8 @@
         <mxCell id="tTAQENSdJZJP09zD3_8I-2" parent="tTAQENSdJZJP09zD3_8I-0" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" value="" vertex="1">
           <mxGeometry height="8" width="300" y="66" as="geometry" />
         </mxCell>
-        <mxCell id="tTAQENSdJZJP09zD3_8I-5" parent="tTAQENSdJZJP09zD3_8I-0" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" value="__init__( p_input_space : MSpace,&#xa;               p_output_space : MSpace,&#xa;               p_output_elem_cls = Element, &#xa;               p_ada:bool=True, &#xa;               p_buffer_size=0,&#xa;               p_name : str = None,&#xa;               p_range_max : int = C_RANGE_PROCESS,&#xa;               p_autorun = Task.C_AUTORUN_NONE,&#xa;               p_class_shared = None,&#xa;               p_visualize:bool=False,&#xa;               p_logging=Log.C_LOG_ALL,&#xa;               **p_par )" vertex="1">
-          <mxGeometry height="180" width="300" y="74" as="geometry" />
+        <mxCell id="tTAQENSdJZJP09zD3_8I-5" parent="tTAQENSdJZJP09zD3_8I-0" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" value="__init__( p_input_space : MSpace,&#xa;               p_output_space : MSpace,&#xa;               p_output_elem_cls = Element, &#xa;               p_ada:bool=True, &#xa;               p_buffer_size=0,&#xa;               p_name : str = None,&#xa;               p_range_max : int = C_RANGE_PROCESS,&#xa;               p_autorun = Task.C_AUTORUN_NONE,&#xa;               p_event_config : EventConfig = None,&#xa;               p_class_shared = None,&#xa;               p_visualize:bool=False,&#xa;               p_logging=Log.C_LOG_ALL,&#xa;               **p_par )" vertex="1">
+          <mxGeometry height="197" width="300" y="74" as="geometry" />
         </mxCell>
         <mxCell id="tTAQENSdJZJP09zD3_8I-6" parent="WIyWlLk6GJQsqaUBKTNV-1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;shadow=1;fontStyle=1;align=left;verticalAlign=top;spacingLeft=2;" value="Template class for adaptive mathematical functions." vertex="1">
           <mxGeometry height="60" width="140" x="1390" y="840" as="geometry" />
