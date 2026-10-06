@@ -41,27 +41,28 @@
 ## -- 2024-07-08  2.1.0     DA       Class Cluster: hand over of kwargs to inner properties
 ## -- 2025-06-06  2.2.0     DA       Refactoring: p_inst -> p_instances
 ## -- 2025-06-11  2.3.0     DA       New method Cluster.update_properties()
+## -- 2026-10-06  2.4.0     DA       New class ClusterBase
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.3.0 (2025-06-11)
+Ver. 2.4.0 (2026-10-06)
 
 This module provides a template class for clusters to be used in cluster analyzer algorithms.
 
 """
 
-
+from abc import ABC, abstractmethod
 from mlpro.bf.various import Id, KWArgs, TStampType
-from mlpro.bf.plot import PlotSettings
+from mlpro.bf.plot import PlotSettings, Plottable
 from mlpro.bf.math.properties import PropertyDefinitions, Properties
 from mlpro.bf.streams import Instance
 
 
 
 # Export list for public API
-__all__ = [ 'Cluster',
-            'ClusterId' ]
-
+__all__ = [ 'ClusterId',
+            'ClusterBase',
+            'Cluster' ]
 
 
 
@@ -71,7 +72,99 @@ ClusterId = int
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class Cluster (Id, Properties, KWArgs):
+class ClusterBase (ABC, Id, Plottable):
+    """
+    Base class for a cluster. 
+
+    Parameters
+    ----------
+    p_id : ClusterId
+        Unique cluster id.
+    p_color : str = None
+        Plot color of the cluster.
+    p_visualize : bool
+        Boolean switch for visualisation. Default = False.
+    """
+
+    C_PLOT_ACTIVE           = True
+    C_PLOT_STANDALONE       = False
+    C_PLOT_VALID_VIEWS      = [ PlotSettings.C_VIEW_2D, 
+                                PlotSettings.C_VIEW_3D, 
+                                PlotSettings.C_VIEW_ND ]
+    C_PLOT_DEFAULT_VIEW     = PlotSettings.C_VIEW_ND
+
+    C_CLUSTER_COLORS        = [ 'brown', 
+                                'olive', 
+                                'orange', 
+                                'green', 
+                                'red', 
+                                'gray', 
+                                'purple', 
+                                'pink', 
+                                'cyan', 
+                                'blue' ]
+
+## -------------------------------------------------------------------------------------------------
+    def __init__( self, 
+                  p_id : ClusterId,
+                  p_color : str = None,
+                  p_visualize : bool = False ):
+
+        Id.__init__( self, p_id = p_id )
+        Plottable.__init__( self, p_visualize = p_visualize )
+
+        self.color : str = p_color
+
+
+## -------------------------------------------------------------------------------------------------
+    @abstractmethod
+    def get_membership(self, p_instance : Instance ) -> float:
+        """
+        Custom method to determine a scalar membership value for the given instance.
+
+        Parameters
+        ----------
+        p_instance : Instance
+            Instance to be examined for membership.
+
+        Returns
+        -------
+        float
+            A scalar value in [0,1] that determines the given instance's membership in this cluster. 
+            A value of 0 means that the given instance is not a member of the cluster at all while
+            a value of 1 confirms full membership.
+        """
+
+        ...
+    
+
+## -------------------------------------------------------------------------------------------------
+    @abstractmethod
+    def get_influence(self, p_instance : Instance ) -> float:
+        """
+        Custom method to compute a scalar influence value for the given instance.
+
+        Parameters
+        ----------
+        p_instance : Instance
+            Instance to be examined for its influence to the cluster.
+
+        Returns
+        -------
+        float
+            Scalar value >= 0 that determines the influence of the cluster on the specified instance. 
+            A value 0 means that the cluster has no influence on the instance at all.
+        """
+
+        ...
+    
+
+
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
+class Cluster (ClusterBase, Properties, KWArgs):
     """
     Universal template class for a cluster with any number of properties added by a cluster analyzer. 
 
@@ -109,59 +202,25 @@ class Cluster (Id, Properties, KWArgs):
     def __init__( self, 
                   p_id : ClusterId,
                   p_properties : PropertyDefinitions = [],
+                  p_color : str = None,
                   p_visualize : bool = False,
                   **p_kwargs ):
 
         KWArgs.__init__( self, **p_kwargs )
-        Properties.__init__( self, p_properties = p_properties, p_visualize = p_visualize, **p_kwargs )
-        Id.__init__( self, p_id = p_id )
+        Properties.__init__( self, 
+                             p_properties = p_properties, 
+                             p_visualize = p_visualize, 
+                             **p_kwargs )
+        ClusterBase.__init__( self, 
+                              p_id = p_id,
+                              p_color = p_color,
+                              p_visualize = p_visualize )
 
 
 ## -------------------------------------------------------------------------------------------------
     def set_plot_color(self, p_color):
         Properties.set_plot_color( self, p_color = p_color)
         
-
-## -------------------------------------------------------------------------------------------------
-    def get_membership(self, p_instance : Instance ) -> float:
-        """
-        Custom method to determine a scalar membership value for the given instance.
-
-        Parameters
-        ----------
-        p_instance : Instance
-            Instance to be examined for membership.
-
-        Returns
-        -------
-        float
-            A scalar value in [0,1] that determines the given instance's membership in this cluster. 
-            A value of 0 means that the given instance is not a member of the cluster at all while
-            a value of 1 confirms full membership.
-        """
-
-        raise NotImplementedError
-    
-
-## -------------------------------------------------------------------------------------------------
-    def get_influence(self, p_instance : Instance ) -> float:
-        """
-        Custom method to compute a scalar influence value for the given instance.
-
-        Parameters
-        ----------
-        p_instance : Instance
-            Instance to be examined for its influence to the cluster.
-
-        Returns
-        -------
-        float
-            Scalar value >= 0 that determines the influence of the cluster on the specified instance. 
-            A value 0 means that the cluster has no influence on the instance at all.
-        """
-
-        raise NotImplementedError
-    
 
 ## -------------------------------------------------------------------------------------------------
     def update_properties(self, p_tstamp : TStampType ):

@@ -52,10 +52,11 @@
 ## --                                - Bugfix: added missing parameter p_thrs_cluster_influence
 ## --                                - Method _get_cluster_relations(): robustness for negative influences
 ## -- 2026-08-05  1.9.0     DA       New classes ClusterActions, ClusterInfrastructure
+## -- 2026-10-06  2.0.0     DA       Refactoring and extension
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.9.0 (2026-08-05)
+Ver. 2.0.0 (2026-10-06)
 
 This module provides a template class for online cluster analysis.
 """
@@ -64,16 +65,12 @@ This module provides a template class for online cluster analysis.
 from typing import List, Tuple
 from abc import ABC, abstractmethod
 
-try:
-    from matplotlib.figure import Figure
-except:
-    class Figure : pass
-
-from mlpro.bf.events import Event as MLProEvent, EventManager
-from mlpro.bf.math.properties import *
-from mlpro.bf.streams import Instance, InstDict
 from mlpro.bf.various import *
 from mlpro.bf.plot import *
+from mlpro.bf.events import *
+from mlpro.bf.math.properties import *
+from mlpro.bf.streams import Instance, InstDict
+from mlpro.bf.ml import EventModeML
 
 from mlpro.oa.streams import OAStreamTask
 from mlpro.bf.math.normalizers import Normalizer
@@ -82,11 +79,12 @@ from mlpro.oa.streams.tasks.clusteranalyzers.clusters import Cluster, ClusterId
 
 
 # Export list for public API
-__all__ = [ 'ClusterActions',
-            'ClusterInfrastructure',
+__all__ = [ 'ResultItem',
+            'ClusterActions',
+            'EventConfigCA',
             'ClusterAnalyzer',
-            'ClusterId',
-            'ResultItem' ]
+            'ClusterInfrastructure',
+            'ClusterAnalyzerExt' ]
 
 
 
@@ -101,7 +99,6 @@ class ClusterActions (ABC):
     # Possible result scopes for methods get_cluster_memberships() and get_cluster_influences()
     C_RESULT_SCOPE_ALL : int        = 0
     C_RESULT_SCOPE_MAX : int        = 1
-
 
 ## -------------------------------------------------------------------------------------------------
     def __init__( self ):
@@ -141,7 +138,12 @@ class ClusterActions (ABC):
     @abstractmethod
     def get_cluster_influences( self, 
                                 p_instance : Instance,
-                                p_scope : int = C_RESULT_SCOPE_MAX ) -> List[ResultItem]: ...
+                                p_scope : int = C_RESULT_SCOPE_MAX ) -> List[ResultItem]: 
+        """
+        ...
+        """
+
+        ...
 
 
 
@@ -149,7 +151,162 @@ class ClusterActions (ABC):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class ClusterInfrastructure (ClusterActions):    # EventManager, Plottable, 
+@dataclass
+class EventConfigCA (EventConfig):
+    """
+    ...
+    """
+
+    CLUSTER_ADDED   : EventModeML = EventModeML.OFF
+    CLUSTER_REMOVED : EventModeML = EventModeML.OFF
+
+
+
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
+class ClusterAnalyzer (OAStreamTask, ClusterActions):
+    """
+    Base class for online cluster analysis in MLPro.
+
+    Steps to implement a new algorithm are:
+    - Create a new class and inherit from this base class
+    - Specify all cluster properties provided/maintained by your algorithm in C_CLUSTER_PROPERTIES.
+    - Implement method self._adapt() to update your cluster list on new instances
+    - Implement method self._adapt_reverse() to update your cluster list on obsolete instances
+    - New cluster: hand over self._cluster_properties.values() on instantiation
+    
+    Parameters
+    ----------
+    p_name : str
+        Optional name of the task. Default is None.
+    p_range_max : int
+        Maximum range of asynchonicity. See class Range. Default is Range.C_RANGE_PROCESS.
+    p_ada : bool = True
+        Boolean switch for adaptivitiy. Default = True.
+    p_duplicate_data : bool = False
+        If True, instances will be duplicated before processing. Default = False.
+    p_event_config : EventConfigCA = EventConfigCA()
+        Optional event configuration. ML-specific event
+        switches may use :class:`mlpro.bf.ml.EventModeML`. If omitted, queried events default to
+        :attr:`mlpro.bf.events.EventMode.EVENT`.
+    p_visualize : bool
+        Boolean switch for visualisation. Default = False.
+    p_logging
+        Log level (see constants of class Log). Default: Log.C_LOG_ALL
+    **p_kwargs 
+        Further optional keyword arguments.
+
+    Attributes
+    ----------
+    C_RESULT_SCOPE_ALL : int = 0
+        Result scope, that includes all clusters
+    C_RESULT_SCOPE_MAX : int = 2
+        Result scope, that includes just the cluster with the highest result value.
+    C_CLUSTER_PROPERTIES : PropertyDefinitions
+        List of cluster properties supported/maintained by the algorithm. These properties 
+        are handed over to each new cluster.
+    """
+
+    C_TYPE                          = 'Cluster Analyzer'
+
+    C_EVENT_CLUSTER_ADDED           = 'CLUSTER_ADDED'
+    C_EVENT_CLUSTER_REMOVED         = 'CLUSTER_REMOVED'
+
+    C_PLOT_ACTIVE                   = True
+    C_PLOT_STANDALONE               = False
+
+## -------------------------------------------------------------------------------------------------
+    def __init__( self, 
+                  p_name: str = None, 
+                  p_range_max = OAStreamTask.C_RANGE_THREAD, 
+                  p_ada: bool = True, 
+                  p_duplicate_data: bool = False, 
+                  p_event_config : EventConfigCA = EventConfigCA(),
+                  p_visualize: bool = False, 
+                  p_logging = Log.C_LOG_ALL, 
+                  **p_kwargs ):
+        
+        OAStreamTask.__init__( self,
+                               p_name = p_name, 
+                               p_range_max = p_range_max, 
+                               p_ada = p_ada, 
+                               p_duplicate_data = p_duplicate_data, 
+                               p_event_config = p_event_config,
+                               p_visualize = p_visualize, 
+                               p_logging = p_logging, 
+                               **p_kwargs )
+
+        ClusterActions.__init__( self )
+
+
+## -------------------------------------------------------------------------------------------------
+    def _run(self, p_instances : InstDict):
+        self.adapt( p_instances = p_instances )
+
+
+## -------------------------------------------------------------------------------------------------
+    def init_plot(self, p_figure: Figure = None, p_plot_settings: PlotSettings = None):
+
+        if not self.get_visualization(): return
+
+        super().init_plot( p_figure=p_figure, p_plot_settings=p_plot_settings)
+
+        for cluster in self.clusters.values():
+            cluster.init_plot(p_figure=p_figure, p_plot_settings = p_plot_settings)
+
+
+## -------------------------------------------------------------------------------------------------
+    def update_plot( self, 
+                     p_instances : InstDict = None, 
+                     **p_kwargs ):
+
+        if not self.get_visualization(): return
+
+        for cluster in self.clusters.values():
+            cluster.update_plot( p_instances = p_instances, **p_kwargs)
+
+
+## -------------------------------------------------------------------------------------------------
+    def remove_plot(self, p_refresh:bool = True):
+        """"
+        Removes the plot and optionally refreshes the display.
+
+        Parameters
+        ----------
+        p_refresh : bool = True
+            On True the display is refreshed after removal
+        """
+
+        if not self.get_visualization(): return
+
+        for cluster in self.clusters.values():
+            cluster.remove_plot( p_refresh = False)
+
+        
+## -------------------------------------------------------------------------------------------------
+    def _renormalize(self, p_normalizer: Normalizer):
+        """
+        Internal renormalization of all clusters. See method OATask.renormalize_on_event() for further
+        information.
+
+        Parameters
+        ----------
+        p_normalizer : Normalizer
+            Normalizer object to be applied on task-specific 
+        """
+
+        for cluster in self.clusters.values():
+            cluster.renormalize( p_normalizer=p_normalizer )
+
+
+
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
+class ClusterInfrastructure (ClusterActions):   
     """
     Base class for online cluster analysis. It raises an event when a cluster was added or removed.
 
@@ -282,10 +439,6 @@ class ClusterInfrastructure (ClusterActions):    # EventManager, Plottable,
         if self.get_visualization(): 
             p_cluster.init_plot( p_figure=self._figure, p_plot_settings=self.get_plot_settings() )
 
-        # self._raise_event( p_event_id = self.C_EVENT_CLUSTER_ADDED, 
-        #                    p_event_object = MLProEvent( p_raising_object = self,
-        #                                                 p_cluster = p_cluster ) )
-
 
 ## -------------------------------------------------------------------------------------------------
     def _remove_cluster(self, p_cluster:Cluster):
@@ -300,10 +453,6 @@ class ClusterInfrastructure (ClusterActions):    # EventManager, Plottable,
 
         p_cluster.remove_plot(p_refresh=True)
         del self.clusters[p_cluster.id]
-
-        # self._raise_event( p_event_id = self.C_EVENT_CLUSTER_REMOVED, 
-        #                    p_event_object = MLProEvent( p_raising_object = self,
-        #                                                 p_cluster = p_cluster ) )
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -466,9 +615,9 @@ class ClusterInfrastructure (ClusterActions):    # EventManager, Plottable,
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class ClusterAnalyzer (OAStreamTask, ClusterInfrastructure):
+class ClusterAnalyzerExt (ClusterAnalyzer, ClusterInfrastructure):
     """
-    Base class for online cluster analysis. It raises an event when a cluster was added or removed.
+    Template class for online cluster analysis in MLPro.
 
     Steps to implement a new algorithm are:
     - Create a new class and inherit from this base class
@@ -499,30 +648,14 @@ class ClusterAnalyzer (OAStreamTask, ClusterInfrastructure):
         Log level (see constants of class Log). Default: Log.C_LOG_ALL
     p_kwargs : dict
         Further optional named parameters.
-
-    Attributes
-    ----------
-    C_RESULT_SCOPE_ALL : int = 0
-        Result scope, that includes all clusters
-    C_RESULT_SCOPE_MAX : int = 2
-        Result scope, that includes just the cluster with the highest result value.
-    C_CLUSTER_PROPERTIES : PropertyDefinitions
-        List of cluster properties supported/maintained by the algorithm. These properties 
-        are handed over to each new cluster.
     """
 
-    C_TYPE                          = 'Cluster Analyzer'
-
-    C_EVENT_CLUSTER_ADDED           = 'CLUSTER_ADDED'
-    C_EVENT_CLUSTER_REMOVED         = 'CLUSTER_REMOVED'
-
-    C_PLOT_ACTIVE                   = True
-    C_PLOT_STANDALONE               = False
+    C_TYPE  = 'Cluster Analyzer (Ext)'
 
 ## -------------------------------------------------------------------------------------------------
     def __init__( self, 
                   p_name: str = None, 
-                  p_range_max = OAStreamTask.C_RANGE_THREAD, 
+                  p_range_max = OAStreamTask.C_RANGE_PROCESS, 
                   p_ada: bool = True, 
                   p_duplicate_data: bool = False, 
                   p_cls_cluster : type = Cluster,
@@ -532,77 +665,16 @@ class ClusterAnalyzer (OAStreamTask, ClusterInfrastructure):
                   p_logging = Log.C_LOG_ALL, 
                   **p_kwargs ):
         
-        OAStreamTask.__init__( self,
-                               p_name = p_name, 
-                               p_range_max = p_range_max, 
-                               p_ada = p_ada, 
-                               p_duplicate_data = p_duplicate_data, 
-                               p_visualize = p_visualize, 
-                               p_logging = p_logging, 
-                               **p_kwargs )
+        ClusterAnalyzerBase.__init__( self,
+                                      p_name = p_name, 
+                                      p_range_max = p_range_max, 
+                                      p_ada = p_ada, 
+                                      p_duplicate_data = p_duplicate_data, 
+                                      p_visualize = p_visualize, 
+                                      p_logging = p_logging, 
+                                      **p_kwargs )
 
         ClusterInfrastructure.__init__( self, 
                                         p_cls_cluster = p_cls_cluster,
                                         p_cluster_limit = p_cluster_limit,
                                         p_thrs_cluster_influence = p_thrs_cluster_influence )
-
-
-## -------------------------------------------------------------------------------------------------
-    def _run(self, p_instances : InstDict):
-        self.adapt( p_instances = p_instances )
-
-
-## -------------------------------------------------------------------------------------------------
-    def init_plot(self, p_figure: Figure = None, p_plot_settings: PlotSettings = None):
-
-        if not self.get_visualization(): return
-
-        super().init_plot( p_figure=p_figure, p_plot_settings=p_plot_settings)
-
-        for cluster in self.clusters.values():
-            cluster.init_plot(p_figure=p_figure, p_plot_settings = p_plot_settings)
-
-
-## -------------------------------------------------------------------------------------------------
-    def update_plot( self, 
-                     p_instances : InstDict = None, 
-                     **p_kwargs ):
-
-        if not self.get_visualization(): return
-
-        for cluster in self.clusters.values():
-            cluster.update_plot( p_instances = p_instances, **p_kwargs)
-
-
-## -------------------------------------------------------------------------------------------------
-    def remove_plot(self, p_refresh:bool = True):
-        """"
-        Removes the plot and optionally refreshes the display.
-
-        Parameters
-        ----------
-        p_refresh : bool = True
-            On True the display is refreshed after removal
-        """
-
-        if not self.get_visualization(): return
-
-        for cluster in self.clusters.values():
-            cluster.remove_plot( p_refresh = False)
-
-        
-## -------------------------------------------------------------------------------------------------
-    def _renormalize(self, p_normalizer: Normalizer):
-        """
-        Internal renormalization of all clusters. See method OATask.renormalize_on_event() for further
-        information.
-
-        Parameters
-        ----------
-        p_normalizer : Normalizer
-            Normalizer object to be applied on task-specific 
-        """
-
-        for cluster in self.clusters.values():
-            cluster.renormalize( p_normalizer=p_normalizer )
-
