@@ -665,14 +665,14 @@ class ClusterAnalyzerExt (ClusterAnalyzer, ClusterInfrastructure):
                   p_logging = Log.C_LOG_ALL, 
                   **p_kwargs ):
         
-        ClusterAnalyzerBase.__init__( self,
-                                      p_name = p_name, 
-                                      p_range_max = p_range_max, 
-                                      p_ada = p_ada, 
-                                      p_duplicate_data = p_duplicate_data, 
-                                      p_visualize = p_visualize, 
-                                      p_logging = p_logging, 
-                                      **p_kwargs )
+        ClusterAnalyzer.__init__( self,
+                                  p_name = p_name, 
+                                  p_range_max = p_range_max, 
+                                  p_ada = p_ada, 
+                                  p_duplicate_data = p_duplicate_data, 
+                                  p_visualize = p_visualize, 
+                                  p_logging = p_logging, 
+                                  **p_kwargs )
 
         ClusterInfrastructure.__init__( self, 
                                         p_cls_cluster = p_cls_cluster,
