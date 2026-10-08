@@ -37,10 +37,13 @@
 ## -- 2025-07-15  1.4.2     DA       Class OAStreamAdaptationType: new parent class AdaptationType   
 ## -- 2025-07-16  1.4.3     DA       Refactoring 
 ## -- 2026-10-05  1.5.0     DA       Class OAStreamTask: new parameter p_event_config
+## -- 2026-10-08  1.6.0     DA       Class OAStreamTask: optimization of adaptation 
+## --                                - removed logging
+## --                                - removed expensive try/except statements
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.5.0 (2026-10-05)
+Ver. 1.6.0 (2026-10-08)
 
 Core classes for online-adaptive data stream processing (OADSP).
 
@@ -54,6 +57,7 @@ from mlpro.bf.ops import Mode
 from mlpro.bf.streams import InstDict, Instance, InstTypeNew, StreamShared, StreamTask, StreamWorkflow, StreamScenario
 from mlpro.bf.math.normalizers import Normalizer
 from mlpro.bf.ml import AdaptationType, Adaptation, Model, AWorkflow
+
 
 
 # Export list for public API
@@ -267,7 +271,6 @@ class OAStreamTask (StreamTask, Model):
 
         # 0 Intro
         if not self._adaptivity: return False
-        self.log(self.C_LOG_TYPE_S, 'Adaptation started')
 
         adapted_forward  = False
         adapted_reverse  = False
@@ -276,17 +279,11 @@ class OAStreamTask (StreamTask, Model):
         
 
         # 1 Preprocessing 
-        try:
-            atype_pre = self._adapt_pre()
+        atype_pre = self._adapt_pre()
 
-            if atype_pre != OAStreamAdaptationType.NONE:
-                if atype_pre == OAStreamAdaptationType.FORWARD: adapted_forward = True
-                elif atype_pre == OAStreamAdaptationType.REVERSE: adapted_reverse = True
-
-                self.log(self.C_LOG_TYPE_S, 'Preprocessing done')
-
-        except NotImplementedError:
-            pass
+        if atype_pre != OAStreamAdaptationType.NONE:
+            if atype_pre == OAStreamAdaptationType.FORWARD: adapted_forward = True
+            elif atype_pre == OAStreamAdaptationType.REVERSE: adapted_reverse = True
 
 
         # 2 Main adaptation loop
@@ -294,45 +291,28 @@ class OAStreamTask (StreamTask, Model):
 
             if inst_type == InstTypeNew:
                 # 2.1 Adaptation on a new stream instance
-                self.log(self.C_LOG_TYPE_S, 'Adaptation on new instance', inst_id)
                 if self._adapt( p_instance_new=inst):
                     adapted_forward      = True
                     num_inst_forward    += 1
-                    self.log(self.C_LOG_TYPE_S, 'Policy adapted')
-                else:
-                    self.log(self.C_LOG_TYPE_S, 'Policy not adapted')
 
             else:
                 # 2.2 Reverse adaptation on an obsolete stream instance
-                self.log(self.C_LOG_TYPE_S, 'Reverse adaptation on obsolete instance', inst_id)
-                try:
-                    if self._adapt_reverse( p_instance_del=inst ):
-                        adapted_reverse      = True
-                        num_inst_reverse    += 1
-                        self.log(self.C_LOG_TYPE_S, 'Policy adapted')
-                    else:
-                        self.log(self.C_LOG_TYPE_S, 'Policy not adapted')
-                except NotImplementedError:
-                    self.log(self.C_LOG_TYPE_W, 'Reverse adaptation not implemented', inst_id)
+                if self._adapt_reverse( p_instance_del=inst ):
+                    adapted_reverse      = True
+                    num_inst_reverse    += 1
 
 
         # 3 Postprocessing
-        try:
-            atype_post = self._adapt_post()
+        atype_post = self._adapt_post()
 
-            if atype_post != OAStreamAdaptationType.NONE:
-                if atype_post == OAStreamAdaptationType.FORWARD: adapted_forward = True
-                elif atype_post == OAStreamAdaptationType.REVERSE: adapted_reverse = True
+        if atype_post != OAStreamAdaptationType.NONE:
+            if atype_post == OAStreamAdaptationType.FORWARD: adapted_forward = True
+            elif atype_post == OAStreamAdaptationType.REVERSE: adapted_reverse = True
 
-                self.log(self.C_LOG_TYPE_S, 'Postprocessing done')
-
-        except NotImplementedError:
-            pass
 
 
         # 4 Outro: Logging and adaptation events
         if adapted_forward or adapted_reverse:
-            self.log(self.C_LOG_TYPE_S, 'Adaptation done with changes')
             tstamp = self.get_so().tstamp
 
             if adapted_reverse:
@@ -350,7 +330,6 @@ class OAStreamTask (StreamTask, Model):
             return True
         
         else:
-            self.log(self.C_LOG_TYPE_S, 'Adaptation done without changes')
             self._set_adapted( p_adapted = False )
             return False
 
@@ -366,7 +345,7 @@ class OAStreamTask (StreamTask, Model):
             Type of adaptation carried out.
         """
 
-        raise NotImplementedError
+        return OAStreamAdaptationType.NONE
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -385,7 +364,7 @@ class OAStreamTask (StreamTask, Model):
             True, if something has been adapted. False otherwise.
         """
 
-        raise NotImplementedError
+        pass
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -404,7 +383,7 @@ class OAStreamTask (StreamTask, Model):
             True, if something has been adapted. False otherwise.
         """
 
-        raise NotImplementedError
+        pass
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -418,7 +397,7 @@ class OAStreamTask (StreamTask, Model):
             Type of adaptation carried out.
         """
 
-        raise NotImplementedError
+        return OAStreamAdaptationType.NONE
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -434,7 +413,7 @@ class OAStreamTask (StreamTask, Model):
             Normalizer object to be applied on task-specific 
         """
 
-        raise NotImplementedError
+        pass
 
 
 ## -------------------------------------------------------------------------------------------------
