@@ -14,24 +14,95 @@
 ## -- 2024-05-23  1.3.0     DA       Method EventManger._raise_event(): reduction to TypeError   
 ## -- 2025-05-27  1.4.0     DA       Class Event: new parent class KWArgs
 ## -- 2025-07-18  1.5.0     DA       Refactoring
+## -- 2026-10-05  2.0.0     DA       Refactoring: 
+## --                                - logging removed from EventManager
+## --                                - tuned method EventManager._raise_event
+## --                                - new type EventId
+## --                                - new classes EventMode, EventConfig
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.5.0 (2025-07-18)
+Ver. 2.0.0 (2026-10-05)
 
-This module provides classes for event handling. To this regard, the property class Eventmanager is
-provided to add event functionality to child classes by inheritence.
+This module provides generic building blocks for event handling. Event identifiers are represented
+by the type alias EventId. EventMode and EventConfig provide a lightweight configuration mechanism
+that allows event-capable classes to enable or disable individual events.
+
+The property class EventManager adds event handling functionality to child classes by inheritance.
+It manages event-handler registration and dispatch. Concrete EventConfig child classes may define
+arbitrary event switches. By convention, event ids and the names of their corresponding switches
+are written in upper case and must be identical. This convention is implemented and documented by
+the concrete event-capable class; it is not enforced automatically by EventManager.
 """
 
 from datetime import datetime
-from mlpro.bf.various import Log, TStamp, TStampType, KWArgs
-from mlpro.bf.exceptions import *
+from typing import TypeAlias
+from dataclasses import dataclass
+from enum import IntEnum
+
+from mlpro.bf.various import TStamp, TStampType, KWArgs
+from mlpro.bf.exceptions import ImplementationError
 
 
 
 # Export list for public API
-__all__ = [ 'Event',
+__all__ = [ 'EventId',
+            'EventMode',
+            'EventConfig',
+            'Event',
             'EventManager' ]
+
+
+
+EventId: TypeAlias = str
+
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
+class EventMode(IntEnum):
+    """
+    Defines the generic operating modes of an event.
+
+    The mode is typically queried by an event-capable implementation before an :class:`Event`
+    object is created. This allows disabled events to be skipped with minimal runtime overhead.
+
+    Attributes
+    ----------
+    OFF : int
+        Event is disabled.
+    EVENT : int
+        Event is enabled and may be raised.
+    """
+
+    OFF   = 0
+    EVENT = 1
+
+
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
+@dataclass
+class EventConfig:
+    """
+    Root class for event configurations.
+
+    Concrete child classes define implementation-specific event switches as dataclass attributes.
+    The type of a switch is typically :class:`EventMode` or a specialized derivative introduced
+    by a higher-level MLPro package.
+
+    By convention, event ids and the names of their corresponding event switches are written in
+    upper case and must be identical. The concrete event-capable implementation is responsible for
+    maintaining this relation; it is deliberately not enforced automatically by MLPro.
+
+    Notes
+    -----
+    The root class itself does not define any event switches.
+    """
+
+    pass    
+
 
 
 
@@ -46,13 +117,16 @@ class Event (TStamp, KWArgs):
     Parameters
     ----------
     p_raising_object
-        Reference to object that raised the event.
-    **p_kwargs 
-        List of named parameters
+        Reference to the object that raises the event.
+    p_tstamp : TStampType, optional
+        Time stamp of the event. If omitted, the current date and time are used.
+    **p_kwargs
+        Additional event-specific data passed to registered handlers.
     """
 
 ## -------------------------------------------------------------------------------------------------
     def __init__(self, p_raising_object, p_tstamp:TStampType = None, **p_kwargs):
+
         self._raising_object = p_raising_object
 
         if p_tstamp is None:
@@ -65,11 +139,29 @@ class Event (TStamp, KWArgs):
 
 ## -------------------------------------------------------------------------------------------------
     def get_raising_object(self):
+        """
+        Returns the object that raised the event.
+
+        Returns
+        -------
+        object
+            Raising object.
+        """
+
         return self._raising_object
 
 
 ## -------------------------------------------------------------------------------------------------
     def get_data(self):
+        """
+        Returns the event-specific key/value data.
+
+        Returns
+        -------
+        dict
+            Dictionary with event-specific data supplied at event creation.
+        """
+
         return self.kwargs
 
 
@@ -78,37 +170,51 @@ class Event (TStamp, KWArgs):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class EventManager (Log):
+class EventManager:
     """
-    This property class provides universal event management functionalities to be inherited to child
-    classes.
+    Property class providing universal event management functionality.
+
+    EventManager manages handler registration and dispatch for string-based :class:`EventId`
+    values. An optional :class:`EventConfig` can be supplied to configure individual events.
+
+    For backward compatibility, :meth:`_get_event_mode` returns :attr:`EventMode.EVENT` if no
+    event configuration is supplied. If a configuration is supplied, every queried event id must
+    have a matching attribute in that configuration. A mismatch is treated as an implementation
+    error.
 
     Parameters
     ----------
-    p_logging
-        Log level (see constants of class Log). Default: Log.C_LOG_ALL
+    p_event_config : EventConfig, optional
+        Optional event configuration used by the concrete event-capable implementation. If omitted,
+        :meth:`_get_event_mode` returns :attr:`EventMode.EVENT` for every event id.
 
+    Notes
+    -----
+    Event configuration is intentionally evaluated through :meth:`_get_event_mode` by the concrete
+    event-capable implementation before creating the corresponding :class:`Event` object.
+    :meth:`_raise_event` only dispatches an already created event and does not evaluate the
+    configuration itself.
     """
 
-    C_TYPE      = 'EventManager'
-
 ## -------------------------------------------------------------------------------------------------
-    def __init__(self, p_logging=Log.C_LOG_ALL):
-        Log.__init__(self, p_logging=p_logging)
+    def __init__(self, p_event_config : EventConfig = None):
+
         self._registered_handlers = {}
+        self._event_config        = p_event_config
 
 
 ## -------------------------------------------------------------------------------------------------
-    def register_event_handler(self, p_event_id:str, p_event_handler):
+    def register_event_handler(self, p_event_id : EventId, p_event_handler):
         """
         Registers an event handler. 
 
         Parameters 
         ----------
-        p_event_id : str
-            Unique event id
+        p_event_id : EventId
+            Unique event identifier.
         p_event_handler
-            Reference to an event handler method with parameters p_event_id and p_event_object:Event
+            Reference to an event handler callable accepting the named parameters `p_event_id`
+            and `p_event_object`.
         """
 
         try:
@@ -118,16 +224,16 @@ class EventManager (Log):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def remove_event_handler(self, p_event_id:str, p_event_handler):
+    def remove_event_handler(self, p_event_id : EventId, p_event_handler):
         """
         Removes an already registered event handler.
 
         Parameters 
         ----------
-        p_event_id 
-            Unique event id
+        p_event_id : EventId
+            Unique event identifier.
         p_event_handler
-            Reference to an event handler method.
+            Reference to the registered event handler to be removed.
         """
 
         try:
@@ -137,38 +243,83 @@ class EventManager (Log):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def _raise_event(self, p_event_id:str, p_event_object:Event):
+    def _get_event_mode(self, p_event_id : EventId) -> EventMode:
+        """
+        Returns the configured mode of an event.
+
+        This internal service method is intended to be called by the concrete event-capable
+        implementation before creating an :class:`Event` object. This allows disabled events to be
+        rejected early and avoids unnecessary event-object creation.
+
+        Parameters
+        ----------
+        p_event_id : EventId
+            Unique event identifier. By convention, the identifier is written in upper case and
+            exactly matches the corresponding attribute name in the concrete
+            :class:`EventConfig` child class.
+
+        Returns
+        -------
+        EventMode
+            Configured event mode. :attr:`EventMode.EVENT` is returned if no event configuration
+            is supplied.
+
+        Raises
+        ------
+        ImplementationError
+            If an event configuration is supplied but does not provide an attribute matching the
+            given event id.
+
+        Notes
+        -----
+        The fallback to :attr:`EventMode.EVENT` in the absence of an event configuration preserves
+        the behaviour of existing MLPro event implementations. If a configuration is supplied, the
+        concrete implementation must ensure that each queried event id has a matching attribute.
+        """
+
+        if self._event_config is None:
+            return EventMode.EVENT
+
+        try:
+            return getattr(
+                self._event_config,
+                p_event_id,
+            )
+        except AttributeError:
+            raise ImplementationError(
+                'Event configuration of type "'
+                + type(self._event_config).__name__
+                + '" does not provide an attribute for event id "'
+                + p_event_id
+                + '". Check the event implementation and its EventConfig class.'
+            )        
+
+
+## -------------------------------------------------------------------------------------------------
+    def _raise_event(self, p_event_id : EventId, p_event_object:Event):
         """
         Raises an event and calls all registered handlers. To be used inside an event manager class.
 
         Parameters
         ----------
-        p_event_id : str
-            Unique event id
+        p_event_id : EventId
+            Unique event identifier.
         p_event_object : Event
-            Event object with further context informations
+            Event object carrying the event context.
+
+        Notes
+        -----
+        This method does not evaluate the event configuration. The concrete implementation should
+        call :meth:`_get_event_mode` before creating the event object and invoke this method only
+        for events that are to be dispatched.
         """
 
-        # 0 Intro
-        self.log(Log.C_LOG_TYPE_S, 'Event "' + p_event_id + '" fired')
-
-
-        # 1 Get list of registered handlers for given event id
-        try:
-            handlers = self._registered_handlers[p_event_id]
-        except:
-            handlers = []
-
-        if len(handlers) == 0:
-            self.log(Log.C_LOG_TYPE_I, 'No handlers registered for event "' + p_event_id + '"')
-            return
+        # 1 Check for registered event handlers
+        handlers = self._registered_handlers.get(p_event_id)
+        if not handlers: return
 
 
         # 2 Call all registered handlers
-        for i, handler in enumerate(handlers):
-            try:
-                self.log(Log.C_LOG_TYPE_I, 'Calling handler', i)
-                handler( p_event_id=p_event_id, p_event_object=p_event_object )
-            except TypeError:
-                self.log(Log.C_LOG_TYPE_E, 'Handler not compatible! Check your code!')
-                raise TypeError
+        for handler in handlers:
+            handler( p_event_id=p_event_id,
+                     p_event_object=p_event_object )   

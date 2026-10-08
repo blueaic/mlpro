@@ -11,19 +11,22 @@ observations may disappear from the active context. In its current development s
 **standardized framework and templates for implementing custom online cluster analyzers** rather than a broad collection of
 ready-to-use clustering algorithms.
 
-The current architecture separates the cluster-analysis contract, reusable cluster-management infrastructure, and integration
-into an online-adaptive stream task. Three classes are central:
+The cluster-analysis architecture is deliberately split into a lightweight core and optional standard MLPro infrastructure. This
+allows high-performance implementations to reuse the common clustering contract without depending on MLPro's generic property
+model.
 
-- ``ClusterActions`` defines the common public API through which cluster-based functionality can access a current cluster model.
-- ``ClusterInfrastructure`` implements reusable, task-internal handling of clusters, properties, memberships, influences, and
-  cluster lifecycle operations.
-- ``ClusterAnalyzer`` combines that infrastructure with ``OAStreamTask`` and thereby turns a concrete clustering algorithm into
-  an online-adaptive stream-processing task.
+Four classes are central:
 
-This separation is important for custom implementations. A component that only needs to consume cluster results can depend on
-``ClusterActions`` instead of a particular analyzer implementation, while analyzer developers can reuse
-``ClusterInfrastructure`` for the common mechanics of cluster handling and concentrate their own implementation on the actual
-clustering algorithm.
+- ``ClusterActions`` defines the common public API for access to a current cluster model.
+- ``ClusterAnalyzer`` combines this contract with ``OAStreamTask`` and provides the lightweight online-adaptive task layer.
+- ``ClusterInfrastructure`` provides reusable standard MLPro mechanics for cluster storage, ids, limits, properties, memberships,
+  influences, and cluster lifecycle operations.
+- ``ClusterAnalyzerExt`` combines ``ClusterAnalyzer`` and ``ClusterInfrastructure`` and therefore represents the convenient
+  standard MLPro implementation.
+
+This separation is intentional. Specialized analyzers may derive directly from ``ClusterAnalyzer`` and provide their own cluster
+representation and management, while conventional MLPro implementations can use ``ClusterAnalyzerExt`` and the generic property
+infrastructure.
 
 
 ClusterActions: common cluster-analysis API
@@ -40,15 +43,30 @@ The two principal operations are:
 Both operations use the common ``ResultItem`` representation consisting of a cluster id, a result value, and the corresponding
 cluster object. Result scopes allow callers either to inspect all applicable clusters or to request only the strongest result.
 
-For integrations, this class is therefore the preferred API boundary whenever a consumer needs cluster information without
-requiring the full adaptive task interface of ``ClusterAnalyzer``.
+For integrations, this class is the preferred API boundary whenever a consumer needs cluster information without requiring the
+full adaptive task interface.
 
 
-ClusterInfrastructure: reusable cluster handling
+ClusterAnalyzer: lightweight adaptive task layer
 ------------------------------------------------
 
-``ClusterInfrastructure`` implements the common mechanics behind cluster-based tasks. It derives from ``ClusterActions`` and
-provides the standardized internal machinery needed by cluster analyzers and potentially other cluster-oriented components.
+``ClusterAnalyzer`` combines ``OAStreamTask`` and ``ClusterActions``. It deliberately does **not** prescribe how clusters are
+implemented, stored, created, or removed.
+
+A specialized analyzer can therefore reuse MLPro-OA's stream-task lifecycle, adaptivity, event handling, visualization hooks,
+workflow integration, and forward/reverse adaptation while implementing its own cluster-management strategy. This is particularly
+important for high-performance implementations where the generic MLPro property infrastructure would introduce unnecessary
+runtime overhead.
+
+``ClusterAnalyzer`` forwards incoming stream data to the adaptive model and integrates cluster visualization and renormalization
+at task level. The concrete cluster implementation remains responsible for supporting the corresponding operations.
+
+
+ClusterInfrastructure: reusable standard MLPro mechanics
+--------------------------------------------------------
+
+``ClusterInfrastructure`` is a task-independent mixin that implements the standard MLPro mechanics behind conventional cluster
+analyzers. It derives from ``ClusterActions`` but does not itself introduce ``Task``, ``StreamTask``, or ``OAStreamTask`` semantics.
 
 Its responsibilities include:
 
@@ -60,48 +78,65 @@ Its responsibilities include:
 - result scopes and optional influence thresholds;
 - access to the configured cluster class.
 
-The architectural intention is to keep these recurring concerns out of the concrete clustering algorithm. An implementation can
-therefore focus on *when* and *how* its model changes, while ``ClusterInfrastructure`` standardizes *how clusters are represented,
-managed, and queried* inside the task.
+The infrastructure can therefore be combined with a compatible task layer where these generic mechanisms are desired, but it is
+not mandatory for every cluster analyzer.
 
 
-ClusterAnalyzer: adaptive stream-task integration
--------------------------------------------------
+ClusterAnalyzerExt: standard MLPro combination
+----------------------------------------------
 
-``ClusterAnalyzer`` combines ``OAStreamTask`` and ``ClusterInfrastructure``. It is the common adaptive template for online
-clustering in an ``OAStreamWorkflow``.
+``ClusterAnalyzerExt`` combines the lightweight ``ClusterAnalyzer`` with ``ClusterInfrastructure``. It is the convenient base
+class for conventional MLPro cluster analyzers that use the standard cluster model and property infrastructure.
 
-A concrete analyzer supplies the algorithm-specific adaptation behavior for newly arriving and obsolete instances. The inherited
-infrastructure provides the cluster model and cluster operations, while ``OAStreamTask`` contributes the common OA lifecycle,
-execution model, adaptivity switch, workflow integration, and event-driven interaction with other stream tasks.
-
-``ClusterAnalyzer`` additionally integrates cluster visualization and renormalization. If an upstream adaptive normalizer changes
-its parameters, the maintained cluster model can be renormalized so that its geometric representation remains consistent with the
-new coordinate system.
-
-The resulting responsibility split can be summarized as::
+The responsibility split can be summarized as::
 
     consumer / downstream component
                 |
                 v
          ClusterActions
         common query API
-                ^
-                |
-    ClusterInfrastructure
-    common cluster mechanics
-                ^
-                |
-         ClusterAnalyzer
-    OAStreamTask integration
-                ^
-                |
-      concrete algorithm
-    _adapt() / _adapt_reverse()
+           ^         ^
+           |         |
+           |   ClusterInfrastructure
+           |   standard MLPro mechanics
+           |         ^
+           |         |
+       ClusterAnalyzer
+       OA task layer
+           ^         ^
+           |         |
+ specialized      ClusterAnalyzerExt
+ high-speed       standard MLPro stack
+ analyzer
 
-``ClusterAnalyzer`` therefore does not solve the clustering problem by itself. It defines the standardized environment in which
-application-specific or third-party online clustering algorithms can be implemented consistently.
+This structure keeps the core clustering contract reusable while preserving the richer MLPro implementation as an optional layer.
 
+
+Event configuration
+-------------------
+
+Cluster analyzers use ``EventConfigCA`` as their specific event configuration. It extends the generic MLPro event configuration by
+the two cluster-lifecycle events ``CLUSTER_ADDED`` and ``CLUSTER_REMOVED``. Both are disabled by default and can be enabled
+individually by the embedding application.
+
+The event configuration belongs to the analyzer layer and can be extended by specialized implementations with additional
+domain-specific events.
+
+
+Cluster model
+-------------
+
+The cluster model follows the same lightweight-versus-rich separation.
+
+``ClusterBase`` is the minimal abstract cluster representation. It provides cluster identity, optional plot support, and the two
+generic relation operations ``get_membership()`` and ``get_influence()``. It is deliberately independent of MLPro's generic
+``Properties`` model.
+
+``Cluster`` extends ``ClusterBase`` with ``Properties`` and ``KWArgs`` and remains the standard MLPro cluster template. Further
+specializations such as ``ClusterCentroid`` and ``ClusterBody`` build on this richer model.
+
+This gives specialized high-performance analyzers a clean option to derive directly from ``ClusterBase`` while conventional MLPro
+algorithms can continue to use the property-based ``Cluster`` hierarchy.
 
 Benchmarking with native BF-Streams
 -----------------------------------
@@ -112,7 +147,7 @@ They can generate known static or dynamic cluster structures in configurable dim
 
 This creates a useful separation between **benchmark definition** and **analyzer implementation**: BF-Streams defines controlled
 input scenarios, while OA-Streams standardizes how an online cluster analyzer represents, updates, and exposes its cluster model.
-A custom ``ClusterAnalyzer`` can therefore be tested repeatedly against the same benchmark stream and compared with alternative
+A custom cluster analyzer can therefore be tested repeatedly against the same benchmark stream and compared with alternative
 implementations under equivalent conditions.
 
 Single-cluster scenarios are useful for validating basic model behavior, membership semantics, and adaptation to movement or size
@@ -150,16 +185,13 @@ A few representative benchmark scenarios are shown below. The complete visual be
 Cluster model and properties
 ----------------------------
 
-Clusters are first-class objects rather than anonymous labels. The cluster-analysis package defines a reusable cluster model with
-``Cluster``, cluster identifiers, centroid- and body-oriented specializations, and extensible cluster properties.
+The standard MLPro cluster hierarchy remains property-based. Algorithms using ``ClusterInfrastructure`` can declare the
+properties they maintain through ``C_CLUSTER_PROPERTIES``. New clusters can receive those definitions, and property settings
+can be aligned with external consumers. The native property pool includes reusable concepts around cluster centroids and bodies
+as well as derived properties such as **density** and **deformation index**.
 
-Algorithms declare the properties they maintain through ``C_CLUSTER_PROPERTIES``. New clusters can receive those definitions,
-and property settings can be aligned with external consumers. The native property pool includes reusable concepts around cluster
-centroids and bodies as well as derived properties such as **density** and **deformation index**.
-
-Because the property mechanism builds on the generic BF-Math property abstractions, cluster metadata can be extended without
-changing the common ``ClusterActions`` API or the fundamental analyzer lifecycle.
-
+This property layer is optional: lightweight implementations can derive their cluster objects directly from ``ClusterBase``
+without carrying the generic property machinery.
 
 Forward and reverse adaptation
 ------------------------------
@@ -186,15 +218,14 @@ current cluster model can program against ``ClusterActions`` instead of dependin
 
 A typical architecture is::
 
-    Stream -> adaptive preprocessing -> ClusterAnalyzer -> cluster-based consumer
-                                      |                 |
-                                      |                 +-> ClusterActions API
-                                      +-> cluster model / properties
+    Stream -> adaptive preprocessing -> ClusterAnalyzer-based task -> cluster-based consumer
+                                      |                      |
+                                      |                      +-> ClusterActions API
+                                      +-> lightweight or standard cluster model
 
-This makes clustering a reusable adaptive model inside a larger processing chain while keeping the actual clustering algorithm
-replaceable. Cluster-based change detection is still under development and should therefore be regarded as an evolving
-integration area rather than mature ready-to-use functionality.
-
+This makes clustering a reusable adaptive model inside a larger processing chain while keeping both the clustering algorithm and
+its internal cluster representation replaceable. Cluster-based change detection is still under development and should therefore
+be regarded as an evolving integration area rather than mature ready-to-use functionality.
 
 **Cross reference**
 

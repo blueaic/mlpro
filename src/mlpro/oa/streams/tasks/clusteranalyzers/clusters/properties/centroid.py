@@ -17,10 +17,11 @@
 ## -- 2025-03-19  0.8.2     DA       Removed property definitions cprop_center_geo*
 ## -- 2025-06-08  0.9.0     DA       Refactoring of Centroid._update_plot*: new return parameter
 ## -- 2025-06-25  1.0.0     DA       Class Crosshair: implementation of nD plot methods
+## -- 2026-09-28  1.0.1     DA       Bugfix (illegal import)
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2025-06-25)
+Ver. 1.0.1 (2026-09-28)
 
 This module provides the cluster property class 'Centroid'.
 
@@ -36,7 +37,6 @@ except:
     class Line3D : pass
     class Text3D : pass
 
-from mlpro.bf.mt import Figure, PlotSettings
 from mlpro.bf.various import *
 from mlpro.bf.plot import *
 from mlpro.bf.streams import *

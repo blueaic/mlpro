@@ -52,10 +52,11 @@
 ## --                                - Bugfix: added missing parameter p_thrs_cluster_influence
 ## --                                - Method _get_cluster_relations(): robustness for negative influences
 ## -- 2026-08-05  1.9.0     DA       New classes ClusterActions, ClusterInfrastructure
+## -- 2026-10-06  2.0.0     DA       Refactoring and extension
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.9.0 (2026-08-05)
+Ver. 2.0.0 (2026-10-06)
 
 This module provides a template class for online cluster analysis.
 """
@@ -63,17 +64,14 @@ This module provides a template class for online cluster analysis.
 
 from typing import List, Tuple
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
-try:
-    from matplotlib.figure import Figure
-except:
-    class Figure : pass
-
-from mlpro.bf.events import Event as MLProEvent, EventManager
-from mlpro.bf.math.properties import *
-from mlpro.bf.streams import Instance, InstDict
 from mlpro.bf.various import *
 from mlpro.bf.plot import *
+from mlpro.bf.events import *
+from mlpro.bf.math.properties import *
+from mlpro.bf.streams import Instance, InstDict
+from mlpro.bf.ml import EventModeML
 
 from mlpro.oa.streams import OAStreamTask
 from mlpro.bf.math.normalizers import Normalizer
@@ -82,11 +80,12 @@ from mlpro.oa.streams.tasks.clusteranalyzers.clusters import Cluster, ClusterId
 
 
 # Export list for public API
-__all__ = [ 'ClusterActions',
-            'ClusterInfrastructure',
+__all__ = [ 'ResultItem',
+            'ClusterActions',
+            'EventConfigCA',
             'ClusterAnalyzer',
-            'ClusterId',
-            'ResultItem' ]
+            'ClusterInfrastructure',
+            'ClusterAnalyzerExt' ]
 
 
 
@@ -97,11 +96,18 @@ ResultItem = Tuple[ClusterId, float, object]
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
 class ClusterActions (ABC): 
+    """
+    Abstract interface for cluster collections and cluster-relation queries.
+
+    The class provides the common clusters container and defines the public interface for evaluating
+    membership and influence of instances with respect to the currently managed clusters. It does
+    not prescribe how clusters are created, updated, removed, or stored beyond the public cluster
+    dictionary.
+    """
 
     # Possible result scopes for methods get_cluster_memberships() and get_cluster_influences()
     C_RESULT_SCOPE_ALL : int        = 0
     C_RESULT_SCOPE_MAX : int        = 1
-
 
 ## -------------------------------------------------------------------------------------------------
     def __init__( self ):
@@ -114,24 +120,24 @@ class ClusterActions (ABC):
                                  p_instance : Instance,
                                  p_scope : int = C_RESULT_SCOPE_MAX ) -> List[ResultItem]: 
         """
-        Method to determine the relative membership of the given instance to each cluster as a value 
-        in [0,1]. 
-        
-        See also: method Cluster.get_membership().
+        Determines the relative memberships of an instance with respect to the managed clusters.
+
+        The cluster-specific membership measure is provided by Cluster.get_membership() or an
+        equivalent implementation of the cluster interface.
 
         Parameters
         ----------
         p_instance : Instance
             Instance to be evaluated.
         p_scope : int
-            Scope of the result list. See class attributes C_RESULT_SCOPE_* for possible values. Default
-            value is C_RESULT_SCOPE_MAX.
+            Scope of the result. Use C_RESULT_SCOPE_ALL for all clusters or C_RESULT_SCOPE_MAX for
+            the cluster with the highest membership.
 
         Returns
         -------
         List[ResultItem]
-            List of membership items which are tuples of a cluster id, a relative membership value 
-            in [0,1], and a reference to the cluster object.
+            Membership results as tuples of cluster id, relative membership in [0,1], and the
+            corresponding cluster object.
         """
 
         ...
@@ -141,7 +147,29 @@ class ClusterActions (ABC):
     @abstractmethod
     def get_cluster_influences( self, 
                                 p_instance : Instance,
-                                p_scope : int = C_RESULT_SCOPE_MAX ) -> List[ResultItem]: ...
+                                p_scope : int = C_RESULT_SCOPE_MAX ) -> List[ResultItem]: 
+        """
+        Determines the relative influences of the managed clusters on an instance.
+
+        The cluster-specific influence measure is provided by Cluster.get_influence() or an
+        equivalent implementation of the cluster interface.
+
+        Parameters
+        ----------
+        p_instance : Instance
+            Instance to be evaluated.
+        p_scope : int
+            Scope of the result. Use C_RESULT_SCOPE_ALL for all clusters or C_RESULT_SCOPE_MAX for
+            the cluster with the highest influence.
+
+        Returns
+        -------
+        List[ResultItem]
+            Influence results as tuples of cluster id, relative influence in [0,1], and the
+            corresponding cluster object.
+        """
+
+        ...
 
 
 
@@ -149,39 +177,212 @@ class ClusterActions (ABC):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class ClusterInfrastructure (ClusterActions):    # EventManager, Plottable, 
+@dataclass
+class EventConfigCA (EventConfig):
     """
-    Base class for online cluster analysis. It raises an event when a cluster was added or removed.
+    Event configuration for cluster analyzers.
 
-    Steps to implement a new algorithm are:
-    - Create a new class and inherit from this base class
-    - Specify all cluster properties provided/maintained by your algorithm in C_CLUSTER_PROPERTIES.
-    - Implement method self._adapt() to update your cluster list on new instances
-    - Implement method self._adapt_reverse() to update your cluster list on obsolete instances
-    - New cluster: hand over self._cluster_properties.values() on instantiation
-    
-    Parameters
-    ----------
-    p_cls_cluster 
-        Cluster class (Class Cluster or a child class).
-    p_cluster_limit : int
-        Optional limit for clusters to be created. Default = 0 (no limit).
-    p_thrs_cluster_influence : float
-        Threshold for cluster influence. Default = 0.0.
-    p_visualize : bool
-        Boolean switch for visualisation. Default = False.
-    p_logging
-        Log level (see constants of class Log). Default: Log.C_LOG_ALL
+    The configuration extends the generic event configuration by switches for changes of the cluster
+    population. Both cluster-specific events are disabled by default and can be enabled independently
+    from outside the analyzer.
 
     Attributes
     ----------
-    C_RESULT_SCOPE_ALL : int = 0
-        Result scope, that includes all clusters
-    C_RESULT_SCOPE_MAX : int = 2
-        Result scope, that includes just the cluster with the highest result value.
+    CLUSTER_ADDED : EventModeML
+        Event mode for notifications about newly added clusters.
+    CLUSTER_REMOVED : EventModeML
+        Event mode for notifications about removed clusters.
+    """
+
+    CLUSTER_ADDED   : EventModeML = EventModeML.OFF
+    CLUSTER_REMOVED : EventModeML = EventModeML.OFF
+
+
+
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
+class ClusterAnalyzer (OAStreamTask, ClusterActions):
+    """
+    Lightweight base class for online cluster analysis.
+
+    ClusterAnalyzer combines the execution semantics of OAStreamTask with the abstract cluster
+    interface defined by ClusterActions. It intentionally does not prescribe a concrete cluster
+    implementation or cluster-management infrastructure. Specialized analyzers can therefore provide
+    their own high-performance cluster representation and storage while reusing the standard OA
+    stream-task, event, plotting, and adaptation mechanisms.
+
+    Parameters
+    ----------
+    p_name : str
+        Optional task name. Default is None.
+    p_range_max
+        Maximum range of asynchronicity. Default is OAStreamTask.C_RANGE_THREAD.
+    p_ada : bool
+        Enables or disables adaptivity. Default is True.
+    p_duplicate_data : bool
+        If True, incoming instances are duplicated before processing. Default is False.
+    p_event_config : EventConfigCA
+        Event configuration used by the analyzer. Default is EventConfigCA().
+    p_visualize : bool
+        Enables or disables visualization. Default is False.
+    p_logging
+        Log level according to class Log. Default is Log.C_LOG_ALL.
+    **p_kwargs
+        Further optional keyword arguments forwarded to the underlying OA stream task.
+    """
+
+    C_TYPE                          = 'Cluster Analyzer'
+
+    C_EVENT_CLUSTER_ADDED           = 'CLUSTER_ADDED'
+    C_EVENT_CLUSTER_REMOVED         = 'CLUSTER_REMOVED'
+
+    C_PLOT_ACTIVE                   = True
+    C_PLOT_STANDALONE               = False
+
+## -------------------------------------------------------------------------------------------------
+    def __init__( self, 
+                  p_name: str = None, 
+                  p_range_max = OAStreamTask.C_RANGE_THREAD, 
+                  p_ada: bool = True, 
+                  p_duplicate_data: bool = False, 
+                  p_event_config : EventConfigCA = EventConfigCA(),
+                  p_visualize: bool = False, 
+                  p_logging = Log.C_LOG_ALL, 
+                  **p_kwargs ):
+        
+        OAStreamTask.__init__( self,
+                               p_name = p_name, 
+                               p_range_max = p_range_max, 
+                               p_ada = p_ada, 
+                               p_duplicate_data = p_duplicate_data, 
+                               p_event_config = p_event_config,
+                               p_visualize = p_visualize, 
+                               p_logging = p_logging, 
+                               **p_kwargs )
+
+        ClusterActions.__init__( self )
+
+
+## -------------------------------------------------------------------------------------------------
+    def _run(self, p_instances : InstDict):
+        """
+        Processes a batch of stream instances by forwarding it to the adaptive model.
+
+        Parameters
+        ----------
+        p_instances : InstDict
+            Dictionary of stream instances to be processed.
+        """
+
+        self.adapt( p_instances = p_instances )
+
+
+## -------------------------------------------------------------------------------------------------
+    def init_plot(self, p_figure: Figure = None, p_plot_settings: PlotSettings = None):
+        """
+        Initializes the analyzer plot and propagates plot initialization to all current clusters.
+
+        Parameters
+        ----------
+        p_figure : Figure
+            Optional matplotlib figure.
+        p_plot_settings : PlotSettings
+            Optional plot settings.
+        """
+
+        if not self.get_visualization(): return
+
+        super().init_plot( p_figure=p_figure, p_plot_settings=p_plot_settings)
+
+        for cluster in self.clusters.values():
+            cluster.init_plot(p_figure=p_figure, p_plot_settings = p_plot_settings)
+
+
+## -------------------------------------------------------------------------------------------------
+    def update_plot( self, 
+                     p_instances : InstDict = None, 
+                     **p_kwargs ):
+        """
+        Updates the visualization of all current clusters.
+
+        Parameters
+        ----------
+        p_instances : InstDict
+            Optional stream instances related to the current update.
+        **p_kwargs
+            Further plot-specific keyword arguments forwarded to the clusters.
+        """
+
+        if not self.get_visualization(): return
+
+        for cluster in self.clusters.values():
+            cluster.update_plot( p_instances = p_instances, **p_kwargs)
+
+
+## -------------------------------------------------------------------------------------------------
+    def remove_plot(self, p_refresh:bool = True):
+        """
+        Removes the plots of all current clusters.
+
+        Parameters
+        ----------
+        p_refresh : bool
+            If True, requests a display refresh after plot removal. Default is True.
+        """
+
+        if not self.get_visualization(): return
+
+        for cluster in self.clusters.values():
+            cluster.remove_plot( p_refresh = False)
+
+        
+## -------------------------------------------------------------------------------------------------
+    def _renormalize(self, p_normalizer: Normalizer):
+        """
+        Renormalizes all current clusters with the supplied normalizer.
+
+        This hook is used by the OA task's event-driven renormalization mechanism.
+
+        Parameters
+        ----------
+        p_normalizer : Normalizer
+            Normalizer to be applied to all clusters.
+        """
+
+        for cluster in self.clusters.values():
+            cluster.renormalize( p_normalizer=p_normalizer )
+
+
+
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
+class ClusterInfrastructure (ClusterActions):   
+    """
+    Reusable cluster-management infrastructure for cluster analyzers.
+
+    This mixin implements cluster creation limits, cluster identifiers, cluster storage, and the
+    evaluation of membership and influence relations. It contains no task or stream-task semantics
+    of its own and is intended to be combined with ClusterAnalyzer or another compatible host class.
+
+    Parameters
+    ----------
+    p_cls_cluster : type
+        Cluster class used by the infrastructure. Default is Cluster.
+    p_cluster_limit : int
+        Maximum number of clusters. A value of 0 disables the limit. Default is 0.
+    p_thrs_cluster_influence : float
+        Optional lower threshold for cluster influence clipping. Default is None.
+
+    Attributes
+    ----------
     C_CLUSTER_PROPERTIES : PropertyDefinitions
-        List of cluster properties supported/maintained by the algorithm. These properties 
-        are handed over to each new cluster.
+        Property definitions maintained by the standard MLPro cluster infrastructure.
+    C_EPSILON_CI : float
+        Small offset used when shifting non-positive influence values.
     """
 
     # List of cluster properties supported/maintained by the algorithm
@@ -243,12 +444,12 @@ class ClusterInfrastructure (ClusterActions):    # EventManager, Plottable,
 ## -------------------------------------------------------------------------------------------------
     def new_cluster_allowed(self) -> bool:
         """
-        Determines whether adding a new cluster is allowed.
+        Checks whether another cluster may be added.
 
         Returns
         -------
         bool
-           True, if adding a new cluster allowed. False otherwise.
+            True if the configured cluster limit has not been reached or no limit is active.
         """
 
         return ( self._cluster_limit == 0 ) or ( len(self.clusters.keys()) < self._cluster_limit )
@@ -256,11 +457,29 @@ class ClusterInfrastructure (ClusterActions):    # EventManager, Plottable,
 
 ## -------------------------------------------------------------------------------------------------
     def get_cluster_cls(self):
+        """
+        Returns the cluster class configured for this infrastructure.
+
+        Returns
+        -------
+        type
+            Configured cluster class.
+        """
+
         return self._cls_cluster
     
 
 ## -------------------------------------------------------------------------------------------------
     def _get_next_cluster_id(self) -> ClusterId:
+        """
+        Generates the next cluster identifier.
+
+        Returns
+        -------
+        ClusterId
+            Next monotonically increasing cluster id.
+        """
+
         self._next_cluster_id += 1
         return self._next_cluster_id
     
@@ -268,8 +487,9 @@ class ClusterInfrastructure (ClusterActions):    # EventManager, Plottable,
 ## -------------------------------------------------------------------------------------------------
     def _add_cluster(self, p_cluster:Cluster) -> bool:
         """
-        Protected method to be used to add a new cluster. Please use as part of your algorithm. 
-        Please use method new_cluster_allowed() before adding a cluster.
+        Adds a cluster to the managed cluster collection.
+
+        Algorithms should call new_cluster_allowed() before invoking this method.
 
         Parameters
         ----------
@@ -282,28 +502,20 @@ class ClusterInfrastructure (ClusterActions):    # EventManager, Plottable,
         if self.get_visualization(): 
             p_cluster.init_plot( p_figure=self._figure, p_plot_settings=self.get_plot_settings() )
 
-        # self._raise_event( p_event_id = self.C_EVENT_CLUSTER_ADDED, 
-        #                    p_event_object = MLProEvent( p_raising_object = self,
-        #                                                 p_cluster = p_cluster ) )
-
 
 ## -------------------------------------------------------------------------------------------------
     def _remove_cluster(self, p_cluster:Cluster):
         """
-        Protected method to remove an existing cluster. Please use as part of your algorithm.
+        Removes a cluster from the managed cluster collection.
 
         Parameters
         ----------
         p_cluster : Cluster
-            Cluster object to be added.
+            Cluster object to be removed.
         """
 
         p_cluster.remove_plot(p_refresh=True)
         del self.clusters[p_cluster.id]
-
-        # self._raise_event( p_event_id = self.C_EVENT_CLUSTER_REMOVED, 
-        #                    p_event_object = MLProEvent( p_raising_object = self,
-        #                                                 p_cluster = p_cluster ) )
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -313,28 +525,27 @@ class ClusterInfrastructure (ClusterActions):    # EventManager, Plottable,
                                 p_relative_values : bool ,
                                 p_scope : int ) -> List[ResultItem]:
         """
-        Internal method to determine the relation of the given instance to each cluster as a value in 
-        percent. Currently supported relations are membership and influence. 
+        Evaluates one cluster relation for the given instance across the managed clusters.
 
-        See also: public methods get_cluster_memberships() and get_cluster influences()
+        Relation type 0 evaluates membership, while type 1 evaluates influence. Influence values can
+        optionally be clipped by p_thrs_cluster_influence. If relative values are requested, the
+        absolute relation values are normalized over the selected result scope.
 
-                
         Parameters
         ----------
         p_relation_type : int
-            Possible values are 0 (cluster membership) and 1 (cluster influence)
+            Relation type: 0 for membership or 1 for influence.
         p_instance : Instance
             Instance to be evaluated.
         p_relative_values : bool
-            If True, the result values are relative (i.e., normalized to the sum of all results).
+            If True, normalizes the resulting relation values.
         p_scope : int
-            Scope of the result list. See class attributes C_RESULT_SCOPE_* for possible values.
+            Result scope, typically C_RESULT_SCOPE_ALL or C_RESULT_SCOPE_MAX.
 
         Returns
         -------
-        results : List[ResultItem]
-            List of result items which are tuples of a cluster id, a relative result 
-            value in [0,1] and a reference to the cluster object.
+        List[ResultItem]
+            Evaluated cluster relations for the requested scope.
         """
 
         # 1 Determination of membership values of the instance for all clusters
@@ -404,24 +615,19 @@ class ClusterInfrastructure (ClusterActions):    # EventManager, Plottable,
                                  p_instance : Instance,
                                  p_scope : int = ClusterActions.C_RESULT_SCOPE_MAX ) -> List[ResultItem]:
         """
-        Method to determine the relative membership of the given instance to each cluster as a value 
-        in [0,1]. 
-        
-        See also: method Cluster.get_membership().
+        Determines relative cluster memberships for the given instance.
 
         Parameters
         ----------
         p_instance : Instance
             Instance to be evaluated.
         p_scope : int
-            Scope of the result list. See class attributes C_RESULT_SCOPE_* for possible values. Default
-            value is C_RESULT_SCOPE_MAX.
+            Result scope. Default is C_RESULT_SCOPE_MAX.
 
         Returns
         -------
         List[ResultItem]
-            List of membership items which are tuples of a cluster id, a relative membership value 
-            in [0,1], and a reference to the cluster object.
+            Membership results as tuples of cluster id, relative membership, and cluster object.
         """
 
         return self._get_cluster_relations( p_relation_type = 0,
@@ -435,24 +641,19 @@ class ClusterInfrastructure (ClusterActions):    # EventManager, Plottable,
                                 p_instance : Instance,
                                 p_scope : int = ClusterActions.C_RESULT_SCOPE_MAX ) -> List[ResultItem]:
         """
-        Method to determine the relative influence of the given instance to each cluster as a value 
-        in [0,1]. 
-        
-        See also: method Cluster.get_influence().
+        Determines relative cluster influences for the given instance.
 
         Parameters
         ----------
         p_instance : Instance
             Instance to be evaluated.
         p_scope : int
-            Scope of the result list. See class attributes C_RESULT_SCOPE_* for possible values. Default
-            value is C_RESULT_SCOPE_MAX.
+            Result scope. Default is C_RESULT_SCOPE_MAX.
 
         Returns
         -------
         List[ResultItem]
-            List of influence items which are tuples of a cluster id, a relative influence value in 
-            [0,1], and a reference to the cluster object.
+            Influence results as tuples of cluster id, relative influence, and cluster object.
         """
 
         return self._get_cluster_relations( p_relation_type = 1,
@@ -466,63 +667,44 @@ class ClusterInfrastructure (ClusterActions):    # EventManager, Plottable,
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class ClusterAnalyzer (OAStreamTask, ClusterInfrastructure):
+class ClusterAnalyzerExt (ClusterAnalyzer, ClusterInfrastructure):
     """
-    Base class for online cluster analysis. It raises an event when a cluster was added or removed.
+    Extended MLPro cluster analyzer with the standard cluster infrastructure.
 
-    Steps to implement a new algorithm are:
-    - Create a new class and inherit from this base class
-    - Specify all cluster properties provided/maintained by your algorithm in C_CLUSTER_PROPERTIES.
-    - Implement method self._adapt() to update your cluster list on new instances
-    - Implement method self._adapt_reverse() to update your cluster list on obsolete instances
-    - New cluster: hand over self._cluster_properties.values() on instantiation
-    
+    This convenience class combines the lightweight ClusterAnalyzer task layer with
+    ClusterInfrastructure. It represents the standard MLPro implementation for analyzers that use
+    MLPro cluster objects and the generic cluster-property infrastructure.
+
     Parameters
     ----------
     p_name : str
-        Optional name of the task. Default is None.
-    p_range_max : int
-        Maximum range of asynchonicity. See class Range. Default is Range.C_RANGE_PROCESS.
+        Optional task name. Default is None.
+    p_range_max
+        Maximum range of asynchronicity. Default is OAStreamTask.C_RANGE_PROCESS.
     p_ada : bool
-        Boolean switch for adaptivitiy. Default = True.
+        Enables or disables adaptivity. Default is True.
     p_duplicate_data : bool
-        If True, instances will be duplicated before processing. Default = False.
-    p_cls_cluster 
-        Cluster class (Class Cluster or a child class).
+        If True, incoming instances are duplicated before processing. Default is False.
+    p_cls_cluster : type
+        Cluster class used by the infrastructure. Default is Cluster.
     p_cluster_limit : int
-        Optional limit for clusters to be created. Default = 0 (no limit).
+        Maximum number of clusters. A value of 0 disables the limit. Default is 0.
     p_thrs_cluster_influence : float
-        Threshold for cluster influence. Default = 0.0.
+        Optional threshold for cluster influence clipping. Default is None.
     p_visualize : bool
-        Boolean switch for visualisation. Default = False.
+        Enables or disables visualization. Default is False.
     p_logging
-        Log level (see constants of class Log). Default: Log.C_LOG_ALL
-    p_kwargs : dict
-        Further optional named parameters.
-
-    Attributes
-    ----------
-    C_RESULT_SCOPE_ALL : int = 0
-        Result scope, that includes all clusters
-    C_RESULT_SCOPE_MAX : int = 2
-        Result scope, that includes just the cluster with the highest result value.
-    C_CLUSTER_PROPERTIES : PropertyDefinitions
-        List of cluster properties supported/maintained by the algorithm. These properties 
-        are handed over to each new cluster.
+        Log level according to class Log. Default is Log.C_LOG_ALL.
+    **p_kwargs
+        Further optional keyword arguments forwarded to ClusterAnalyzer.
     """
 
-    C_TYPE                          = 'Cluster Analyzer'
-
-    C_EVENT_CLUSTER_ADDED           = 'CLUSTER_ADDED'
-    C_EVENT_CLUSTER_REMOVED         = 'CLUSTER_REMOVED'
-
-    C_PLOT_ACTIVE                   = True
-    C_PLOT_STANDALONE               = False
+    C_TYPE  = 'Cluster Analyzer (Ext)'
 
 ## -------------------------------------------------------------------------------------------------
     def __init__( self, 
                   p_name: str = None, 
-                  p_range_max = OAStreamTask.C_RANGE_THREAD, 
+                  p_range_max = OAStreamTask.C_RANGE_PROCESS, 
                   p_ada: bool = True, 
                   p_duplicate_data: bool = False, 
                   p_cls_cluster : type = Cluster,
@@ -532,77 +714,16 @@ class ClusterAnalyzer (OAStreamTask, ClusterInfrastructure):
                   p_logging = Log.C_LOG_ALL, 
                   **p_kwargs ):
         
-        OAStreamTask.__init__( self,
-                               p_name = p_name, 
-                               p_range_max = p_range_max, 
-                               p_ada = p_ada, 
-                               p_duplicate_data = p_duplicate_data, 
-                               p_visualize = p_visualize, 
-                               p_logging = p_logging, 
-                               **p_kwargs )
+        ClusterAnalyzer.__init__( self,
+                                  p_name = p_name, 
+                                  p_range_max = p_range_max, 
+                                  p_ada = p_ada, 
+                                  p_duplicate_data = p_duplicate_data, 
+                                  p_visualize = p_visualize, 
+                                  p_logging = p_logging, 
+                                  **p_kwargs )
 
         ClusterInfrastructure.__init__( self, 
                                         p_cls_cluster = p_cls_cluster,
                                         p_cluster_limit = p_cluster_limit,
                                         p_thrs_cluster_influence = p_thrs_cluster_influence )
-
-
-## -------------------------------------------------------------------------------------------------
-    def _run(self, p_instances : InstDict):
-        self.adapt( p_instances = p_instances )
-
-
-## -------------------------------------------------------------------------------------------------
-    def init_plot(self, p_figure: Figure = None, p_plot_settings: PlotSettings = None):
-
-        if not self.get_visualization(): return
-
-        super().init_plot( p_figure=p_figure, p_plot_settings=p_plot_settings)
-
-        for cluster in self.clusters.values():
-            cluster.init_plot(p_figure=p_figure, p_plot_settings = p_plot_settings)
-
-
-## -------------------------------------------------------------------------------------------------
-    def update_plot( self, 
-                     p_instances : InstDict = None, 
-                     **p_kwargs ):
-
-        if not self.get_visualization(): return
-
-        for cluster in self.clusters.values():
-            cluster.update_plot( p_instances = p_instances, **p_kwargs)
-
-
-## -------------------------------------------------------------------------------------------------
-    def remove_plot(self, p_refresh:bool = True):
-        """"
-        Removes the plot and optionally refreshes the display.
-
-        Parameters
-        ----------
-        p_refresh : bool = True
-            On True the display is refreshed after removal
-        """
-
-        if not self.get_visualization(): return
-
-        for cluster in self.clusters.values():
-            cluster.remove_plot( p_refresh = False)
-
-        
-## -------------------------------------------------------------------------------------------------
-    def _renormalize(self, p_normalizer: Normalizer):
-        """
-        Internal renormalization of all clusters. See method OATask.renormalize_on_event() for further
-        information.
-
-        Parameters
-        ----------
-        p_normalizer : Normalizer
-            Normalizer object to be applied on task-specific 
-        """
-
-        for cluster in self.clusters.values():
-            cluster.renormalize( p_normalizer=p_normalizer )
-

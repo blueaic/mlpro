@@ -23,6 +23,8 @@ The instance dictionary carried through a workflow does not only contain data ob
 
 A StreamWorkflow builds on MLPro's multitasking layer. Independent branches can therefore be executed according to their predecessor dependencies and configured range of asynchronicity, while the shared object provides task-specific results and instance sets.
 
+``StreamTask`` also inherits MLPro's event-management infrastructure and forwards the optional ``p_event_config`` parameter to its underlying ``Task``. Stream-processing implementations can therefore expose their own configurable events without introducing a separate callback mechanism. As elsewhere in MLPro, the event mode should be queried before creating the corresponding event object.
+
 The detailed page shows how to implement own StreamTasks, connect them to workflows, and orchestrate them with StreamScenario.
 
 

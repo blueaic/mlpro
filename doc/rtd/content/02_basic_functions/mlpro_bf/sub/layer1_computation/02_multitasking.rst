@@ -47,6 +47,8 @@ relationships. Successor tasks are informed about the termination of their prede
 consistently reused in higher functions through inheritance. Some examples are :ref:`Stream Processing <target_bf_streams_processing>` 
 and the :ref:`Adaptive Workflows <target_bf_ml_workflows>`.
 
+``Task`` integrates ``EventManager`` and therefore accepts the optional parameter ``p_event_config``. This provides a common configuration channel for event-capable task subclasses. Such subclasses can query ``_get_event_mode()`` before constructing an event object and thereby suppress disabled events without unnecessary object creation. The built-in ``C_EVENT_FINISHED`` event continues to coordinate predecessor/successor execution in workflows.
+
 
 **Gap under MacOS**
 

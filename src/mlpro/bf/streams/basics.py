@@ -95,10 +95,11 @@
 ## -- 2025-09-21  3.4.0     DA       Class Stream, MultiStream: adjustments and bugfixes
 ## -- 2025-10-23  3.4.1     DA       Bugfix in StreamTask._update_plot_3d()
 ## -- 2025-10-24  3.5.0     DA       Refactoring of plot legend handling in StreamTask._update_plot_nd()
+## -- 2026-10-05  3.6.0     DA       Class StreamTask: new parameter p_event_config
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 3.5.0 (2025-10-24)
+Ver. 3.6.0 (2026-10-05)
 
 This module provides classes for standardized data stream processing. 
 
@@ -111,17 +112,12 @@ from itertools import cycle
 import time
 from datetime import timedelta, datetime
 
-try:
-    from matplotlib.figure import Figure
-except:
-    class Figure : pass
-
 from mlpro.bf.various import Id, TStampType, TStamp, KWArgs, ScientificObject, Log
 from mlpro.bf.exceptions import Error, ImplementationError, ParamError
-from mlpro.bf.events import Event
+from mlpro.bf.events import EventConfig, Event
 from mlpro.bf.ops import Mode, ScenarioBase
 from mlpro.bf.mt import Range, Shared, Task, Workflow
-from mlpro.bf.plot import Plottable, PlotSettings
+from mlpro.bf.plot import Figure, Plottable, PlotSettings
 from mlpro.bf.math import Dimension, Element, MSpace
 
 
@@ -1124,6 +1120,11 @@ class StreamTask (Task):
         Maximum range of asynchonicity. See class Range. Default is Range.C_RANGE_PROCESS.
     p_duplicate_data : bool
         If True, instances will be duplicated before processing. Default = False.
+    p_event_config : EventConfig, optional
+        Optional event configuration passed to the inherited event manager. Concrete event-capable
+        stream tasks can query it through
+        :meth:`mlpro.bf.events.EventManager._get_event_mode`. If omitted, queried events default
+        to :attr:`mlpro.bf.events.EventMode.EVENT`.
     p_visualize : bool
         Boolean switch for visualisation. Default = False.
     p_logging
@@ -1149,6 +1150,7 @@ class StreamTask (Task):
                   p_name: str = None, 
                   p_range_max = Task.C_RANGE_THREAD, 
                   p_duplicate_data : bool = False,
+                  p_event_config : EventConfig = None,
                   p_visualize : bool = False,
                   p_logging = Log.C_LOG_ALL, 
                   **p_kwargs ):
@@ -1158,6 +1160,7 @@ class StreamTask (Task):
                        p_range_max=p_range_max, 
                        p_autorun=Task.C_AUTORUN_NONE, 
                        p_class_shared=None, 
+                       p_event_config=p_event_config,
                        p_visualize=p_visualize,
                        p_logging=p_logging, 
                        **p_kwargs )

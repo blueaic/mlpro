@@ -76,10 +76,12 @@
 ## --                                  - Incorporation of new class Adaptation
 ## -- 2025-06-02  2.5.0     DA       New class AdaptationType
 ## -- 2025-07-15  2.5.1     DA       Class AdaptationType: replaced parent class StrEnum by str
+## -- 2026-10-05  2.6.0     DA       - New class EventModeML
+## --                                - Classes Model, AdaptiveFunction: new parameter p_event_config
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.5.1 (2025-07-15)
+Ver. 2.6.0 (2026-10-05)
 
 This module provides the fundamental templates and processes for machine learning in MLPro.
 
@@ -87,10 +89,11 @@ This module provides the fundamental templates and processes for machine learnin
 
 import random
 from datetime import datetime
+from enum import IntEnum
 import os
 
 from mlpro.bf.various import *
-from mlpro.bf.events import Event
+from mlpro.bf.events import *
 from mlpro.bf.exceptions import *
 from mlpro.bf.plot import PlotSettings 
 from mlpro.bf.math import *
@@ -103,18 +106,19 @@ class Figure: pass
 
 
 # Export list for public API
-__all__ = [ 'Model',
-            'AWorkflow',
-            'Adaptation',
-            'AdaptationType',
-            'HyperParam',
+__all__ = [ 'HyperParam',
             'HyperParamSpace',
             'HyperParamTuple',
             'HyperParamDispatcher',
+            'AdaptationType',
+            'Adaptation',
+            'EventModeML',
+            'Model',
+            'AWorkflow',
             'Scenario',
-            'Training',
             'TrainingResults',
             'HyperParamTuner',
+            'Training',
             'AdaptiveFunction' ]
 
 
@@ -263,6 +267,32 @@ class Adaptation (Event):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
+class EventModeML(IntEnum):
+    """
+    Extends :class:`mlpro.bf.events.EventMode` with ML-specific adaptation semantics.
+
+    Attributes
+    ----------
+    OFF : int
+        Event is disabled.
+    EVENT : int
+        Event is enabled and may be raised without implying model adaptation.
+    ADAPTATION : int
+        Event is enabled and additionally represents a model adaptation. Concrete ML
+        implementations are responsible for evaluating this mode and integrating it into their
+        adaptation logic.
+    """
+
+    OFF        = EventMode.OFF
+    EVENT      = EventMode.EVENT
+    ADAPTATION = 2
+
+
+
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 class Model (Task, ScientificObject):
     """
     Fundamental template class for adaptive ML models. Supports in particular
@@ -292,6 +322,10 @@ class Model (Task, ScientificObject):
         actions.    
     p_class_shared
         Optional class for a shared object (class Shared or a child class of it)
+    p_event_config : EventConfig, optional
+        Optional event configuration passed to the inherited event manager. ML-specific event
+        switches may use :class:`EventModeML`. If omitted, queried events default to
+        :attr:`EventMode.EVENT`.
     p_visualize : bool
         Boolean switch for visualisation. Default = False.
     p_logging
@@ -319,6 +353,7 @@ class Model (Task, ScientificObject):
                   p_range_max: int = Async.C_RANGE_PROCESS, 
                   p_autorun = Task.C_AUTORUN_NONE, 
                   p_class_shared=None, 
+                  p_event_config : EventConfig = None,
                   p_visualize: bool = False, 
                   p_logging=Log.C_LOG_ALL, 
                   **p_par ):
@@ -329,6 +364,7 @@ class Model (Task, ScientificObject):
                        p_range_max = p_range_max, 
                        p_autorun = p_autorun, 
                        p_class_shared = p_class_shared, 
+                       p_event_config = p_event_config,
                        p_visualize = p_visualize, 
                        p_logging = p_logging )
 
@@ -446,12 +482,14 @@ class Model (Task, ScientificObject):
                       p_tstamp : TStampType = None,
                       **p_kwargs ):
         """
-        Sets the adapted flag and raises an adaptation event.
+        Updates the internal adaptation state and, if applicable, raises the model's adaptation
+        event.
 
         Parameters
         ----------
         p_adapted : bool
-            Adaptation flag. If True and event handlers are registered an adaptation event is raised.
+            Adaptation flag. If True and at least one event handler is registered, an adaptation
+            event of type :attr:`C_EVENT_CLS` is dispatched under :attr:`C_EVENT_ADAPTED`.
         p_subtype : AdaptationType
             Subtype of adaptation. See class AdaptationType for further details.
         p_tstamp : TStampType = None
@@ -530,17 +568,19 @@ class Model (Task, ScientificObject):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def adapt_on_event(self, p_event_id:str, p_event_object:Event):
+    def adapt_on_event(self, p_event_id: EventId, p_event_object: Event):
         """
-        Method to be used as event handler for event-based adaptations. Calls custom method 
-        _adapt_on_event() and updates the internal adaptation state.
+        Handles an incoming event by triggering an event-based model adaptation.
+
+        The concrete adaptation logic is delegated to :meth:`_adapt_on_event`. Its return value is
+        forwarded to :meth:`_set_adapted` using :attr:`AdaptationType.EVENT`.
 
         Parameters
         ----------
-        p_event_id : str
-            Event id.
+        p_event_id : EventId
+            Unique identifier of the triggering event.
         p_event_object : Event
-            Object with further context informations about the event.
+            Event object carrying the event context.
         """
 
         self._set_adapted( p_adapted = self._adapt_on_event( p_event_id=p_event_id, 
@@ -549,21 +589,21 @@ class Model (Task, ScientificObject):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def _adapt_on_event(self, p_event_id:str, p_event_object:Event) -> bool:
+    def _adapt_on_event(self, p_event_id: EventId, p_event_object: Event) -> bool:
         """
-        Custom method to be used for event-based adaptation. See method adapt_on_event().
+        Custom method implementing an event-based adaptation.
 
         Parameters
         ----------
-        p_event_id : str
-            Event id.
+        p_event_id : EventId
+            Unique identifier of the triggering event.
         p_event_object : Event
-            Object with further context informations about the event.
+            Event object carrying the event context.
 
         Returns
         -------
         adapted : bool
-            True, if something was adapted. False otherwise.
+            True if the model was adapted, otherwise False.
         """
 
         raise NotImplementedError
@@ -1530,6 +1570,10 @@ class AdaptiveFunction (Function, Model):
         actions.    
     p_class_shared
         Optional class for a shared object (class Shared or a child class of it)
+    p_event_config : EventConfig, optional
+        Optional event configuration passed to the inherited event manager. ML-specific event
+        switches may use :class:`EventModeML`. If omitted, queried events default to
+        :attr:`EventMode.EVENT`.
     p_visualize : bool
         Boolean switch for visualisation. Default = False.
     p_logging
@@ -1552,6 +1596,7 @@ class AdaptiveFunction (Function, Model):
                   p_range_max: int = Async.C_RANGE_PROCESS, 
                   p_autorun = Task.C_AUTORUN_NONE, 
                   p_class_shared=None, 
+                  p_event_config : EventConfig = None,
                   p_visualize: bool = False, 
                   p_logging=Log.C_LOG_ALL, 
                   **p_par ):
@@ -1568,6 +1613,7 @@ class AdaptiveFunction (Function, Model):
                         p_range_max = p_range_max,
                         p_autorun = p_autorun,
                         p_class_shared = p_class_shared,
+                        p_event_config = p_event_config,
                         p_visualize = p_visualize,
                         p_logging = p_logging, 
                         **p_par )

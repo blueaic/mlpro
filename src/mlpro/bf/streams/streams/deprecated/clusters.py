@@ -335,7 +335,7 @@ class StreamMLProClusterGenerator (StreamMLProBase, EventManager):
                                   p_logging=p_logging,
                                   **p_kwargs)
         
-        EventManager.__init__(self, p_logging=p_logging)    
+        EventManager.__init__(self)    
 
 
         # 4 Initialize seeding
