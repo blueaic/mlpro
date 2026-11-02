@@ -76,7 +76,7 @@ class ClusterAPI (ABC, Id, Plottable):
     """
     Minimal abstract representation of a cluster.
 
-    ClusterBase defines only the generic cluster identity, optional visualization support, and the
+    ClusterAPI defines only the generic cluster identity, optional visualization support, and the
     two relation operations required by cluster analyzers. It is intentionally independent of
     MLPro's property model and can therefore serve as a lightweight base for specialized or
     high-performance cluster implementations.
@@ -176,7 +176,7 @@ class Cluster (ClusterAPI, Properties, KWArgs):
     """
     Property-based MLPro cluster template.
 
-    Cluster extends the lightweight ClusterBase by MLPro's generic Properties and KWArgs mechanisms.
+    Cluster extends the lightweight ClusterAPI by MLPro's generic Properties and KWArgs mechanisms.
     It is intended for conventional MLPro cluster analyzers that benefit from dynamically configured
     cluster properties. The concrete membership and influence semantics remain the responsibility of
     specialized subclasses.
