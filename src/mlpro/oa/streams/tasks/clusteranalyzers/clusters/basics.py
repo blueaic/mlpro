@@ -41,11 +41,11 @@
 ## -- 2024-07-08  2.1.0     DA       Class Cluster: hand over of kwargs to inner properties
 ## -- 2025-06-06  2.2.0     DA       Refactoring: p_inst -> p_instances
 ## -- 2025-06-11  2.3.0     DA       New method Cluster.update_properties()
-## -- 2026-10-06  2.4.0     DA       New class ClusterBase
+## -- 2026-11-02  2.4.0     DA       New class ClusterAPI
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.4.0 (2026-10-06)
+Ver. 2.4.0 (2026-11-02)
 
 This module provides a template class for clusters to be used in cluster analyzer algorithms.
 
@@ -61,7 +61,7 @@ from mlpro.bf.streams import Instance
 
 # Export list for public API
 __all__ = [ 'ClusterId',
-            'ClusterBase',
+            'ClusterAPI',
             'Cluster' ]
 
 
@@ -72,7 +72,7 @@ ClusterId = int
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class ClusterBase (ABC, Id, Plottable):
+class ClusterAPI (ABC, Id, Plottable):
     """
     Minimal abstract representation of a cluster.
 
@@ -172,7 +172,7 @@ class ClusterBase (ABC, Id, Plottable):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class Cluster (ClusterBase, Properties, KWArgs):
+class Cluster (ClusterAPI, Properties, KWArgs):
     """
     Property-based MLPro cluster template.
 
@@ -195,24 +195,6 @@ class Cluster (ClusterBase, Properties, KWArgs):
         Further keyword arguments used by the property infrastructure.
     """
 
-    C_PLOT_ACTIVE           = True
-    C_PLOT_STANDALONE       = False
-    C_PLOT_VALID_VIEWS      = [ PlotSettings.C_VIEW_2D, 
-                                PlotSettings.C_VIEW_3D, 
-                                PlotSettings.C_VIEW_ND ]
-    C_PLOT_DEFAULT_VIEW     = PlotSettings.C_VIEW_ND
-
-    C_CLUSTER_COLORS        = [ 'brown', 
-                                'olive', 
-                                'orange', 
-                                'green', 
-                                'red', 
-                                'gray', 
-                                'purple', 
-                                'pink', 
-                                'cyan', 
-                                'blue' ]
-
 ## -------------------------------------------------------------------------------------------------
     def __init__( self, 
                   p_id : ClusterId,
@@ -226,10 +208,10 @@ class Cluster (ClusterBase, Properties, KWArgs):
                              p_properties = p_properties, 
                              p_visualize = p_visualize, 
                              **p_kwargs )
-        ClusterBase.__init__( self, 
-                              p_id = p_id,
-                              p_color = p_color,
-                              p_visualize = p_visualize )
+        ClusterAPI.__init__( self, 
+                             p_id = p_id,
+                             p_color = p_color,
+                             p_visualize = p_visualize )
 
 
 ## -------------------------------------------------------------------------------------------------

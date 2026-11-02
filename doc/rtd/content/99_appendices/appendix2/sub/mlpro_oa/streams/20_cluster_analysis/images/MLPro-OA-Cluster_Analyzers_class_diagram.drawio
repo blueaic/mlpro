@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.4.13 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36">
   <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
-    <mxGraphModel dx="2403" dy="1035" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2336" pageHeight="1654" math="0" shadow="0">
+    <mxGraphModel dx="3393" dy="1461" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2336" pageHeight="1654" math="0" shadow="0">
       <root>
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
@@ -57,7 +57,7 @@
         <mxCell id="lkQwYRyyD5MhjZEy1njy-37" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="ZzQm4s6gQr2k5gAJpQ90-0" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;" target="lkQwYRyyD5MhjZEy1njy-25">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="ZzQm4s6gQr2k5gAJpQ90-0" parent="WIyWlLk6GJQsqaUBKTNV-1" style="swimlane;fontStyle=3;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=53;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=1;strokeWidth=1;fillColor=#dae8fc;strokeColor=#6c8ebf;swimlaneFillColor=#ffffff;gradientColor=#FFFFFF;" value="Cluster &#xa;(ClusterBase, bf.math.Properties,&#xa;bf.various.KWArgs)" vertex="1">
+        <mxCell id="ZzQm4s6gQr2k5gAJpQ90-0" parent="WIyWlLk6GJQsqaUBKTNV-1" style="swimlane;fontStyle=3;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=53;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=1;strokeWidth=1;fillColor=#dae8fc;strokeColor=#6c8ebf;swimlaneFillColor=#ffffff;gradientColor=#FFFFFF;" value="Cluster &#xa;(ClusterAPI, bf.math.Properties,&#xa;bf.various.KWArgs)" vertex="1">
           <mxGeometry height="147" width="300" x="800" y="580" as="geometry">
             <mxRectangle height="26" width="160" x="230" y="140" as="alternateBounds" />
           </mxGeometry>
@@ -369,7 +369,7 @@
         <mxCell id="lkQwYRyyD5MhjZEy1njy-18" parent="lkQwYRyyD5MhjZEy1njy-16" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=default;fontStyle=1" value="CLUSTER_REMOVED : EventModeML = OFF" vertex="1">
           <mxGeometry height="27" width="300" y="68" as="geometry" />
         </mxCell>
-        <mxCell id="lkQwYRyyD5MhjZEy1njy-25" parent="WIyWlLk6GJQsqaUBKTNV-1" style="swimlane;fontStyle=3;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=1;strokeWidth=1;fillColor=#dae8fc;strokeColor=#6c8ebf;swimlaneFillColor=#ffffff;gradientColor=#FFFFFF;" value="ClusterBase&#xa;( ABC, bf.various.Id, bf.plot.Plottable )" vertex="1">
+        <mxCell id="lkQwYRyyD5MhjZEy1njy-25" parent="WIyWlLk6GJQsqaUBKTNV-1" style="swimlane;fontStyle=3;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=1;strokeWidth=1;fillColor=#dae8fc;strokeColor=#6c8ebf;swimlaneFillColor=#ffffff;gradientColor=#FFFFFF;" value="ClusterAPI&#xa;(ABC, bf.various.Id, bf.plot.Plottable)" vertex="1">
           <mxGeometry height="405" width="300" x="800" y="90" as="geometry">
             <mxRectangle height="26" width="160" x="230" y="140" as="alternateBounds" />
           </mxGeometry>
