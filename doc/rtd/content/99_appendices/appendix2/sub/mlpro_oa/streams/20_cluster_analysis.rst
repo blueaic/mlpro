@@ -8,7 +8,7 @@ The cluster-analysis API is organized as a lightweight core with optional standa
 deliberately leaves the concrete cluster representation and management open. ``ClusterInfrastructure`` provides the reusable
 standard MLPro mechanics, and ``ClusterAnalyzerExt`` combines both layers for conventional property-based implementations.
 
-On cluster level, ``ClusterBase`` provides the minimal abstract representation independent of MLPro's property model, while
+On cluster level, ``ClusterAPI`` provides the minimal abstract cluster API independent of MLPro's property model, while
 ``Cluster`` adds the standard ``Properties`` and ``KWArgs`` infrastructure. ``EventConfigCA`` provides the cluster-specific event
 switches ``CLUSTER_ADDED`` and ``CLUSTER_REMOVED``.
 .. image:: 20_cluster_analysis/images/MLPro-OA-Cluster_Analyzers_class_diagram.drawio.png
