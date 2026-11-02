@@ -128,14 +128,14 @@ Cluster model
 
 The cluster model follows the same lightweight-versus-rich separation.
 
-``ClusterBase`` is the minimal abstract cluster representation. It provides cluster identity, optional plot support, and the two
+``ClusterAPI`` is the minimal abstract cluster API. It provides cluster identity, optional plot support, and the two
 generic relation operations ``get_membership()`` and ``get_influence()``. It is deliberately independent of MLPro's generic
 ``Properties`` model.
 
-``Cluster`` extends ``ClusterBase`` with ``Properties`` and ``KWArgs`` and remains the standard MLPro cluster template. Further
+``Cluster`` extends ``ClusterAPI`` with ``Properties`` and ``KWArgs`` and remains the standard MLPro cluster template. Further
 specializations such as ``ClusterCentroid`` and ``ClusterBody`` build on this richer model.
 
-This gives specialized high-performance analyzers a clean option to derive directly from ``ClusterBase`` while conventional MLPro
+This gives specialized high-performance analyzers a clean option to implement or derive directly from ``ClusterAPI`` while conventional MLPro
 algorithms can continue to use the property-based ``Cluster`` hierarchy.
 
 Benchmarking with native BF-Streams
@@ -190,7 +190,7 @@ properties they maintain through ``C_CLUSTER_PROPERTIES``. New clusters can rece
 can be aligned with external consumers. The native property pool includes reusable concepts around cluster centroids and bodies
 as well as derived properties such as **density** and **deformation index**.
 
-This property layer is optional: lightweight implementations can derive their cluster objects directly from ``ClusterBase``
+This property layer is optional: lightweight implementations can derive their cluster objects directly from ``ClusterAPI``
 without carrying the generic property machinery.
 
 Forward and reverse adaptation
