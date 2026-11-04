@@ -36,16 +36,20 @@
 ## --                                - setup() and _setup()   
 ## -- 2025-07-15  1.4.2     DA       Class OAStreamAdaptationType: new parent class AdaptationType   
 ## -- 2025-07-16  1.4.3     DA       Refactoring 
+## -- 2026-10-05  1.5.0     DA       Class OAStreamTask: new parameter p_event_config
+## -- 2026-10-08  1.6.0     DA       Class OAStreamTask: optimization of adaptation 
+## --                                - removed logging
+## --                                - removed expensive try/except statements
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.4.3 (2025-07-16)
+Ver. 1.6.0 (2026-10-08)
 
 Core classes for online-adaptive data stream processing (OADSP).
 
 """
 
-from mlpro.bf.mt import Event
+from mlpro.bf.events import *
 from mlpro.bf.various import Log, TStampType
 from mlpro.bf.plot import PlotSettings
 from mlpro.bf.mt import Task
@@ -53,6 +57,7 @@ from mlpro.bf.ops import Mode
 from mlpro.bf.streams import InstDict, Instance, InstTypeNew, StreamShared, StreamTask, StreamWorkflow, StreamScenario
 from mlpro.bf.math.normalizers import Normalizer
 from mlpro.bf.ml import AdaptationType, Adaptation, Model, AWorkflow
+
 
 
 # Export list for public API
@@ -106,6 +111,8 @@ class OAStreamAdaptation (Adaptation):
         Type of adaptation.
     p_tstamp : TStampType = None
         Time stamp of adaptation.
+    p_num_inst : int
+        Number of stream instances related to the adaptation. Default = 1.
     **p_kwargs
         Further keyword arguments to be transported by the event.
     """
@@ -147,6 +154,10 @@ class OAStreamTask (StreamTask, Model):
         Initial size of internal data buffer. Defaut = 0 (no buffering).
     p_duplicate_data : bool
         If True, instances will be duplicated before processing. Default = False.
+    p_event_config : EventConfig, optional
+        Optional event configuration passed to the inherited event manager. ML-specific event
+        switches may use :class:`mlpro.bf.ml.EventModeML`. If omitted, queried events default to
+        :attr:`mlpro.bf.events.EventMode.EVENT`.
     p_visualize : bool
         Boolean switch for visualisation. Default = False.
     p_logging
@@ -171,6 +182,7 @@ class OAStreamTask (StreamTask, Model):
                   p_ada : bool = True, 
                   p_buffer_size : int = 0,
                   p_duplicate_data : bool = False,
+                  p_event_config : EventConfig = None,
                   p_visualize : bool = False,
                   p_logging = Log.C_LOG_ALL, 
                   **p_kwargs ):
@@ -182,6 +194,7 @@ class OAStreamTask (StreamTask, Model):
                         p_autorun = Task.C_AUTORUN_NONE,
                         p_class_shared = None,
                         p_buffer_size = p_buffer_size,
+                        p_event_config = p_event_config,
                         p_visualize = p_visualize,
                         p_logging = p_logging )    
 
@@ -189,6 +202,7 @@ class OAStreamTask (StreamTask, Model):
                              p_name = p_name,
                              p_range_max = p_range_max,
                              p_duplicate_data = p_duplicate_data,
+                             p_event_config = p_event_config,
                              p_visualize = p_visualize,
                              p_logging = p_logging,
                              **p_kwargs )                             
@@ -202,7 +216,21 @@ class OAStreamTask (StreamTask, Model):
                       p_num_inst = 1,
                       **p_kwargs ):
         """
-        
+        Updates the adaptation state using an online-adaptive stream adaptation event.
+
+        Parameters
+        ----------
+        p_adapted : bool
+            Adaptation flag.
+        p_subtype : OAStreamAdaptationType
+            Type of online-adaptive stream adaptation.
+        p_tstamp : TStampType, optional
+            Optional explicit time stamp. If omitted, the current stream time stamp is used if
+            available.
+        p_num_inst : int
+            Number of stream instances related to the adaptation. Default = 1.
+        **p_kwargs
+            Additional event-specific data forwarded to the adaptation event.
         """
         
         if p_tstamp is None:
@@ -222,10 +250,27 @@ class OAStreamTask (StreamTask, Model):
 
 ## -------------------------------------------------------------------------------------------------
     def adapt(self, p_instances : InstDict) -> bool:
+        """
+        Adapts the task to new and obsolete stream instances.
+
+        New instances are processed by :meth:`_adapt`, obsolete instances by
+        :meth:`_adapt_reverse`. Optional pre- and postprocessing hooks may report additional
+        adaptation types. If adaptations occur, corresponding adaptation events are generated via
+        :meth:`_set_adapted`.
+
+        Parameters
+        ----------
+        p_instances : InstDict
+            Dictionary of new and obsolete stream instances to be processed.
+
+        Returns
+        -------
+        bool
+            True if at least one forward or reverse adaptation was performed, otherwise False.
+        """
 
         # 0 Intro
         if not self._adaptivity: return False
-        self.log(self.C_LOG_TYPE_S, 'Adaptation started')
 
         adapted_forward  = False
         adapted_reverse  = False
@@ -234,17 +279,11 @@ class OAStreamTask (StreamTask, Model):
         
 
         # 1 Preprocessing 
-        try:
-            atype_pre = self._adapt_pre()
+        atype_pre = self._adapt_pre()
 
-            if atype_pre != OAStreamAdaptationType.NONE:
-                if atype_pre == OAStreamAdaptationType.FORWARD: adapted_forward = True
-                elif atype_pre == OAStreamAdaptationType.REVERSE: adapted_reverse = True
-
-                self.log(self.C_LOG_TYPE_S, 'Preprocessing done')
-
-        except NotImplementedError:
-            pass
+        if atype_pre != OAStreamAdaptationType.NONE:
+            if atype_pre == OAStreamAdaptationType.FORWARD: adapted_forward = True
+            elif atype_pre == OAStreamAdaptationType.REVERSE: adapted_reverse = True
 
 
         # 2 Main adaptation loop
@@ -252,45 +291,28 @@ class OAStreamTask (StreamTask, Model):
 
             if inst_type == InstTypeNew:
                 # 2.1 Adaptation on a new stream instance
-                self.log(self.C_LOG_TYPE_S, 'Adaptation on new instance', inst_id)
                 if self._adapt( p_instance_new=inst):
                     adapted_forward      = True
                     num_inst_forward    += 1
-                    self.log(self.C_LOG_TYPE_S, 'Policy adapted')
-                else:
-                    self.log(self.C_LOG_TYPE_S, 'Policy not adapted')
 
             else:
                 # 2.2 Reverse adaptation on an obsolete stream instance
-                self.log(self.C_LOG_TYPE_S, 'Reverse adaptation on obsolete instance', inst_id)
-                try:
-                    if self._adapt_reverse( p_instance_del=inst ):
-                        adapted_reverse      = True
-                        num_inst_reverse    += 1
-                        self.log(self.C_LOG_TYPE_S, 'Policy adapted')
-                    else:
-                        self.log(self.C_LOG_TYPE_S, 'Policy not adapted')
-                except NotImplementedError:
-                    self.log(self.C_LOG_TYPE_W, 'Reverse adaptation not implemented', inst_id)
+                if self._adapt_reverse( p_instance_del=inst ):
+                    adapted_reverse      = True
+                    num_inst_reverse    += 1
 
 
         # 3 Postprocessing
-        try:
-            atype_post = self._adapt_post()
+        atype_post = self._adapt_post()
 
-            if atype_post != OAStreamAdaptationType.NONE:
-                if atype_post == OAStreamAdaptationType.FORWARD: adapted_forward = True
-                elif atype_post == OAStreamAdaptationType.REVERSE: adapted_reverse = True
+        if atype_post != OAStreamAdaptationType.NONE:
+            if atype_post == OAStreamAdaptationType.FORWARD: adapted_forward = True
+            elif atype_post == OAStreamAdaptationType.REVERSE: adapted_reverse = True
 
-                self.log(self.C_LOG_TYPE_S, 'Postprocessing done')
-
-        except NotImplementedError:
-            pass
 
 
         # 4 Outro: Logging and adaptation events
         if adapted_forward or adapted_reverse:
-            self.log(self.C_LOG_TYPE_S, 'Adaptation done with changes')
             tstamp = self.get_so().tstamp
 
             if adapted_reverse:
@@ -308,7 +330,6 @@ class OAStreamTask (StreamTask, Model):
             return True
         
         else:
-            self.log(self.C_LOG_TYPE_S, 'Adaptation done without changes')
             self._set_adapted( p_adapted = False )
             return False
 
@@ -324,7 +345,7 @@ class OAStreamTask (StreamTask, Model):
             Type of adaptation carried out.
         """
 
-        raise NotImplementedError
+        return OAStreamAdaptationType.NONE
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -343,7 +364,7 @@ class OAStreamTask (StreamTask, Model):
             True, if something has been adapted. False otherwise.
         """
 
-        raise NotImplementedError
+        pass
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -362,7 +383,7 @@ class OAStreamTask (StreamTask, Model):
             True, if something has been adapted. False otherwise.
         """
 
-        raise NotImplementedError
+        pass
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -376,7 +397,7 @@ class OAStreamTask (StreamTask, Model):
             Type of adaptation carried out.
         """
 
-        raise NotImplementedError
+        return OAStreamAdaptationType.NONE
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -392,22 +413,24 @@ class OAStreamTask (StreamTask, Model):
             Normalizer object to be applied on task-specific 
         """
 
-        raise NotImplementedError
+        pass
 
 
 ## -------------------------------------------------------------------------------------------------
-    def renormalize_on_event(self, p_event_id: str, p_event_object: Event):
+    def renormalize_on_event(self, p_event_id: EventId, p_event_object: Event):
         """
-        Event handler method to be registered on event Model.C_EVENT_ADAPTED of an online adaptive
-        normalizer task. It carries out the task-specific renormalization of internally buffered
-        data by calling the custom method _renormalize().
+        Handles adaptation events of an online-adaptive normalizer.
+
+        The handler invokes :meth:`_renormalize` with the event's raising object and marks the task
+        as adapted with subtype :attr:`OAStreamAdaptationType.RENORM` after successful
+        renormalization.
 
         Parameters
         ----------
-        p_event_id : str
-            Unique event id
+        p_event_id : EventId
+            Unique identifier of the triggering event, typically :attr:`Model.C_EVENT_ADAPTED`.
         p_event_object : Event
-            Event object with further context informations
+            Adaptation event whose raising object is expected to provide the normalizer.
         """
 
         self.log(Log.C_LOG_TYPE_I, 'Renormalization triggered')

@@ -54,10 +54,11 @@
 ## -- 2024-10-06  2.5.0     DA       New property attribute State.value
 ## -- 2024-12-11  2.5.0     DA       New method DemoScenario.init_plot()
 ## -- 2025-07-18  2.6.0     DA       Refactoring
+## -- 2026-10-05  2.7.0     DA       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.6.0 (2025-07-18)
+Ver. 2.7.0 (2026-10-05)
 
 This module provides models and templates for state based systems.
 """
@@ -548,7 +549,7 @@ class Actuator (Dimension):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class SAGateway (EventManager):
+class SAGateway (EventManager, Log):
     """
     Template for a gateway implementation that enables access to sensors and actuators.
 
@@ -584,7 +585,8 @@ class SAGateway (EventManager):
         self._sensors   = Set()
         self._actuators = Set()
 
-        EventManager.__init__(self, p_logging=p_logging)
+        EventManager.__init__(self)
+        Log.__init__(self, p_logging=p_logging)
 
 
 ## -------------------------------------------------------------------------------------------------

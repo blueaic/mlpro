@@ -7,16 +7,18 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-06-01  0.1.0     DA       Creation 
 ## -- 2025-06-04  0.2.0     DA       New methods create_boundaries(), _create_boundaries()
+## -- 2026-10-06  0.3.0     DA       Turned BoundaryProvider into an abstract class
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 0.2.0 (2025-06-04)
+Ver. 0.3.0 (2026-10-06)
 
 This module provides classes for the standardized use of value boundaries.
 """
 
 from typing import Union
 from enum import IntEnum
+from abc import ABC, abstractmethod
 
 import numpy as np
 from numpy.typing import NDArray
@@ -47,7 +49,7 @@ class BoundarySide(IntEnum):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class BoundaryProvider:
+class BoundaryProvider (ABC):
     """
     Standardizes the provision/computation of boundaries.
     """
@@ -72,6 +74,7 @@ class BoundaryProvider:
 
 
 ## -------------------------------------------------------------------------------------------------
+    @abstractmethod
     def get_boundaries( self, 
                         p_dim : int = None,
                         p_side : BoundarySide = None,
@@ -103,4 +106,4 @@ class BoundaryProvider:
             - If both `p_side` and `p_dim` are specified: returns a single float value.
         """
         
-        raise NotImplementedError
+        ...

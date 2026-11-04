@@ -45,18 +45,21 @@ __all__ = [ 'ClusterBody' ]
 ## -------------------------------------------------------------------------------------------------
 class ClusterBody (ClusterCentroid):
     """
-    Template class for clusters with a centroid and a body.
+    Property-based cluster with centroid and explicit geometric body.
+
+    ClusterBody extends ClusterCentroid by a body representation and derived geometric properties
+    such as body size, geometric center, deformation index, and density.
 
     Parameters
     ----------
     p_id : ClusterId
-        ID of the cluster.
+        Unique cluster identifier.
     p_properties : PropertyDefinitions
-        List of property definitions.
+        Additional property definitions.
     p_visualize : bool
-        Boolean switch for visualisation. Default = False.
-    p_kwargs : dict
-        Keyword parameters.
+        Enables or disables visualization. Default is False.
+    **p_kwargs
+        Further keyword arguments forwarded to the parent cluster implementation.
     """
 
     C_PROPERTIES        = [ cprop_centroid,
@@ -86,11 +89,33 @@ class ClusterBody (ClusterCentroid):
 
 ## -------------------------------------------------------------------------------------------------
     def get_membership(self, p_instance : Instance ) -> float:
+        """
+        Determines instance membership using the cluster body's membership model.
+
+        Parameters
+        ----------
+        p_instance : Instance
+            Instance to be evaluated.
+
+        Returns
+        -------
+        float
+            Membership value returned by the body representation.
+        """
+
         return self.body.get_membership( p_instance = p_instance )
     
 
 ## -------------------------------------------------------------------------------------------------
     def _update_density(self, p_tstamp : TStampType):
+        """
+        Updates the density from cluster size and geometric body size.
+
+        Parameters
+        ----------
+        p_tstamp : TStampType
+            Time stamp assigned to the density update.
+        """
         
         if self.size_geo.value != 0:
             density = self.size.value / self.size_geo.value
@@ -99,6 +124,15 @@ class ClusterBody (ClusterCentroid):
 
 ## -------------------------------------------------------------------------------------------------
     def update_properties(self, p_tstamp : TStampType):
+        """
+        Updates inherited and body-specific cluster properties.
+
+        Parameters
+        ----------
+        p_tstamp : TStampType
+            Time stamp assigned to the property updates.
+        """
+
         super().update_properties( p_tstamp = p_tstamp )
         self._update_density( p_tstamp = p_tstamp )
         self.body.update_deformation_index( p_tstamp = p_tstamp )

@@ -12,10 +12,11 @@
 ## -- 2024-06-04  1.1.1     DA       Bugfix: ESpace instead of MSpace
 ## -- 2025-06-22  1.2.0     DA       Code cleanup and refactoring#
 ## -- 2025-07-22  1.3.0     DA       Outliers are raised as events now
+## -- 2026-10-05  1.4.0     DA       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.3.0 (2025-07-22)
+Ver. 1.4.0 (2026-10-05)
 
 This module provides a multivariate benchmark stream with configurable baselines per feature and
 additional random point outliers.
@@ -36,7 +37,6 @@ from mlpro.bf.streams.streams.provider_mlpro import StreamMLProBase
 
 # Export list for public API
 __all__ = [ 'StreamMLProPOutliers' ]
-
 
 
 
@@ -93,7 +93,7 @@ class StreamMLProPOutliers (StreamMLProBase, EventManager):
                                   p_logging=p_logging,
                                   **p_kwargs)
         
-        EventManager.__init__(self, p_logging=p_logging)    
+        EventManager.__init__(self)
         
 
 ## -------------------------------------------------------------------------------------------------
