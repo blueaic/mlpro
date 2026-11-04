@@ -33,7 +33,7 @@
 ## --                                - dependency auto-commit disabled for pull requests
 ## -------------------------------------------------------------------------------------------------
 
-name: WF01 - Unit Tests
+name: Unit Tests
 
 on:
   push:
