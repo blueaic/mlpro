@@ -5,9 +5,10 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2022        1.0.0     DA       Creation 
+## -- 2026-11-04  1.1.0     DA       Reactivated
 ## -------------------------------------------------------------------------------------------------
 
-name: Assign project MLPro to new issue
+name: Assign project to new issue
 
 on:
   issues:
@@ -16,11 +17,11 @@ on:
 
 jobs:
   add-to-project:
-    name: Assign project MLPro to new issue
+    name: Assign project to new issue
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/add-to-project@v2
         with:
-          project-url: https://github.com/orgs/blueaic/projects/XX
+          project-url: https://github.com/orgs/blueaic/projects/21
           github-token: ${{ secrets.ISSUE_UPDATES }}
