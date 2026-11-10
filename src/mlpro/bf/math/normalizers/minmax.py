@@ -28,10 +28,11 @@
 ## --                                - Refactoring of method update_parameters()
 ## -- 2025-06-28  2.1.0     DA       Class NormalizerMinMax: new numerical stabilizer C_EPSILON
 ## -- 2025-06-30  2.2.0     DA       Refactoring
+## -- 2026-11-10  2.3.0     DA       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.2.0 (2025-06-30)
+Ver. 2.3.0 (2026-11-10)
 
 This module provides a class for MinMax normalization.
 """
@@ -128,18 +129,18 @@ class NormalizerMinMax (Normalizer):
 
 
         # 2 Initialize or update _param_old
-        if self._param_new is not None:
-            if self._param_old is None or self._param_old.shape != self._param_new.shape:
-                self._param_old = self._param_new.copy()
+        if self._scaler_param_new is not None:
+            if self._scaler_param_old is None or self._scaler_param_old.shape != self._scaler_param_new.shape:
+                self._scaler_param_old = self._scaler_param_new.copy()
             else:
-                np.copyto(self._param_old, self._param_new)
+                np.copyto(self._scaler_param_old, self._scaler_param_new)
 
 
         # 3 Allocate or reuse _param_new
-        if self._param_new is None or self._param_new.shape != (2, n_dims):
-            self._param_new = np.zeros((2, n_dims), dtype=np.float64)
+        if self._scaler_param_new is None or self._scaler_param_new.shape != (2, n_dims):
+            self._scaler_param_new = np.zeros((2, n_dims), dtype=np.float64)
         else:
-            self._param_new[:] = 0.0  # optional in-place reset
+            self._scaler_param_new[:] = 0.0  # optional in-place reset
 
 
         # 4 Compute new parameters into _param_new
@@ -154,9 +155,9 @@ class NormalizerMinMax (Normalizer):
 
             p0 = self._dst_diff / diff
             p1 = self._dst_boundaries[0] - low * p0
-            self._param_new[:, i] = p0, p1
+            self._scaler_param_new[:, i] = p0, p1
 
 
         # 5 Activate _param_new by reference
-        self._set_parameters( p_param = self._param_new )
+        self._set_parameters( p_param = self._scaler_param_new )
         return True

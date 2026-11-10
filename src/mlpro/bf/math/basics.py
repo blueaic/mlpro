@@ -46,10 +46,11 @@
 ## -- 2025-10-02  3.1.0     DA       Refactoring: removed try/except from Function.map()
 ## -- 2026-08-18  3.2.0     DA       Class Element: alignment with higher numpy versions
 ## -- 2026-10-05  3.3.0     DA       Refactoring
+## -- 2026-11-10  3.4.0     DA       Class Scaler: renamed attributes ._param* to ._scaler_param*
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 3.3.0 (2026-10-05)
+Ver. 3.4.0 (2026-11-05)
 
 This module provides basic mathematical classes.
 """
@@ -992,11 +993,11 @@ class Scaler (Function):
 
     Attributes
     ----------
-    _param
+    _scaler_param
         Internal reference to the active set of function parameters applied to the next scaler action.
-    _param_old
+    _scaler_param_old
         Previous parameter set.
-    _param_new
+    _scaler_param_new
         Current parameter set.   
     """
 
@@ -1018,9 +1019,9 @@ class Scaler (Function):
                            p_autocreate_elements = p_autocreate_elements,
                            **p_kwargs )
 
-        self._param     = None
-        self._param_old = None
-        self._param_new = None
+        self._scaler_param     = None
+        self._scaler_param_old = None
+        self._scaler_param_new = None
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -1050,7 +1051,7 @@ class Scaler (Function):
         if p_param is not None:
             self._set_parameters( p_param = p_param )
         else:
-            self._set_parameters( p_param = self._param_new )
+            self._set_parameters( p_param = self._scaler_param_new )
 
         return self.map( p_input = p_data, p_dim = p_dim )
 
@@ -1082,7 +1083,7 @@ class Scaler (Function):
         if p_param is not None:
             self._set_parameters( p_param = p_param )
         else:
-            self._set_parameters( p_param = self._param_new )
+            self._set_parameters( p_param = self._scaler_param_new )
 
         return self.map_inverse( p_input = p_data, p_dim = p_dim )
 
@@ -1116,10 +1117,10 @@ class Scaler (Function):
             The rescaled data.
         """
 
-        if ( self._param_old is None ) and ( p_param_old is None ): return p_data
+        if ( self._scaler_param_old is None ) and ( p_param_old is None ): return p_data
 
-        param_old = p_param_old if p_param_old is not None else self._param_old
-        param_new = p_param_new if p_param_new is not None else self._param_new
+        param_old = p_param_old if p_param_old is not None else self._scaler_param_old
+        param_new = p_param_new if p_param_new is not None else self._scaler_param_new
         
         return self.scale( p_data = self.unscale( p_data = p_data, 
                                                   p_dim = p_dim,
@@ -1139,7 +1140,7 @@ class Scaler (Function):
             Parameter set to be activated.
         """
 
-        self._param = p_param
+        self._scaler_param = p_param
 
 
 ## -------------------------------------------------------------------------------------------------
