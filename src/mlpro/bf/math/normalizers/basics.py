@@ -28,10 +28,11 @@
 ## -- 2025-06-25  1.4.0     DA       Method Normalizer.renormalize(): tuning of dim-wise renormalization
 ## -- 2025-06-30  2.0.0     DA       Class Normalizer: new parent class Scaler
 ## -- 2025-07-07  2.0.1     DA       Refactoring
+## -- 2026-11-10  2.1.0     DA       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.0.1 (2025-07-07)
+Ver. 2.1.0 (2026-11-10)
 
 This module provides base class for Normalizers and normalizer objects including MinMax normalization and
 normalization by Z transformation.
@@ -59,11 +60,11 @@ class Normalizer (Scaler):
     Base class for normalizers. A normalizer in MLPro is a linear scaler with a fixed parameter 
     structure providing the following basic operations:
 
-    Normalization   (= scaling):   scaled_data   = unscaled_data * self._param[0] + self._param[1]
-    Denormalization (= unscaling): unscaled_data = ( scaled_data - self._param[1] ) / self._param[0] 
+    Normalization   (= scaling):   scaled_data   = unscaled_data * self._scaler_param[0] + self._scaler_param[1]
+    Denormalization (= unscaling): unscaled_data = ( scaled_data - self._scaler_param[1] ) / self._scaler_param[0] 
     Renormalization (= unscaling with old params and scaling with new params)
 
-    self._param_old and self._param_new are Numpy arrays of shape (2, n_dims) where n_dims is the number of dimensions
+    self._scaler_param_old and self._scaler_param_new are Numpy arrays of shape (2, n_dims) where n_dims is the number of dimensions
     of the data to be normalized. The first row contains the scaling factors and the second row
     contains the offsets for each dimension.
 
@@ -88,7 +89,7 @@ class Normalizer (Scaler):
             Optional index of the dimension to be normalized.
         p_param = None
             Optional parameter set to be applied to the normalization. If None the set stored in
-            self._param_new is used.
+            self._scaler_param_new is used.
 
         Returns
         -------
@@ -117,7 +118,7 @@ class Normalizer (Scaler):
             Optional index of the dimension to be denormalized.
         p_param = None
             Optional parameter set to be applied to the denormalization. If None the set stored in
-            self._param_old is used.
+            self._scaler_param_old is used.
 
         Returns
         -------
@@ -148,10 +149,10 @@ class Normalizer (Scaler):
             Optional index of the dimension to be renormalized.
         p_param_old = None
             Optional parameter set to be applied to the denormalization. If None the set stored in
-            self._param_old is used.
+            self._scaler_param_old is used.
         p_param_new = None
             Optional parameter set to be applied to the normalizaion. If None the set stored in
-            self._param_new is used.
+            self._scaler_param_new is used.
 
         Returns
         -------
@@ -159,9 +160,9 @@ class Normalizer (Scaler):
             The renormalized data.
         """
 
-        if ( self._param_old is None ) and ( p_param_old is None ): return p_data
+        if ( self._scaler_param_old is None ) and ( p_param_old is None ): return p_data
         
-        if ( p_dim is not None ) and np.array_equal(self._param_new[:,p_dim], self._param_old[:,p_dim] ):
+        if ( p_dim is not None ) and np.array_equal(self._scaler_param_new[:,p_dim], self._scaler_param_old[:,p_dim] ):
             return p_data
         
         return self.rescale( p_data = p_data, 
@@ -176,7 +177,7 @@ class Normalizer (Scaler):
               p_output : Element = None, 
               p_dim : int = None ) -> Element:
 
-        scale, offset = self._param
+        scale, offset = self._scaler_param
         output = p_input if p_output is None else p_output
         values = p_input.get_values()
 
@@ -195,7 +196,7 @@ class Normalizer (Scaler):
                       p_output : np.ndarray = None, 
                       p_dim = None ) -> np.ndarray:
         
-        scale, offset = self._param[0], self._param[1]
+        scale, offset = self._scaler_param[0], self._scaler_param[1]
         output = p_input if p_output is None else p_output
     
         if p_dim is None:
@@ -217,7 +218,7 @@ class Normalizer (Scaler):
         if p_dim is None:
             raise ParamError('Method Normalizer._map_list() needs a valid p_dim')
         
-        scale, offset = self._param
+        scale, offset = self._scaler_param
         output = p_input if p_output is None else p_output
 
         input = np.array(p_input) 
@@ -234,7 +235,7 @@ class Normalizer (Scaler):
                       p_output : Element = None, 
                       p_dim : int = None ) -> Element:
 
-        scale, offset = self._param
+        scale, offset = self._scaler_param
         output = p_input if p_output is None else p_output
         values = p_input.get_values()
 
@@ -253,7 +254,7 @@ class Normalizer (Scaler):
                               p_output : np.ndarray = None, 
                               p_dim = None ) -> np.ndarray:
 
-        scale, offset = self._param[0], self._param[1]
+        scale, offset = self._scaler_param[0], self._scaler_param[1]
         output = p_input if p_output is None else p_output
 
         if p_dim is None:
@@ -275,7 +276,7 @@ class Normalizer (Scaler):
         if p_dim is None:
             raise ParamError('Method Normalizer._map_inverse_list() needs a valid p_dim')
 
-        scale, offset = self._param
+        scale, offset = self._scaler_param
         output = p_input if p_output is None else p_output
 
         input = np.array(p_input) 
