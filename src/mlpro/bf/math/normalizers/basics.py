@@ -328,8 +328,8 @@ class Normalizer (Scaler, NormalizerAPI):
             np.multiply(p_input, scale, out=output)
             np.add(output, offset, out=output)
         else:
-            np.multiply(p_input[:,p_dim], scale, out=output[:,p_dim])
-            np.add(output[:,p_dim], offset, out=output[:,p_dim])
+            np.multiply(p_input[:,p_dim], scale[p_dim], out=output[:,p_dim])
+            np.add(output[:,p_dim], offset[p_dim], out=output[:,p_dim])
 
         return output
         
@@ -386,8 +386,8 @@ class Normalizer (Scaler, NormalizerAPI):
             np.subtract(p_input, offset, out=output)
             np.divide(output, scale, out=output)
         else:
-            np.subtract(p_input[:,p_dim], offset, out=output[:,p_dim])
-            np.divide(output[:,p_dim], scale, out=output[:,p_dim])
+            np.subtract(p_input[:,p_dim], offset[p_dim], out=output[:,p_dim])
+            np.divide(output[:,p_dim], scale[p_dim], out=output[:,p_dim])
 
         return output       
     
