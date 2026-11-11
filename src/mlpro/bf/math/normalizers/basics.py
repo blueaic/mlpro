@@ -31,10 +31,11 @@
 ## -- 2026-11-10  2.1.0     DA       Refactoring
 ## -- 2026-11-11  2.2.0     DA       New class NormalizerAPI
 ## -- 2026-11-11  2.3.0     DA       Optimized renormalization using combined affine parameters
+## -- 2026-11-11  2.4.0     DA       Precompute affine rescaling parameters on update
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.3.0 (2026-11-11)
+Ver. 2.4.0 (2026-11-11)
 
 This module provides base class for Normalizers and normalizer objects including MinMax normalization and
 normalization by Z transformation.
@@ -164,11 +165,11 @@ class Normalizer (Scaler, NormalizerAPI):
 
     Normalization   (= scaling):   scaled_data   = unscaled_data * self._scaler_param[0] + self._scaler_param[1]
     Denormalization (= unscaling): unscaled_data = ( scaled_data - self._scaler_param[1] ) / self._scaler_param[0] 
-    Renormalization (= unscaling with old params and scaling with new params)
+    Renormalization (= rescaling from previous to current parameters; uses a precomputed\n    affine mapping when available)
 
     self._scaler_param_old and self._scaler_param_new are Numpy arrays of shape (2, n_dims) where n_dims is the number of dimensions
     of the data to be normalized. The first row contains the scaling factors and the second row
-    contains the offsets for each dimension.
+    contains the offsets for each dimension. After parameter updates, the combined affine\n    parameters for direct renormalization are stored in _scaler_param_re.
 
     Parameters
     ----------
@@ -234,17 +235,57 @@ class Normalizer (Scaler, NormalizerAPI):
     
 
 ## -------------------------------------------------------------------------------------------------
-    def renormalize( self, 
-                     p_data : Data, 
+    def update_parameters( self, **p_kwargs ) -> bool:
+        """
+        Updates the normalization parameters and prepares direct renormalization.
+
+        Calls the custom parameter update through Scaler.update_parameters(). If the
+        parameters change and both the previous and current parameter sets exist,
+        the combined affine parameters are stored in _scaler_param_re. Otherwise,
+        precomputed renormalization is disabled.
+
+        Parameters
+        ----------
+        **p_kwargs
+            Algorithm-specific arguments forwarded to _update_parameters().
+
+        Returns
+        -------
+        bool
+            True if the parameters changed, otherwise False.
+        """
+
+        updated = super().update_parameters( **p_kwargs )
+        if not updated:
+            return False
+
+        param_old = self._scaler_param_old
+        param_new = self._scaler_param_new
+
+        if param_old is None or param_new is None:
+            self._scaler_param_re = None
+            return True
+
+        # Combine old inverse and new forward affine transformations
+        param_re = np.empty_like(param_new, dtype=np.float64)
+        np.divide(param_new[0], param_old[0], out=param_re[0])
+        np.multiply(param_re[0], param_old[1], out=param_re[1])
+        np.subtract(param_new[1], param_re[1], out=param_re[1])
+        self._scaler_param_re = param_re
+        return True
+
+
+## -------------------------------------------------------------------------------------------------
+    def renormalize( self,
+                     p_data : Data,
                      p_dim : int = None,
                      p_param_old = None,
                      p_param_new = None ) -> Data:
         """
-        Renormalizes previously normalized data using one combined affine mapping.
+        Renormalizes data from previous to current normalization parameters.
 
-        The old and new normalization parameters have the form (scale, offset).
-        The combined scale is new_scale / old_scale and the combined offset is
-        new_offset - combined_scale * old_offset.
+        Uses precomputed parameters if available and no explicit parameter sets
+        are supplied. Otherwise, uses the two-step Scaler.rescale() fallback.
 
         Parameters
         ----------
@@ -253,9 +294,9 @@ class Normalizer (Scaler, NormalizerAPI):
         p_dim : int = None
             Optional index of the dimension to be renormalized.
         p_param_old = None
-            Optional previous parameter set. Defaults to self._scaler_param_old.
+            Optional previous parameter set. Defaults to _scaler_param_old.
         p_param_new = None
-            Optional new parameter set. Defaults to self._scaler_param_new.
+            Optional current parameter set. Defaults to _scaler_param_new.
 
         Returns
         -------
@@ -263,38 +304,11 @@ class Normalizer (Scaler, NormalizerAPI):
             The renormalized data.
         """
 
-        # 1 Resolve parameters
-        param_old = p_param_old if p_param_old is not None else self._scaler_param_old
-        if param_old is None:
-            return p_data
+        return self.rescale( p_data = p_data,
+                             p_dim = p_dim,
+                             p_param_old = p_param_old,
+                             p_param_new = p_param_new )
 
-        param_new = p_param_new if p_param_new is not None else self._scaler_param_new
-
-
-        # 2 Skip unchanged transformations
-        if p_dim is None:
-            if np.array_equal(param_old, param_new):
-                return p_data
-        elif np.array_equal(param_old[:, p_dim], param_new[:, p_dim]):
-            return p_data
-
-
-        # 3 Combine the old inverse and new forward affine mappings
-        param = np.empty_like(param_new, dtype=np.float64)
-        if p_dim is None:
-            np.divide(param_new[0], param_old[0], out=param[0])
-            np.multiply(param[0], param_old[1], out=param[1])
-            np.subtract(param_new[1], param[1], out=param[1])
-        else:
-            param[0, p_dim] = param_new[0, p_dim] / param_old[0, p_dim]
-            param[1, p_dim] = param_new[1, p_dim] - param[0, p_dim] * param_old[1, p_dim]
-
-
-        # 4 Apply the combined transformation in a single pass
-        result = self.scale(p_data=p_data, p_dim=p_dim, p_param=param)
-        self._set_parameters( p_param = param_new )
-        return result
-    
 
 ## -------------------------------------------------------------------------------------------------
     def _map( self, 
