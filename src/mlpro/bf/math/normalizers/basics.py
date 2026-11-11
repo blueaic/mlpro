@@ -270,12 +270,14 @@ class Normalizer (Scaler, NormalizerAPI):
 
         param_new = p_param_new if p_param_new is not None else self._scaler_param_new
 
+
         # 2 Skip unchanged transformations
         if p_dim is None:
             if np.array_equal(param_old, param_new):
                 return p_data
         elif np.array_equal(param_old[:, p_dim], param_new[:, p_dim]):
             return p_data
+
 
         # 3 Combine the old inverse and new forward affine mappings
         param = np.empty_like(param_new, dtype=np.float64)
@@ -287,9 +289,13 @@ class Normalizer (Scaler, NormalizerAPI):
             param[0, p_dim] = param_new[0, p_dim] / param_old[0, p_dim]
             param[1, p_dim] = param_new[1, p_dim] - param[0, p_dim] * param_old[1, p_dim]
 
+
         # 4 Apply the combined transformation in a single pass
-        return self.scale(p_data=p_data, p_dim=p_dim, p_param=param)
+        result = self.scale(p_data=p_data, p_dim=p_dim, p_param=param)
+        self._set_parameters( p_param = p_param_new )
+        return result
     
+
 ## -------------------------------------------------------------------------------------------------
     def _map( self, 
               p_input : Element, 
