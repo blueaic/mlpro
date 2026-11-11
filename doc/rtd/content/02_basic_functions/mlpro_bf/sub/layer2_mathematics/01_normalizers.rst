@@ -8,13 +8,21 @@ Why normalization?
 
 Many algorithms become easier to combine and numerically more stable when their input features live on comparable scales. A temperature in degrees, a position in meters, and a probability may all describe the same sample, but their numerical ranges can differ by orders of magnitude.
 
-MLPro treats normalization as a reversible mapping rather than as a one-way preprocessing step. The common abstraction is **Normalizer**, which builds on :class:`Scaler` and therefore supports normalization, denormalization, and renormalization with a consistent parameter model.
+MLPro treats normalization as a reversible mapping rather than as a one-way preprocessing step. The abstract **NormalizerAPI** defines the common interface for normalization, denormalization, and renormalization. The base class **Normalizer** implements this interface and extends :class:`Scaler` with a consistent linear parameter model.
+
+**NormalizerAPI** declares three abstract operations:
+
+* ``normalize(p_data, p_dim=None, p_param=None)`` maps data into normalized coordinates,
+* ``denormalize(p_data, p_dim=None, p_param=None)`` maps normalized data back to their original coordinates,
+* ``renormalize(p_data, p_dim=None, p_param_old=None, p_param_new=None)`` transforms normalized data from one parameter set to another.
+
+The interface is independent of the normalization strategy. Concrete implementations provide the normalization behavior and parameter management. The optional ``p_dim`` argument selects a single dimension; parameter arguments allow explicit parameter sets where supported.
 
 The basic lifecycle is:
 
 ``raw data -> determine parameters -> normalize -> parameters change -> renormalize``
 
-All normalizers use linear parameters per dimension. Internally, each dimension has a scale factor and an offset. This common representation enables the same operations for different normalization strategies:
+The supplied MLPro normalizers use linear parameters per dimension. Internally, each dimension has a scale factor and an offset. This common representation enables the same operations for different normalization strategies:
 
 * ``normalize()`` maps original data into normalized coordinates,
 * ``denormalize()`` reconstructs data in the original coordinates,
