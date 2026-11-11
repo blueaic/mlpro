@@ -30,10 +30,11 @@
 ## -- 2025-07-07  2.0.1     DA       Refactoring
 ## -- 2026-11-10  2.1.0     DA       Refactoring
 ## -- 2026-11-11  2.2.0     DA       New class NormalizerAPI
+## -- 2026-11-11  2.3.0     DA       Optimized renormalization using combined affine parameters
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.2.0 (2026-11-11)
+Ver. 2.3.0 (2026-11-11)
 
 This module provides base class for Normalizers and normalizer objects including MinMax normalization and
 normalization by Z transformation.
@@ -239,8 +240,11 @@ class Normalizer (Scaler, NormalizerAPI):
                      p_param_old = None,
                      p_param_new = None ) -> Data:
         """
-        Renormalizes the specified data by denormalizing them with previous parameters stored in 
-        _param_old and normalize them with the current parameters in _param_new.
+        Renormalizes previously normalized data using one combined affine mapping.
+
+        The old and new normalization parameters have the form (scale, offset).
+        The combined scale is new_scale / old_scale and the combined offset is
+        new_offset - combined_scale * old_offset.
 
         Parameters
         ----------
@@ -249,11 +253,9 @@ class Normalizer (Scaler, NormalizerAPI):
         p_dim : int = None
             Optional index of the dimension to be renormalized.
         p_param_old = None
-            Optional parameter set to be applied to the denormalization. If None the set stored in
-            self._scaler_param_old is used.
+            Optional previous parameter set. Defaults to self._scaler_param_old.
         p_param_new = None
-            Optional parameter set to be applied to the normalizaion. If None the set stored in
-            self._scaler_param_new is used.
+            Optional new parameter set. Defaults to self._scaler_param_new.
 
         Returns
         -------
@@ -261,17 +263,33 @@ class Normalizer (Scaler, NormalizerAPI):
             The renormalized data.
         """
 
-        if ( self._scaler_param_old is None ) and ( p_param_old is None ): return p_data
-        
-        if ( p_dim is not None ) and np.array_equal(self._scaler_param_new[:,p_dim], self._scaler_param_old[:,p_dim] ):
+        # 1 Resolve parameters
+        param_old = p_param_old if p_param_old is not None else self._scaler_param_old
+        if param_old is None:
             return p_data
-        
-        return self.rescale( p_data = p_data, 
-                             p_dim = p_dim,
-                             p_param_old = p_param_old,
-                             p_param_new = p_param_new )
-    
 
+        param_new = p_param_new if p_param_new is not None else self._scaler_param_new
+
+        # 2 Skip unchanged transformations
+        if p_dim is None:
+            if np.array_equal(param_old, param_new):
+                return p_data
+        elif np.array_equal(param_old[:, p_dim], param_new[:, p_dim]):
+            return p_data
+
+        # 3 Combine the old inverse and new forward affine mappings
+        param = np.empty_like(param_new, dtype=np.float64)
+        if p_dim is None:
+            np.divide(param_new[0], param_old[0], out=param[0])
+            np.multiply(param[0], param_old[1], out=param[1])
+            np.subtract(param_new[1], param[1], out=param[1])
+        else:
+            param[0, p_dim] = param_new[0, p_dim] / param_old[0, p_dim]
+            param[1, p_dim] = param_new[1, p_dim] - param[0, p_dim] * param_old[1, p_dim]
+
+        # 4 Apply the combined transformation in a single pass
+        return self.scale(p_data=p_data, p_dim=p_dim, p_param=param)
+    
 ## -------------------------------------------------------------------------------------------------
     def _map( self, 
               p_input : Element, 
