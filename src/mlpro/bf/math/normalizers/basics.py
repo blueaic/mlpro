@@ -292,7 +292,7 @@ class Normalizer (Scaler, NormalizerAPI):
 
         # 4 Apply the combined transformation in a single pass
         result = self.scale(p_data=p_data, p_dim=p_dim, p_param=param)
-        self._set_parameters( p_param = p_param_new )
+        self._set_parameters( p_param = param_new )
         return result
     
 
