@@ -982,11 +982,10 @@ class Function (KWArgs, ScientificObject):
 ## -------------------------------------------------------------------------------------------------
 class Scaler (Function):
     """
-    Template for scaler algorithms scaling, unscaling, rescaling data. This class introduces a
-    parameter handling based on the three attributes _scaler_param, _scaler_param_old, and 
-    _scaler_param_new. All custom methods inherited from the class Function shall apply the 
-    parameters stored in _scaler_param, which is a reference to eigther _scaler_param_old or 
-    _scaler_param_new.  
+    Template for scaler algorithms scaling, unscaling, and rescaling data. Parameter sets
+    are managed via _scaler_param, _scaler_param_old, and _scaler_param_new. An optional
+    _scaler_param_re enables direct rescaling using precomputed parameters. Custom methods
+    inherited from Function use the active parameter set stored in _scaler_param.
 
     Parameters
     ----------
@@ -999,7 +998,9 @@ class Scaler (Function):
     _scaler_param_old
         Previous parameter set.
     _scaler_param_new
-        Current parameter set.   
+        Current parameter set.
+    _scaler_param_re
+        Optional precomputed parameters for direct rescaling. None disables this optimization.
     """
 
 ## -------------------------------------------------------------------------------------------------
@@ -1023,6 +1024,7 @@ class Scaler (Function):
         self._scaler_param     = None
         self._scaler_param_old = None
         self._scaler_param_new = None
+        self._scaler_param_re  = None  # Optional precomputed parameters for direct rescaling
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -1041,7 +1043,7 @@ class Scaler (Function):
             Optional index of the dimension to be scaled.
         p_param = None
             Optional parameter set to be applied to the scaling operation. If None the set stored in
-            self._param_new is used.
+            self._scaler_param_new is used.
 
         Returns
         -------
@@ -1073,7 +1075,7 @@ class Scaler (Function):
             Optional index of the dimension to be unscaled.
         p_param = None
             Optional parameter set to be applied to the unscaling operation. If None the set stored in
-            self._param_new is used.
+            self._scaler_param_new is used.
 
         Returns
         -------
@@ -1090,14 +1092,17 @@ class Scaler (Function):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def rescale( self, 
-                 p_data : Data, 
+    def rescale( self,
+                 p_data : Data,
                  p_dim : int = None,
                  p_param_old = None,
                  p_param_new = None ) -> Data:
         """
-        Rescales the specified data by unscaling them with previous parameters stored in _param_old and
-        scaling them with the current parameters in _param_new.
+        Rescales data from an old parameter set to a new one.
+
+        If no parameter set is explicitly provided and _scaler_param_re is available,
+        rescaling uses a single mapping with these precomputed parameters. Otherwise,
+        the original two-step unscaling and scaling procedure is used.
 
         Parameters
         ----------
@@ -1106,26 +1111,31 @@ class Scaler (Function):
         p_dim : int = None
             Optional index of the dimension to be rescaled.
         p_param_old = None
-            Optional parameter set to be applied to the unscaling operation. If None the set stored in
-            self._param_old is used.
+            Optional previous parameters for unscaling. Defaults to _scaler_param_old.
         p_param_new = None
-            Optional parameter set to be applied to the scaling operation. If None the set stored in
-            self._param_new is used.
+            Optional current parameters for scaling. Defaults to _scaler_param_new.
 
         Returns
         -------
         Data
-            The rescaled data.
+            Rescaled data, or unchanged data if no previous parameters exist.
         """
 
         if ( self._scaler_param_old is None ) and ( p_param_old is None ): return p_data
 
+        # 1 Use optional precomputed rescaling parameters
+        if ( self._scaler_param_re is not None ) and ( p_param_old is None ) and ( p_param_new is None ):
+            result = self.scale( p_data = p_data, p_dim = p_dim, p_param = self._scaler_param_re )
+            self._set_parameters( p_param = self._scaler_param_new )
+            return result
+
+        # 2 Fall back to the original two-step transformation
         param_old = p_param_old if p_param_old is not None else self._scaler_param_old
         param_new = p_param_new if p_param_new is not None else self._scaler_param_new
-        
-        return self.scale( p_data = self.unscale( p_data = p_data, 
-                                                  p_dim = p_dim,
-                                                  p_param = param_old ), 
+
+        return self.scale( p_data = self.unscale( p_data = p_data,
+                                                 p_dim = p_dim,
+                                                 p_param = param_old ),
                            p_dim = p_dim,
                            p_param = param_new )
 
@@ -1147,18 +1157,19 @@ class Scaler (Function):
 ## -------------------------------------------------------------------------------------------------
     def update_parameters( self, **p_kwargs ) -> bool:
         """
-        Method to update the parameters of the scaler. It calls the custom method _update_parameters(),
-        which specifies the actual parameters needed by the particular algorithm.
+        Updates the scaler parameters through the custom method _update_parameters().
+        Implementations that use _scaler_param_re must keep it consistent with the
+        old and new parameter sets.
 
         Parameters
         ----------
-        p_data : Data
-            Data needed to update the parameters of the scaler.
+        **p_kwargs
+            Algorithm-specific arguments for updating scaler parameters.
 
         Returns
         -------
         bool
-            True, if the parameters were changed. False otherwise.
+            True if the parameters changed, otherwise False.
         """
 
         return self._update_parameters( **p_kwargs )
@@ -1167,19 +1178,18 @@ class Scaler (Function):
 ## -------------------------------------------------------------------------------------------------
     def _update_parameters( self, **p_kwargs ) -> bool:
         """
-        Custom method to update the parameters of the scaler based on data specific to the particular 
-        algorithm. Please set the internal attribute p_param_new with new values and backup the previous content in
-        p_param_old before.
+        Custom method to update the scaler parameters. Implementations maintain
+        _scaler_param_old and _scaler_param_new and optionally _scaler_param_re.
 
         Parameters
         ----------
-        p_data : Data
-            Data needed to update the parameters of the scaler.
+        **p_kwargs
+            Algorithm-specific arguments for updating scaler parameters.
 
         Returns
         -------
         bool
-            True, if the parameters were changed. False otherwise.
+            True if the parameters changed, otherwise False.
         """
 
         raise NotImplementedError
