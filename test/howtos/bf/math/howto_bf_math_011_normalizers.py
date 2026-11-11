@@ -184,3 +184,31 @@ if p_printing:
 normalized_state = my_normalizer_minmax.normalize(my_state.copy())
 if p_printing:
     print('16. Normalized value (Validation renormalization):\n', normalized_state.get_values(),'\n\n')
+
+# 17. Validating optimized renormalization against the original two-step operation
+#     on a numpy dataset, including dimension-wise and explicit parameters
+old_param = my_normalizer_minmax._scaler_param_old.copy()
+new_param = my_normalizer_minmax._scaler_param_new.copy()
+
+data_old = np.array([[0.1, -0.4], [0.5, 0.7]], dtype=np.float64)
+expected = (data_old - old_param[1]) / old_param[0] * new_param[0] + new_param[1]
+actual = my_normalizer_minmax.renormalize(data_old.copy())
+np.testing.assert_allclose(actual, expected, rtol=1e-12, atol=1e-12)
+
+expected_dim = data_old.copy()
+expected_dim[:, 1] = (data_old[:, 1] - old_param[1, 1]) / old_param[0, 1] * new_param[0, 1] + new_param[1, 1]
+actual_dim = my_normalizer_minmax.renormalize(data_old.copy(), p_dim=1)
+np.testing.assert_allclose(actual_dim, expected_dim, rtol=1e-12, atol=1e-12)
+
+explicit_old = np.array([[2.0, 0.5], [1.0, -3.0]])
+explicit_new = np.array([[4.0, 3.0], [-1.0, 2.0]])
+explicit_expected = (data_old - explicit_old[1]) / explicit_old[0] * explicit_new[0] + explicit_new[1]
+explicit_actual = my_normalizer_minmax.renormalize(
+    data_old.copy(),
+    p_param_old=explicit_old,
+    p_param_new=explicit_new,
+)
+np.testing.assert_allclose(explicit_actual, explicit_expected, rtol=1e-12, atol=1e-12)
+
+if p_printing:
+    print('17. Optimized renormalization validated against two-step transformation')
