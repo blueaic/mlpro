@@ -47,10 +47,11 @@
 ## -- 2026-08-18  3.2.0     DA       Class Element: alignment with higher numpy versions
 ## -- 2026-10-05  3.3.0     DA       Refactoring
 ## -- 2026-11-10  3.4.0     DA       Class Scaler: renamed attributes ._param* to ._scaler_param*
+## -- 2026-11-11  3.5.0     DA       Class Scaler: optimized rescaling
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 3.4.0 (2026-11-05)
+Ver. 3.5.0 (2026-11-11)
 
 This module provides basic mathematical classes.
 """
@@ -79,8 +80,6 @@ __all__ = [ 'Dimension',
             'Function',
             'Data',
             'Scaler' ]
-
-
 
 
 
@@ -1121,13 +1120,16 @@ class Scaler (Function):
             Rescaled data, or unchanged data if no previous parameters exist.
         """
 
+        # 0 if no parameters are available at all the data stay untouched
         if ( self._scaler_param_old is None ) and ( p_param_old is None ): return p_data
 
-        # 1 Use optional precomputed rescaling parameters
+
+        # 1 Optional precomputed rescaling parameters have priority
         if ( self._scaler_param_re is not None ) and ( p_param_old is None ) and ( p_param_new is None ):
             result = self.scale( p_data = p_data, p_dim = p_dim, p_param = self._scaler_param_re )
             self._set_parameters( p_param = self._scaler_param_new )
             return result
+            
 
         # 2 Fall back to the original two-step transformation
         param_old = p_param_old if p_param_old is not None else self._scaler_param_old
