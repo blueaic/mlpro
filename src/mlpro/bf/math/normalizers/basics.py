@@ -29,15 +29,17 @@
 ## -- 2025-06-30  2.0.0     DA       Class Normalizer: new parent class Scaler
 ## -- 2025-07-07  2.0.1     DA       Refactoring
 ## -- 2026-11-10  2.1.0     DA       Refactoring
+## -- 2026-11-11  2.2.0     DA       New class NormalizerAPI
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.1.0 (2026-11-10)
+Ver. 2.2.0 (2026-11-11)
 
 This module provides base class for Normalizers and normalizer objects including MinMax normalization and
 normalization by Z transformation.
 """
 
+from abc import ABC, abstractmethod
 
 import numpy as np
 
@@ -47,15 +49,114 @@ from mlpro.bf.math import Data, Element, Scaler
 
 
 # Export list for public API
-__all__ = [ 'Normalizer',
+__all__ = [ 'NormalizerAPI',
+            'Normalizer',
             'Renormalizable' ]
 
 
 
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
+class NormalizerAPI (ABC): 
+    """
+    API class for normalizers. 
+    """
+
+## -------------------------------------------------------------------------------------------------
+    @abstractmethod
+    def normalize( self, 
+                   p_data : Data, 
+                   p_dim : int = None,
+                   p_param = None ) -> Data: 
+        """
+        Normalizes the specified data.
+
+        Parameters
+        ----------
+        p_data : Data
+            Data to be normalized.
+        p_dim : int = None
+            Optional index of the dimension to be normalized.
+        p_param = None
+            Optional parameter set to be applied to the normalization. If None the set stored in
+            self._scaler_param_new is used.
+
+        Returns
+        -------
+        Data
+            The normalized data.
+        """
+
+        ...               
+
+
+## -------------------------------------------------------------------------------------------------
+    @abstractmethod
+    def denormalize( self, 
+                     p_data : Data, 
+                     p_dim : int = None,
+                     p_param = None ) -> Data: 
+        """
+        Denormalizes the specified data.
+
+        Parameters
+        ----------
+        p_data : Data
+            Data to be denormalized.
+        p_dim : int = None
+            Optional index of the dimension to be denormalized.
+        p_param = None
+            Optional parameter set to be applied to the denormalization. If None the set stored in
+            self._scaler_param_old is used.
+
+        Returns
+        -------
+        Data
+            The normalized data.
+        """
+
+        ...               
+
+
+## -------------------------------------------------------------------------------------------------
+    @abstractmethod
+    def renormalize( self, 
+                     p_data : Data, 
+                     p_dim : int = None,
+                     p_param_old = None,
+                     p_param_new = None ) -> Data: 
+        """
+        Renormalizes the specified data by denormalizing them with previous parameters stored in 
+        _param_old and normalize them with the current parameters in _param_new.
+
+        Parameters
+        ----------
+        p_data : Data
+            Data to be renormalized.
+        p_dim : int = None
+            Optional index of the dimension to be renormalized.
+        p_param_old = None
+            Optional parameter set to be applied to the denormalization. If None the set stored in
+            self._scaler_param_old is used.
+        p_param_new = None
+            Optional parameter set to be applied to the normalizaion. If None the set stored in
+            self._scaler_param_new is used.
+
+        Returns
+        -------
+        Data
+            The renormalized data.
+        """
+
+        ...               
+
+
+
+
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class Normalizer (Scaler):
+class Normalizer (Scaler, NormalizerAPI):
     """
     Base class for normalizers. A normalizer in MLPro is a linear scaler with a fixed parameter 
     structure providing the following basic operations:
