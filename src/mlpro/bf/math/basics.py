@@ -983,9 +983,10 @@ class Function (KWArgs, ScientificObject):
 class Scaler (Function):
     """
     Template for scaler algorithms scaling, unscaling, rescaling data. This class introduces a
-    parameter handling based on the three attributes _param, _param_old, and _param_new. All custom
-    methods inherited from the class Function shall apply the parameters stored in _param, which is 
-    a reference to eigther _param_old or _param_new.  
+    parameter handling based on the three attributes _scaler_param, _scaler_param_old, and 
+    _scaler_param_new. All custom methods inherited from the class Function shall apply the 
+    parameters stored in _scaler_param, which is a reference to eigther _scaler_param_old or 
+    _scaler_param_new.  
 
     Parameters
     ----------
