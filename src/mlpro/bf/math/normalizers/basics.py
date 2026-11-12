@@ -235,6 +235,41 @@ class Normalizer (Scaler, NormalizerAPI):
     
 
 ## -------------------------------------------------------------------------------------------------
+    def renormalize( self,
+                     p_data : Data,
+                     p_dim : int = None,
+                     p_param_old = None,
+                     p_param_new = None ) -> Data:
+        """
+        Renormalizes data from previous to current normalization parameters.
+
+        Uses precomputed parameters if available and no explicit parameter sets
+        are supplied. Otherwise, uses the two-step Scaler.rescale() fallback.
+
+        Parameters
+        ----------
+        p_data : Data
+            Data to be renormalized.
+        p_dim : int = None
+            Optional index of the dimension to be renormalized.
+        p_param_old = None
+            Optional previous parameter set. Defaults to _scaler_param_old.
+        p_param_new = None
+            Optional current parameter set. Defaults to _scaler_param_new.
+
+        Returns
+        -------
+        Data
+            The renormalized data.
+        """
+
+        return self.rescale( p_data = p_data,
+                             p_dim = p_dim,
+                             p_param_old = p_param_old,
+                             p_param_new = p_param_new )
+
+
+## -------------------------------------------------------------------------------------------------
     def update_parameters( self, **p_kwargs ) -> bool:
         """
         Updates the normalization parameters and prepares direct renormalization.
@@ -273,42 +308,7 @@ class Normalizer (Scaler, NormalizerAPI):
         np.subtract(param_new[1], param_re[1], out=param_re[1])
         self._scaler_param_re = param_re
         return True
-
-
-## -------------------------------------------------------------------------------------------------
-    def renormalize( self,
-                     p_data : Data,
-                     p_dim : int = None,
-                     p_param_old = None,
-                     p_param_new = None ) -> Data:
-        """
-        Renormalizes data from previous to current normalization parameters.
-
-        Uses precomputed parameters if available and no explicit parameter sets
-        are supplied. Otherwise, uses the two-step Scaler.rescale() fallback.
-
-        Parameters
-        ----------
-        p_data : Data
-            Data to be renormalized.
-        p_dim : int = None
-            Optional index of the dimension to be renormalized.
-        p_param_old = None
-            Optional previous parameter set. Defaults to _scaler_param_old.
-        p_param_new = None
-            Optional current parameter set. Defaults to _scaler_param_new.
-
-        Returns
-        -------
-        Data
-            The renormalized data.
-        """
-
-        return self.rescale( p_data = p_data,
-                             p_dim = p_dim,
-                             p_param_old = p_param_old,
-                             p_param_new = p_param_new )
-
+        
 
 ## -------------------------------------------------------------------------------------------------
     def _map( self, 
