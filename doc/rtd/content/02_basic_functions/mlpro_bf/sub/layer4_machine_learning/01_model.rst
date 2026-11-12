@@ -33,6 +33,17 @@ Core capabilities
     distinguishes regular forward adaptation from event-triggered adaptation. Other ML objects can register handlers and react
     to these events, enabling adaptation chains between cooperating models.
 
+**Configurable model events**
+    ``Model`` accepts the optional ``p_event_config`` parameter inherited from ``EventManager``. Concrete model implementations
+    can define their own ``EventConfig`` child classes and use ``EventModeML`` for the individual switches. ``EventModeML``
+    extends the generic modes ``OFF`` and ``EVENT`` by ``ADAPTATION``. The latter expresses that the concrete event shall be
+    emitted and shall additionally count as a model adaptation. The concrete model is responsible for evaluating this mode and
+    integrating it into its adaptation logic; the generic ``EventManager`` does not interpret ML-specific modes.
+
+    As in the generic event layer, event ids and their matching configuration attributes are written in upper case and are
+    expected to be identical. The mode should be queried before an ``Event`` object is created, so that disabled high-frequency
+    events do not cause avoidable runtime overhead.
+
 **Execution and multitasking**
     Because ``Model`` is a ``Task``, a model can execute synchronously or within MLPro's asynchronous task infrastructure. Range,
     autorun, shared-object, and visualization concepts therefore apply to ML models as they do to other BF tasks.

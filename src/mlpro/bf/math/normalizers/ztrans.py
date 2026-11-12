@@ -27,10 +27,11 @@
 ## -- 2024-05-27  1.2.2     LSB      Scientific Reference added
 ## -- 2024-12-09  1.3.0     DA       Method NormalizerZTrans.update_parameters(): review/optimization
 ## -- 2025-07-05  2.0.0     DA       Refactoring
+## -- 2026-11-10  2.1.0     DA       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.0.0 (2025-07-05)
+Ver. 2.1.0 (2026-11-10)
 
 This module provides a class for Z transformation.
 """
@@ -111,11 +112,11 @@ class NormalizerZTrans (Normalizer):
         """
 
         # 0 Backup current parameters
-        if self._param_new is not None:
-            if self._param_old is None:
-                self._param_old = self._param_new.copy()
+        if self._scaler_param_new is not None:
+            if self._scaler_param_old is None:
+                self._scaler_param_old = self._scaler_param_new.copy()
             else:
-                np.copyto(self._param_old, self._param_new)
+                np.copyto(self._scaler_param_old, self._scaler_param_new)
 
 
         # 1 Update on dataset (full reset)
@@ -132,8 +133,8 @@ class NormalizerZTrans (Normalizer):
             np.copyto(self._std, np.std(p_dataset, axis=0, dtype=np.float64))
             np.copyto(self._s, np.square(self._std) * self._n)
 
-            if self._param_new is None:
-                self._param_new = np.zeros([2, self._std.shape[-1]])
+            if self._scaler_param_new is None:
+                self._scaler_param_new = np.zeros([2, self._std.shape[-1]])
 
         else:
             # 2 Update on new data
@@ -151,13 +152,13 @@ class NormalizerZTrans (Normalizer):
                     self._std      = np.ones_like(data_new, dtype=np.float64)
                     self._mean_old = np.zeros_like(data_new, dtype=np.float64)
                     
-                    if self._param_new is None:
-                        self._param_new = np.zeros([2, data_new.shape[-1]])
+                    if self._scaler_param_new is None:
+                        self._scaler_param_new = np.zeros([2, data_new.shape[-1]])
 
-                    np.copyto(self._param_new[0], 1.0)
-                    np.copyto(self._param_new[1], -self._mean)
+                    np.copyto(self._scaler_param_new[0], 1.0)
+                    np.copyto(self._scaler_param_new[1], -self._mean)
 
-                    self._set_parameters(p_param=self._param_new)
+                    self._set_parameters(p_param=self._scaler_param_new)
                     return True
 
                 # 2.2 Incremental update
@@ -188,17 +189,17 @@ class NormalizerZTrans (Normalizer):
                     np.copyto(self._s, 0.0)
                     np.copyto(self._std, 1.0)
 
-                    np.copyto(self._param_new[0], 1.0)
-                    np.copyto(self._param_new[1], -self._mean)
+                    np.copyto(self._scaler_param_new[0], 1.0)
+                    np.copyto(self._scaler_param_new[1], -self._mean)
 
-                    self._set_parameters(p_param=self._param_new)
+                    self._set_parameters(p_param=self._scaler_param_new)
                     return True
 
 
         # 4 Update of parameters with epsilon safeguard
         safe_std = np.maximum(self._std, self.C_EPSILON)
-        np.copyto(self._param_new[0], np.divide(1, safe_std, out=np.zeros_like(safe_std), where=safe_std != 0))
-        np.copyto(self._param_new[1], -np.divide(self._mean, safe_std, out=np.zeros_like(safe_std), where=safe_std != 0))
+        np.copyto(self._scaler_param_new[0], np.divide(1, safe_std, out=np.zeros_like(safe_std), where=safe_std != 0))
+        np.copyto(self._scaler_param_new[1], -np.divide(self._mean, safe_std, out=np.zeros_like(safe_std), where=safe_std != 0))
 
-        self._set_parameters(p_param=self._param_new)
+        self._set_parameters(p_param=self._scaler_param_new)
         return True

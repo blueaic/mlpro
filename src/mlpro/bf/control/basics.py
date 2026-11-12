@@ -33,10 +33,11 @@
 ## -- 2025-06-02  1.0.1     DA       Implemented method ControlledSystem._reset()
 ## -- 2025-06-11  1.1.0     DA       Refactoring
 ## -- 2025-07-18  1.2.0     DA       Refactoring
+## -- 2026-10-05  1.3.0     DA       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.2.0 (2025-07-18)
+Ver. 1.3.0 (2026-10-05)
 
 This module provides basic classes around the topic closed-loop control.
 
@@ -638,9 +639,10 @@ class ControlledSystem (ControlTask):
 
 
 
+
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class ControlPanel (EventManager):
+class ControlPanel (Log, EventManager):
     """
     Enables external control of a closed-loop control.
     """
@@ -649,6 +651,11 @@ class ControlPanel (EventManager):
     C_NAME                  = '????'
 
     C_EVENT_ID_SETPOINT_CHG = 'SETPOINT_CHG'
+
+## -------------------------------------------------------------------------------------------------
+    def __init__(self, p_logging = Log.C_LOG_ALL):
+        Log.__init__(self, p_logging = p_logging)
+        EventManager.__init__(self)
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -725,7 +732,7 @@ class ControlPanel (EventManager):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class ControlShared (StreamShared, ControlPanel, Log):
+class ControlShared (StreamShared, ControlPanel):
     """
     ...
     """
@@ -736,7 +743,7 @@ class ControlShared (StreamShared, ControlPanel, Log):
     def __init__(self, p_range: int = Range.C_RANGE_PROCESS):
 
         StreamShared.__init__(self, p_range=p_range)
-        Log.__init__(self, p_logging = Log.C_LOG_NOTHING)
+        ControlPanel.__init__(self, p_logging=Log.C_LOG_NOTHING)
 
         self._next_inst_id                = 0
         self._superior_so : ControlShared = None

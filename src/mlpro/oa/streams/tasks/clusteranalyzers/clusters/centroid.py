@@ -65,12 +65,16 @@ __all__ = [ 'ClusterCentroid' ]
 ## -------------------------------------------------------------------------------------------------
 class ClusterCentroid (Cluster):
     """
-    Extended cluster class with a centroid. 
+    Property-based cluster specialization with a centroid.
+
+    The class adds a centroid property and provides a default distance-based influence measure.
+    Membership remains undefined because it depends on the concrete cluster shape and therefore has
+    to be implemented by a further specialization.
 
     Attributes
     ----------
-    centroid : Centroid
-        Centroid object.
+    centroid
+        Centroid property of the cluster.
     """
 
     C_PROPERTIES    = [ cprop_centroid ]
@@ -78,6 +82,15 @@ class ClusterCentroid (Cluster):
 
 # ## -------------------------------------------------------------------------------------------------
     def set_id(self, p_id):
+        """
+        Sets the cluster id and keeps the centroid id synchronized.
+
+        Parameters
+        ----------
+        p_id
+            New cluster identifier.
+        """
+
         super().set_id( p_id = p_id )
         self.centroid.id = p_id
 
@@ -85,8 +98,20 @@ class ClusterCentroid (Cluster):
 ## -------------------------------------------------------------------------------------------------
     def get_influence(self, p_instance: Instance) -> float:
         """
-        Default strategy to determine the influence of a cluster on a specified instance based
-        on the metric distance between the instance and the cluster centroid.
+        Determines cluster influence from the metric distance to the centroid.
+
+        The influence is computed as the inverse centroid distance with C_EPSILON added to the
+        denominator to avoid division by zero.
+
+        Parameters
+        ----------
+        p_instance : Instance
+            Instance to be evaluated.
+
+        Returns
+        -------
+        float
+            Positive influence value that decreases with increasing distance to the centroid.
         """
 
         feature_data = p_instance.get_feature_data()
