@@ -53,10 +53,11 @@
 ## --                                - Method _get_cluster_relations(): robustness for negative influences
 ## -- 2026-08-05  1.9.0     DA       New classes ClusterActions, ClusterInfrastructure
 ## -- 2026-10-06  2.0.0     DA       Refactoring and extension
+## -- 2026-11-15  2.1.0     DA       New constant ClusterAction.C_RESULT_SCOPE_NONZERO
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.0.0 (2026-10-06)
+Ver. 2.1.0 (2026-11-15)
 
 This module provides a template class for online cluster analysis.
 """
@@ -106,8 +107,9 @@ class ClusterActions (ABC):
     """
 
     # Possible result scopes for methods get_cluster_memberships() and get_cluster_influences()
-    C_RESULT_SCOPE_ALL : int        = 0
-    C_RESULT_SCOPE_MAX : int        = 1
+    C_RESULT_SCOPE_ALL : int     = 0
+    C_RESULT_SCOPE_MAX : int     = 1
+    C_RESULT_SCOPE_NONZERO : int = 2
 
 ## -------------------------------------------------------------------------------------------------
     def __init__( self ):
