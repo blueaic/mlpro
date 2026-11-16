@@ -138,7 +138,7 @@ class ClusterActions (ABC):
         Returns
         -------
         List[ResultItem]
-            Membership results as tuples of cluster id, relative membership in [0,1], and the
+            Membership results as tuples of cluster id, membership value in [0,1], and the
             corresponding cluster object.
         """
 
@@ -167,7 +167,7 @@ class ClusterActions (ABC):
         Returns
         -------
         List[ResultItem]
-            Influence results as tuples of cluster id, relative influence in [0,1], and the
+            Influence results as tuples of cluster id, influence value >= 0, and the
             corresponding cluster object.
         """
 
