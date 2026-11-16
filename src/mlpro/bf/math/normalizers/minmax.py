@@ -29,10 +29,11 @@
 ## -- 2025-06-28  2.1.0     DA       Class NormalizerMinMax: new numerical stabilizer C_EPSILON
 ## -- 2025-06-30  2.2.0     DA       Refactoring
 ## -- 2026-11-10  2.3.0     DA       Refactoring
+## -- 2026-11-16  2.4.0     DA       Method NormalizerMinMax._update_parameters() tuned
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.3.0 (2026-11-10)
+Ver. 2.4.0 (2026-11-16)
 
 This module provides a class for MinMax normalization.
 """
@@ -98,15 +99,82 @@ class NormalizerMinMax (Normalizer):
 
 
 # -------------------------------------------------------------------------------------------------
-    def _update_parameters(self, p_set: Set = None, p_boundaries: Union[list, np.ndarray] = None) -> bool:
+    # def _update_parameters(self, p_set: Set = None, p_boundaries: Union[list, np.ndarray] = None) -> bool:
+    #     """
+    #     Update the normalization parameters using MinMax strategy.
+
+    #     Parameters
+    #     ----------
+    #     p_set : Set, optional
+    #         A set object providing dimensional boundaries per feature.
+
+    #     p_boundaries : list or np.ndarray, optional
+    #         Explicit array of (low, high) boundaries for each dimension.
+
+    #     Raises
+    #     ------
+    #     ParamError
+    #         Raised if neither p_set nor p_boundaries is provided.
+    #     """
+
+    #     # 1 Determine normalization boundaries
+    #     if p_set is not None:
+    #         dim_ids = p_set.get_dim_ids()
+    #         boundaries = [p_set.get_dim(i).get_boundaries() for i in dim_ids]
+    #     elif p_boundaries is not None:
+    #         boundaries = np.asarray(p_boundaries).reshape(-1, 2)
+    #     else:
+    #         raise ParamError("Either p_set or p_boundaries must be provided.")
+
+    #     n_dims = len(boundaries)
+
+
+    #     # 2 Initialize or update _param_old
+    #     if self._scaler_param_new is not None:
+    #         if self._scaler_param_old is None or self._scaler_param_old.shape != self._scaler_param_new.shape:
+    #             self._scaler_param_old = self._scaler_param_new.copy()
+    #         else:
+    #             np.copyto(self._scaler_param_old, self._scaler_param_new)
+
+
+    #     # 3 Allocate or reuse _param_new
+    #     if self._scaler_param_new is None or self._scaler_param_new.shape != (2, n_dims):
+    #         self._scaler_param_new = np.zeros((2, n_dims), dtype=np.float64)
+    #     else:
+    #         self._scaler_param_new[:] = 0.0  # optional in-place reset
+
+
+    #     # 4 Compute new parameters into _param_new
+    #     for i, (low, high) in enumerate(boundaries):
+    #         if high == low:
+    #             high += 1
+    #             low  -= 1
+
+    #         diff = high - low
+    #         if diff < self.C_EPSILON:
+    #             diff = self.C_EPSILON
+
+    #         p0 = self._dst_diff / diff
+    #         p1 = self._dst_boundaries[0] - low * p0
+    #         self._scaler_param_new[:, i] = p0, p1
+
+
+    #     # 5 Activate _param_new by reference
+    #     self._set_parameters( p_param = self._scaler_param_new )
+    #     return True
+
+
+# -------------------------------------------------------------------------------------------------
+    def _update_parameters( self, 
+                            p_set: Set = None,
+                            p_boundaries: Union[list, np.ndarray] = None) -> bool:
         """
-        Update the normalization parameters using MinMax strategy.
+        Update the normalization parameters using the MinMax strategy.
 
         Parameters
         ----------
         p_set : Set, optional
             A set object providing dimensional boundaries per feature.
-
         p_boundaries : list or np.ndarray, optional
             Explicit array of (low, high) boundaries for each dimension.
 
@@ -119,7 +187,9 @@ class NormalizerMinMax (Normalizer):
         # 1 Determine normalization boundaries
         if p_set is not None:
             dim_ids = p_set.get_dim_ids()
-            boundaries = [p_set.get_dim(i).get_boundaries() for i in dim_ids]
+            boundaries = np.asarray(
+                [p_set.get_dim(i).get_boundaries() for i in dim_ids]
+            )
         elif p_boundaries is not None:
             boundaries = np.asarray(p_boundaries).reshape(-1, 2)
         else:
@@ -139,25 +209,30 @@ class NormalizerMinMax (Normalizer):
         # 3 Allocate or reuse _param_new
         if self._scaler_param_new is None or self._scaler_param_new.shape != (2, n_dims):
             self._scaler_param_new = np.zeros((2, n_dims), dtype=np.float64)
-        else:
-            self._scaler_param_new[:] = 0.0  # optional in-place reset
 
 
-        # 4 Compute new parameters into _param_new
-        for i, (low, high) in enumerate(boundaries):
-            if high == low:
-                high += 1
-                low  -= 1
+        # 4 Compute new normalization parameters
+        low  = boundaries[:, 0].astype(np.float64)
+        high = boundaries[:, 1].astype(np.float64)
 
-            diff = high - low
-            if diff < self.C_EPSILON:
-                diff = self.C_EPSILON
+        # 4.1 Handle dimensions with identical boundaries
+        equal = high == low
+        low[equal]  -= 1.0
+        high[equal] += 1.0
 
-            p0 = self._dst_diff / diff
-            p1 = self._dst_boundaries[0] - low * p0
-            self._scaler_param_new[:, i] = p0, p1
+        # 4.2 Compute scaling factors
+        diff = np.maximum(high - low, self.C_EPSILON)
+
+        # 4.3 Compute scale and offset
+        p0 = self._dst_diff / diff
+        p1 = self._dst_boundaries[0] - low * p0
+
+        # 4.4 Store parameters
+        self._scaler_param_new[0] = p0
+        self._scaler_param_new[1] = p1
 
 
         # 5 Activate _param_new by reference
-        self._set_parameters( p_param = self._scaler_param_new )
-        return True
+        self._set_parameters(p_param=self._scaler_param_new)
+
+        return True        
