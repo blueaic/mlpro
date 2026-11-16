@@ -9,10 +9,11 @@
 ## -- 2021-11-10  1.0.1     DA       Added new exception ImplementationError
 ## -- 2021-12-12  1.0.2     DA       Added new exception Error
 ## -- 2025-07-18  1.1.0     DA       Refactoring
+## -- 2026-11-12  1.2.0     DA       New exception FunctionDisabled
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.1.0 (2025-07-18)
+Ver. 1.2.0 (2026-11-12)
 
 This module provides exception classes.
 """
@@ -21,8 +22,8 @@ This module provides exception classes.
 # Export list for public API
 __all__ = [ 'ParamError',
             'ImplementationError',
+            'FunctionDisabled',
             'Error' ]
-
 
 
 
@@ -42,6 +43,16 @@ class ImplementationError(Exception):
     To be raised on an implementation error in a child class of MLPro...
     """
     pass
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
+class FunctionDisabled(Exception):
+    """
+    To be raised on an error...
+    """
+    pass
+
 
 
 ## -------------------------------------------------------------------------------------------------

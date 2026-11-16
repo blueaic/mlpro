@@ -46,10 +46,12 @@
 ## -- 2024-12-11  2.4.0     DA       New method Workflow.remove_plot()
 ## -- 2025-07-18  2.5.0     DA       Refactoring
 ## -- 2025-10-09  2.6.0     DA       Method Async._create_so(): additional parameter p_kwargs
+## -- 2026-09-29  2.7.0     DA       Method Async.__init__(): additional parameter p_kwargs
+## -- 2026-10-05  2.8.0     DA       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.6.0 (2025-10-09)
+Ver. 2.8.0 (2026-10-05)
 
 This module provides classes for multitasking with optional interprocess communication (IPC) based
 on shared objects. Multitasking in MLPro combines multrithreading and multiprocessing and simplifies
@@ -67,15 +69,10 @@ import threading as mt
 import multiprocess as mp
 from multiprocess.managers import BaseManager
 
-try:
-    from matplotlib.figure import Figure
-except:
-    class Figure : pass
-
 from mlpro.bf.exceptions import *
 from mlpro.bf.various import *
-from mlpro.bf.events import EventManager, Event
-from mlpro.bf.plot import PlotSettings, Plottable
+from mlpro.bf.events import *
+from mlpro.bf.plot import Figure, PlotSettings, Plottable
 
 
 
@@ -85,7 +82,6 @@ __all__ = [ 'Range',
             'Async',
             'Task',
             'Workflow' ]
-
 
 
 
@@ -324,13 +320,16 @@ class Async (Range, Log):
         Optional class for a shared object (class Shared or a child class of Shared)
     p_logging
         Log level (see constants of class Log). Default: Log.C_LOG_ALL   
+    p_kwargs : dict
+        Optional parameters for a shared object.
     """
 
 ## -------------------------------------------------------------------------------------------------
     def __init__( self,
                   p_range_max:int=Range.C_RANGE_PROCESS,
                   p_class_shared=None, 
-                  p_logging=Log.C_LOG_ALL ):
+                  p_logging=Log.C_LOG_ALL,
+                  **p_kwargs ):
 
         Log.__init__(self, p_logging=p_logging)
         Range.__init__(self, p_range=p_range_max)
@@ -339,7 +338,9 @@ class Async (Range, Log):
         self._mpmanager     = None
         self._class_shared  = p_class_shared
 
-        self._so : Shared   = self._create_so(p_range=p_range_max, p_class_shared=p_class_shared)
+        self._so : Shared = self._create_so( p_range = p_range_max, 
+                                             p_class_shared = p_class_shared,
+                                             **p_kwargs )
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -522,6 +523,10 @@ class Task (Async, EventManager, Plottable, Persistent, KWArgs):
         actions.    
     p_class_shared
         Optional class for a shared object (class Shared or a child class of Shared)
+    p_event_config : EventConfig, optional
+        Optional event configuration passed to :class:`EventManager`. Concrete event-capable
+        implementations can query it through :meth:`EventManager._get_event_mode`. If omitted,
+        queried events default to :attr:`EventMode.EVENT`.
     p_visualize : bool
         Boolean switch for env/agent visualisation. Default = False.
     p_logging
@@ -545,6 +550,7 @@ class Task (Async, EventManager, Plottable, Persistent, KWArgs):
                   p_range_max : int = Async.C_RANGE_THREAD, 
                   p_autorun = C_AUTORUN_NONE,
                   p_class_shared = None, 
+                  p_event_config : EventConfig = None,
                   p_visualize : bool = False,
                   p_logging = Log.C_LOG_ALL,
                   **p_kwargs ):
@@ -564,7 +570,7 @@ class Task (Async, EventManager, Plottable, Persistent, KWArgs):
             self.set_name(str(self.get_id()))
             
         Async.__init__(self, p_range_max=p_range_max, p_class_shared=p_class_shared, p_logging=p_logging)
-        EventManager.__init__(self, p_logging=p_logging)
+        EventManager.__init__(self, p_event_config=p_event_config)
         Plottable.__init__(self, p_visualize=p_visualize)
         Persistent.__init__(self, p_id=p_id, p_logging=p_logging)
 
@@ -736,7 +742,21 @@ class Task (Async, EventManager, Plottable, Persistent, KWArgs):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def _raise_event(self, p_event_id: str, p_event_object: Event):
+    def _raise_event(self, p_event_id: EventId, p_event_object: Event):
+        """
+        Raises a task event and forwards it to all registered handlers.
+
+        Before dispatching :attr:`C_EVENT_FINISHED`, the task-specific hook
+        :meth:`_on_finished` is executed.
+
+        Parameters
+        ----------
+        p_event_id : EventId
+            Unique event identifier.
+        p_event_object : Event
+            Event object carrying the event context.
+        """
+
         if p_event_id == self.C_EVENT_FINISHED: self._on_finished()
         EventManager._raise_event(self, p_event_id, p_event_object)
 
@@ -744,24 +764,25 @@ class Task (Async, EventManager, Plottable, Persistent, KWArgs):
 ## -------------------------------------------------------------------------------------------------
     def _on_finished(self):
         """
-        Custom method that is called before an event C_EVENT_FINISHED is raised.
+        Custom hook that is called immediately before :attr:`C_EVENT_FINISHED` is dispatched.
         """
         pass
 
 
 ## -------------------------------------------------------------------------------------------------
-    def run_on_event(self, p_event_id, p_event_object:Event):
+    def run_on_event(self, p_event_id: EventId, p_event_object: Event):
         """
-        Can be used as event handler - in particular for other tasks in a workflow in combination 
-        with event C_EVENT_FINISHED. Method self.run() is called if the last predecessor task in a
-        workflow has raised event C_EVENT_FINISHED.
+        Event handler that starts the task after predecessor events.
+
+        In a workflow this handler is typically registered for :attr:`C_EVENT_FINISHED` of all
+        predecessor tasks. The task is started after the last predecessor has reported completion.
 
         Parameters
         ----------
-        p_event_id 
-            Event id.
+        p_event_id : EventId
+            Unique event identifier.
         p_event_object : Event
-            Event object with further context informations.
+            Event object carrying the event context and optional parameters for :meth:`run`.
         """
 
         if p_event_id == self.C_EVENT_FINISHED:

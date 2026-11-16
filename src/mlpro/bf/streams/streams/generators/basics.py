@@ -7,10 +7,11 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2025-09-21  1.0.0     DA       Creation 
 ## -- 2025-11-06  1.0.1     DA       Bugfix in StreamGenerator.__next__()
+## -- 2026-10-05  1.1.0     DA       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.1 (2025-11-06)
+Ver. 1.1.0 (2026-10-05)
 
 This module provides template classes for single and multi-stream data generation in a d-dimensional 
 feature space.
@@ -115,7 +116,7 @@ class StreamGenerator (Stream, EventManager):
         self.num_outliers        = 0
 
 
-        EventManager.__init__( self, p_logging = Log.C_LOG_NOTHING)
+        EventManager.__init__( self )
 
         Stream.__init__( self,
                          p_id = p_id,

@@ -7,10 +7,11 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2022-08-21  1.0.0     DA       Creation/release
 ## -- 2022-10-12  1.0.1     DA       Refactoring/Renaming
+## -- 2026-10-05  1.1.0     DA       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.1 (2022-10-12)
+Ver. 1.1.0 (2026-10-05)
 
 This module demonstrates the use of MLPro's event handling as a property in own classes. To this
 regard, a demo class MyMainClass is set up that inherits event functionalities from MLPro's class 
@@ -38,12 +39,10 @@ from mlpro.bf.events import *
 # 1 Definition of custom class that inherits event management functionalities from MLPro's class EventManager
 class MyMainClass (EventManager):
 
-    C_NAME          = 'My main class'
-
     C_EVENT_OWN     = 'MYEVENT'
 
-    def __init__(self, p_logging=Log.C_LOG_ALL):
-        super().__init__(p_logging)
+    def __init__(self):
+        super().__init__()
  
 
     def do_something(self):
@@ -73,7 +72,7 @@ if __name__ == "__main__":
 else:
     # 3.2 Unit test mode
     myhandlerobj    = MyHandlerClass(p_logging=Log.C_LOG_NOTHING)
-    mymainobj       = MyMainClass(p_logging=Log.C_LOG_NOTHING)
+    mymainobj       = MyMainClass()
 
 
 # 4 Own event handler is registered on main class
