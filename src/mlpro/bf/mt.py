@@ -50,6 +50,7 @@
 ## -- 2026-10-05  2.8.0     DA       Refactoring
 ## -- 2026-11-19  2.9.0     DA       Refactoring/tuning:
 ## --                                - Class Async: parent Log removed
+## --                                - Method Async._start_async(): tuning
 ## -------------------------------------------------------------------------------------------------
 
 """
@@ -453,27 +454,29 @@ class Async (Range):
 
 
         # 2 Execution depending on range of asynchronity
-        if range_run == self.C_RANGE_NONE: 
-            # 2.1 Synchronous execution
-            p_target(**p_kwargs)
+        if range_run == self.C_RANGE_THREAD:
 
-        elif range_run in [ self.C_RANGE_THREAD, self.C_RANGE_PROCESS ]:
-            # 2.2 Asynchronous execution as separate thread or process
-            if range_run == self.C_RANGE_THREAD:
-                # 2.2.1 Preparation of a new thread
-                task = mt.Thread(target=p_target, kwargs=p_kwargs, group=None)
-
-            else:
-                # 2.2.2 Preparation of a new process
-                task = mp.Process(target=p_target, kwargs=p_kwargs, group=None)
-
-            # 2.2.3 Registration and start of new thread/process
+            # 2.1 Execute as new thread
+            task = mt.Thread(target=p_target, kwargs=p_kwargs, group=None)
             self._async_tasks.append(task)
             task.start()
 
-        else:
-            raise NotImplementedError   
+        elif range_run == self.C_RANGE_NONE:
 
+            # 2.2 Execute synchronously
+            p_target(**p_kwargs)
+
+        elif range_run == self.C_RANGE_PROCESS:
+
+            # 2.3 Execute as new process
+            task = mp.Process(target=p_target, kwargs=p_kwargs, group=None)
+            self._async_tasks.append(task)
+            task.start()
+            
+        else:
+            # 2.4 Unknown range of asynchonicity
+            raise NotImplementedError
+   
 
         # 3 Returns actual range of asynchonicity
         return range_run         
