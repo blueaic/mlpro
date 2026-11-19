@@ -51,10 +51,11 @@
 ## -- 2026-11-19  2.9.0     DA       Refactoring/tuning:
 ## --                                - Class Async: parent Log removed
 ## --                                - Method Async._start_async(): tuning
+## -- 2026-11-19  2.9.1     DA       Class Async: thread-safe task registration and waiting
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.9.0 (2026-11-19)
+Ver. 2.9.1 (2026-11-19)
 
 This module provides classes for multitasking with optional interprocess communication (IPC) based
 on shared objects. Multitasking in MLPro combines multrithreading and multiprocessing and simplifies
@@ -333,7 +334,8 @@ class Async (Range):
 
         Range.__init__(self, p_range=p_range_max)
 
-        self._async_tasks = []
+        self._async_tasks      = []
+        self._async_tasks_lock = mt.Lock()
         self._mpmanager   = None
         self._so : Shared = None 
 
@@ -458,8 +460,13 @@ class Async (Range):
 
             # 2.1 Execute as new thread
             task = mt.Thread(target=p_target, kwargs=p_kwargs, group=None)
-            self._async_tasks.append(task)
-            task.start()
+            with self._async_tasks_lock:
+                self._async_tasks.append(task)
+                try:
+                    task.start()
+                except BaseException:
+                    self._async_tasks.remove(task)
+                    raise
 
         elif range_run == self.C_RANGE_NONE:
 
@@ -470,8 +477,13 @@ class Async (Range):
 
             # 2.3 Execute as new process
             task = mp.Process(target=p_target, kwargs=p_kwargs, group=None)
-            self._async_tasks.append(task)
-            task.start()
+            with self._async_tasks_lock:
+                self._async_tasks.append(task)
+                try:
+                    task.start()
+                except BaseException:
+                    self._async_tasks.remove(task)
+                    raise
             
         else:
             # 2.4 Unknown range of asynchonicity
@@ -485,11 +497,21 @@ class Async (Range):
 ## -------------------------------------------------------------------------------------------------
     def wait_async_tasks(self):
         """
-        Waits until all internal asynchonous tasks are finished.
+        Waits until all currently registered asynchronous tasks have finished.
+
+        Tasks registered while waiting are included. Call this method after
+        submitting the initial tasks. Only one waiter per Async instance is
+        supported. Do not call from a task that belongs to the same instance.
         """
 
-        for task in self._async_tasks: task.join()
-        self._async_tasks.clear()
+        while True:
+            with self._async_tasks_lock:
+                if not self._async_tasks:
+                    return
+
+                task = self._async_tasks.pop(0)
+
+            task.join()
 
 
 ## -------------------------------------------------------------------------------------------------
