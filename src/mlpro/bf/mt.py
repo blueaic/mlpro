@@ -51,11 +51,11 @@
 ## -- 2026-11-19  2.9.0     DA       Refactoring/tuning:
 ## --                                - Class Async: parent Log removed
 ## --                                - Method Async._start_async(): tuning
-## -- 2026-11-19  2.9.1     DA       Class Async: thread-safe task registration and waiting
+## --                                - Class Async: thread-safe task registration and waiting
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.9.1 (2026-11-19)
+Ver. 2.9.0 (2026-11-19)
 
 This module provides classes for multitasking with optional interprocess communication (IPC) based
 on shared objects. Multitasking in MLPro combines multrithreading and multiprocessing and simplifies
