@@ -48,10 +48,12 @@
 ## -- 2025-10-09  2.6.0     DA       Method Async._create_so(): additional parameter p_kwargs
 ## -- 2026-09-29  2.7.0     DA       Method Async.__init__(): additional parameter p_kwargs
 ## -- 2026-10-05  2.8.0     DA       Refactoring
+## -- 2026-11-19  2.9.0     DA       Refactoring/tuning:
+## --                                - Class Async: parent Log removed
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 2.8.0 (2026-10-05)
+Ver. 2.9.0 (2026-11-19)
 
 This module provides classes for multitasking with optional interprocess communication (IPC) based
 on shared objects. Multitasking in MLPro combines multrithreading and multiprocessing and simplifies
@@ -306,7 +308,7 @@ class Shared (Range):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class Async (Range, Log):
+class Async (Range):
     """
     Property class that enables child classes to run sub-tasks asynchronously. Depending on the
     given range a task can be executed as a separate thread in the same process or a separate
@@ -318,8 +320,6 @@ class Async (Range, Log):
         Maximum range of asynchonicity. See class Range. Default is Range.C_RANGE_PROCESS.
     p_class_shared
         Optional class for a shared object (class Shared or a child class of Shared)
-    p_logging
-        Log level (see constants of class Log). Default: Log.C_LOG_ALL   
     p_kwargs : dict
         Optional parameters for a shared object.
     """
@@ -327,20 +327,20 @@ class Async (Range, Log):
 ## -------------------------------------------------------------------------------------------------
     def __init__( self,
                   p_range_max:int=Range.C_RANGE_PROCESS,
-                  p_class_shared=None, 
-                  p_logging=Log.C_LOG_ALL,
+                  p_class_shared=None,
                   **p_kwargs ):
 
-        Log.__init__(self, p_logging=p_logging)
         Range.__init__(self, p_range=p_range_max)
 
-        self._async_tasks   = []
-        self._mpmanager     = None
-        self._class_shared  = p_class_shared
+        self._async_tasks = []
+        self._mpmanager   = None
+        self._so : Shared = None 
 
-        self._so : Shared = self._create_so( p_range = p_range_max, 
-                                             p_class_shared = p_class_shared,
-                                             **p_kwargs )
+        if p_class_shared is not None:
+            self._class_shared = p_class_shared
+            self._so           = self._create_so( p_range = p_range_max, 
+                                                  p_class_shared = self._class_shared,
+                                                  **p_kwargs )
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -569,10 +569,10 @@ class Task (Async, EventManager, Plottable, Persistent, KWArgs):
         else:
             self.set_name(str(self.get_id()))
             
-        Async.__init__(self, p_range_max=p_range_max, p_class_shared=p_class_shared, p_logging=p_logging)
-        EventManager.__init__(self, p_event_config=p_event_config)
-        Plottable.__init__(self, p_visualize=p_visualize)
-        Persistent.__init__(self, p_id=p_id, p_logging=p_logging)
+        Async.__init__( self, p_range_max = p_range_max, p_class_shared = p_class_shared )
+        EventManager.__init__( self, p_event_config = p_event_config )
+        Plottable.__init__( self, p_visualize = p_visualize )
+        Persistent.__init__( self, p_id = p_id, p_logging = p_logging )
 
         self._custom_run_method = self._get_custom_run_method()
         self._autorun(p_autorun=p_autorun, p_kwargs=self._kwargs)

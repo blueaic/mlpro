@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/20.7.4 Chrome/106.0.5249.199 Electron/21.3.3 Safari/537.36">
   <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
-    <mxGraphModel dx="2403" dy="5707" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="2336" math="0" shadow="0">
+    <mxGraphModel dx="2884" dy="5914" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="2336" math="0" shadow="0">
       <root>
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
@@ -112,7 +112,7 @@
         <mxCell id="9LxAVHbpvMnnxBHoJzir-15" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="WDuXBOlFY5vo2XqwVICg-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontColor=default;endArrow=block;endFill=0;" target="9LxAVHbpvMnnxBHoJzir-0">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="WDuXBOlFY5vo2XqwVICg-16" parent="WIyWlLk6GJQsqaUBKTNV-1" style="swimlane;fontStyle=3;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=1;strokeWidth=1;fillColor=#dae8fc;strokeColor=#6c8ebf;glass=0;swimlaneFillColor=#ffffff;gradientColor=#FFFFFF;" value="Async (Range, Log)" vertex="1">
+        <mxCell id="WDuXBOlFY5vo2XqwVICg-16" parent="WIyWlLk6GJQsqaUBKTNV-1" style="swimlane;fontStyle=3;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=1;strokeWidth=1;fillColor=#dae8fc;strokeColor=#6c8ebf;glass=0;swimlaneFillColor=#ffffff;gradientColor=#FFFFFF;" value="Async (Range)" vertex="1">
           <mxGeometry height="380" width="320" x="640" y="-4290" as="geometry">
             <mxRectangle height="26" width="160" x="230" y="140" as="alternateBounds" />
           </mxGeometry>
@@ -132,26 +132,26 @@
         <mxCell id="WDuXBOlFY5vo2XqwVICg-22" parent="WDuXBOlFY5vo2XqwVICg-16" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" value="" vertex="1">
           <mxGeometry height="8" width="320" y="130" as="geometry" />
         </mxCell>
-        <mxCell id="WDuXBOlFY5vo2XqwVICg-23" parent="WDuXBOlFY5vo2XqwVICg-16" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=default;" value="__init__( p_range_max = Range.C_RANGE_PROCESS,&#xa;               p_class_shared = None,&#xa;               p_logging = Log.C_LOG_ALL )" vertex="1">
-          <mxGeometry height="52" width="320" y="138" as="geometry" />
+        <mxCell id="WDuXBOlFY5vo2XqwVICg-23" parent="WDuXBOlFY5vo2XqwVICg-16" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=default;" value="__init__( p_range_max = Range.C_RANGE_PROCESS,&#xa;               p_class_shared = None )" vertex="1">
+          <mxGeometry height="40" width="320" y="138" as="geometry" />
         </mxCell>
         <mxCell id="qdEd50DQsUWkVp72ktT0-0" parent="WDuXBOlFY5vo2XqwVICg-16" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=default;" value="_create_so(): Shared" vertex="1">
-          <mxGeometry height="26" width="320" y="190" as="geometry" />
+          <mxGeometry height="26" width="320" y="178" as="geometry" />
         </mxCell>
         <mxCell id="WDuXBOlFY5vo2XqwVICg-58" parent="WDuXBOlFY5vo2XqwVICg-16" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=default;" value="get_so(): Shared" vertex="1">
-          <mxGeometry height="26" width="320" y="216" as="geometry" />
+          <mxGeometry height="26" width="320" y="204" as="geometry" />
         </mxCell>
         <mxCell id="95k7f4XXosl03UnbL2Pu-0" parent="WDuXBOlFY5vo2XqwVICg-16" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=default;" value="assign_so( p_so:Shared )" vertex="1">
-          <mxGeometry height="26" width="320" y="242" as="geometry" />
+          <mxGeometry height="26" width="320" y="230" as="geometry" />
         </mxCell>
         <mxCell id="WDuXBOlFY5vo2XqwVICg-26" parent="WDuXBOlFY5vo2XqwVICg-16" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=default;" value="_start_async( p_target,&#xa;                       p_range = None,&#xa;                       **p_kwargs ) -&gt; int" vertex="1">
-          <mxGeometry height="54" width="320" y="268" as="geometry" />
+          <mxGeometry height="54" width="320" y="256" as="geometry" />
         </mxCell>
         <mxCell id="WDuXBOlFY5vo2XqwVICg-28" parent="WDuXBOlFY5vo2XqwVICg-16" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=default;" value="wait_async_tasks()" vertex="1">
-          <mxGeometry height="26" width="320" y="322" as="geometry" />
+          <mxGeometry height="26" width="320" y="310" as="geometry" />
         </mxCell>
         <mxCell id="yGpFFiJKkBdN3eeXSEIb-0" parent="WDuXBOlFY5vo2XqwVICg-16" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=default;" value="__del__()" vertex="1">
-          <mxGeometry height="26" width="320" y="348" as="geometry" />
+          <mxGeometry height="26" width="320" y="336" as="geometry" />
         </mxCell>
         <mxCell id="WDuXBOlFY5vo2XqwVICg-30" parent="WIyWlLk6GJQsqaUBKTNV-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;shadow=1;gradientColor=none;fontStyle=1;align=left;verticalAlign=middle;spacingRight=3;spacingLeft=3;" value="Property class, that enables a child class to start asynchronous sub-functions" vertex="1">
           <mxGeometry height="60" width="180" x="940" y="-4340" as="geometry" />

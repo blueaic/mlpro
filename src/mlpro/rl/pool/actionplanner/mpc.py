@@ -12,10 +12,11 @@
 ## -- 2023-02-04  1.1.1     SY       Bug fixing
 ## -- 2025-04-24  1.1.2     DA       Bugfix in method MPC._async_subtask()
 ## -- 2025-07-17  1.2.0     DA       Refactoring
+## -- 2026-11-19  1.3.0     DA       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.2.0 (2025-07-17) 
+Ver. 1.3.0 (2026-11-19) 
 
 This module provides a default implementation of model predictive control (MPC).
 """
@@ -41,7 +42,7 @@ __all__ = [ 'MPC' ]
         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class MPC(ActionPlanner, ScientificObject, mt.Async):
+class MPC(ActionPlanner, ScientificObject, mt.Async, Log):
     """
     Template class for MPC to be used as part of model-based planning agents. 
     The goal is to find the best sequence of actions that leads to a maximum reward.
@@ -78,8 +79,7 @@ class MPC(ActionPlanner, ScientificObject, mt.Async):
                                  p_logging=p_logging)
         mt.Async.__init__(self,
                           p_range_max=p_range_max, 
-                          p_class_shared=mt.Shared,
-                          p_logging=p_logging)
+                          p_class_shared=mt.Shared)
 
 
 ## -------------------------------------------------------------------------------------------------
