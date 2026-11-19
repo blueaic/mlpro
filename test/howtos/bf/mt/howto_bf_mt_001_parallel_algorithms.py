@@ -9,10 +9,11 @@
 ## -- 2022-10-09  1.1.0     DA       Simplification
 ## -- 2022-10-12  1.2.0     DA       Restructuring of demo steps
 ## -- 2022-10-13  1.3.0     DA       Restructuring of demo steps
+## -- 2026-11-19  1.4.0     DA       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.3.0 (2022-10-13)
+Ver. 1.4.0 (2026-11-19)
 
 This module demonstrates the use of classes ASync and Shared as part of MLPro's multitasking concept.
 Both classes are used to implement a simple parallel algorithm class MyParallelAlgorithm with a
@@ -51,7 +52,7 @@ import random
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class MyParallelAlgorithm (mt.Async):
+class MyParallelAlgorithm (mt.Async, Log):
     """
     This class demonstrates how to run methods asynchronously and to collect results in a shared
     object.
@@ -69,9 +70,10 @@ class MyParallelAlgorithm (mt.Async):
                   p_class_shared=mt.Shared,
                   p_logging=Log.C_LOG_ALL ):
 
-        super().__init__( p_range_max=p_range_max, 
-                          p_class_shared=p_class_shared, 
-                          p_logging=p_logging )
+        mt.Async.__init__( self, 
+                           p_range_max=p_range_max, 
+                           p_class_shared=p_class_shared )
+        Log.__init__( self, p_logging = p_logging )
 
         self._num_tasks    = p_num_tasks
         self._duration     = p_duration
